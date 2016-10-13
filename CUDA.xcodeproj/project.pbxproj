@@ -1,0 +1,382 @@
+// !$*UTF8*$!
+{
+   archiveVersion = "1";
+   objectVersion = "46";
+   objects = {
+      OBJ_1 = {
+         isa = "PBXProject";
+         attributes = {
+            LastUpgradeCheck = "9999";
+         };
+         buildConfigurationList = OBJ_2;
+         compatibilityVersion = "Xcode 3.2";
+         developmentRegion = "English";
+         hasScannedForEncodings = "0";
+         knownRegions = (
+            "en",
+         );
+         mainGroup = OBJ_5;
+         productRefGroup = OBJ_13;
+         projectDirPath = ".";
+         targets = (
+            OBJ_16,
+            OBJ_23,
+         );
+      };
+      OBJ_10 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_11,
+         );
+         path = "Tests";
+         sourceTree = "<group>";
+      };
+      OBJ_11 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_12,
+         );
+         name = "CUDATests";
+         path = "Tests/CUDATests";
+         sourceTree = "SOURCE_ROOT";
+      };
+      OBJ_12 = {
+         isa = "PBXFileReference";
+         path = "CUDATests.swift";
+         sourceTree = "<group>";
+      };
+      OBJ_13 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_14,
+            OBJ_15,
+         );
+         name = "Products";
+         path = "";
+         sourceTree = "BUILT_PRODUCTS_DIR";
+      };
+      OBJ_14 = {
+         isa = "PBXFileReference";
+         path = "CUDA.framework";
+         sourceTree = "BUILT_PRODUCTS_DIR";
+      };
+      OBJ_15 = {
+         isa = "PBXFileReference";
+         path = "CUDATests.xctest";
+         sourceTree = "BUILT_PRODUCTS_DIR";
+      };
+      OBJ_16 = {
+         isa = "PBXNativeTarget";
+         buildConfigurationList = OBJ_17;
+         buildPhases = (
+            OBJ_20,
+            OBJ_22,
+         );
+         dependencies = (
+         );
+         name = "CUDA";
+         productName = "CUDA";
+         productReference = OBJ_14;
+         productType = "com.apple.product-type.framework";
+      };
+      OBJ_17 = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            OBJ_18,
+            OBJ_19,
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Debug";
+      };
+      OBJ_18 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks",
+            );
+            HEADER_SEARCH_PATHS = (
+               "Packages/CCUDA-1.3.0",
+            );
+            INFOPLIST_FILE = "CUDA.xcodeproj/CUDA_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)",
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)",
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "CUDA";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE";
+            SWIFT_VERSION = "3.0";
+            TARGET_NAME = "CUDA";
+         };
+         name = "Debug";
+      };
+      OBJ_19 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            ENABLE_TESTABILITY = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks",
+            );
+            HEADER_SEARCH_PATHS = (
+               "Packages/CCUDA-1.3.0",
+            );
+            INFOPLIST_FILE = "CUDA.xcodeproj/CUDA_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)",
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)",
+            );
+            PRODUCT_BUNDLE_IDENTIFIER = "CUDA";
+            PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+            PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE";
+            SWIFT_VERSION = "3.0";
+            TARGET_NAME = "CUDA";
+         };
+         name = "Release";
+      };
+      OBJ_2 = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            OBJ_3,
+            OBJ_4,
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Debug";
+      };
+      OBJ_20 = {
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            OBJ_21,
+         );
+      };
+      OBJ_21 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_9;
+      };
+      OBJ_22 = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+         );
+      };
+      OBJ_23 = {
+         isa = "PBXNativeTarget";
+         buildConfigurationList = OBJ_24;
+         buildPhases = (
+            OBJ_27,
+            OBJ_29,
+         );
+         dependencies = (
+            OBJ_31,
+         );
+         name = "CUDATests";
+         productName = "CUDATests";
+         productReference = OBJ_15;
+         productType = "com.apple.product-type.bundle.unit-test";
+      };
+      OBJ_24 = {
+         isa = "XCConfigurationList";
+         buildConfigurations = (
+            OBJ_25,
+            OBJ_26,
+         );
+         defaultConfigurationIsVisible = "0";
+         defaultConfigurationName = "Debug";
+      };
+      OBJ_25 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            EMBEDDED_CONTENT_CONTAINS_SWIFT = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks",
+            );
+            HEADER_SEARCH_PATHS = (
+               "Packages/CCUDA-1.3.0",
+            );
+            INFOPLIST_FILE = "CUDA.xcodeproj/CUDATests_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "@loader_path/../Frameworks",
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)",
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)",
+            );
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE";
+            SWIFT_VERSION = "3.0";
+            TARGET_NAME = "CUDATests";
+         };
+         name = "Debug";
+      };
+      OBJ_26 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            EMBEDDED_CONTENT_CONTAINS_SWIFT = "YES";
+            FRAMEWORK_SEARCH_PATHS = (
+               "$(PLATFORM_DIR)/Developer/Library/Frameworks",
+            );
+            HEADER_SEARCH_PATHS = (
+               "Packages/CCUDA-1.3.0",
+            );
+            INFOPLIST_FILE = "CUDA.xcodeproj/CUDATests_Info.plist";
+            LD_RUNPATH_SEARCH_PATHS = (
+               "@loader_path/../Frameworks",
+            );
+            OTHER_LDFLAGS = (
+               "$(inherited)",
+            );
+            OTHER_SWIFT_FLAGS = (
+               "$(inherited)",
+            );
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+            );
+            SWIFT_ACTIVE_COMPILATION_CONDITIONS = "SWIFT_PACKAGE";
+            SWIFT_VERSION = "3.0";
+            TARGET_NAME = "CUDATests";
+         };
+         name = "Release";
+      };
+      OBJ_27 = {
+         isa = "PBXSourcesBuildPhase";
+         files = (
+            OBJ_28,
+         );
+      };
+      OBJ_28 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_12;
+      };
+      OBJ_29 = {
+         isa = "PBXFrameworksBuildPhase";
+         files = (
+            OBJ_30,
+         );
+      };
+      OBJ_3 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            COMBINE_HIDPI_IMAGES = "YES";
+            COPY_PHASE_STRIP = "NO";
+            DEBUG_INFORMATION_FORMAT = "dwarf";
+            DYLIB_INSTALL_NAME_BASE = "@rpath";
+            ENABLE_NS_ASSERTIONS = "YES";
+            GCC_OPTIMIZATION_LEVEL = "0";
+            MACOSX_DEPLOYMENT_TARGET = "10.10";
+            ONLY_ACTIVE_ARCH = "YES";
+            OTHER_SWIFT_FLAGS = (
+               "-DXcode",
+            );
+            PRODUCT_NAME = "$(TARGET_NAME)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+               "iphoneos",
+               "iphonesimulator",
+               "appletvos",
+               "appletvsimulator",
+               "watchos",
+               "watchsimulator",
+            );
+            SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+            USE_HEADERMAP = "NO";
+         };
+         name = "Debug";
+      };
+      OBJ_30 = {
+         isa = "PBXBuildFile";
+         fileRef = OBJ_14;
+      };
+      OBJ_31 = {
+         isa = "PBXTargetDependency";
+         target = OBJ_16;
+      };
+      OBJ_4 = {
+         isa = "XCBuildConfiguration";
+         buildSettings = {
+            COMBINE_HIDPI_IMAGES = "YES";
+            COPY_PHASE_STRIP = "YES";
+            DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+            DYLIB_INSTALL_NAME_BASE = "@rpath";
+            GCC_OPTIMIZATION_LEVEL = "s";
+            MACOSX_DEPLOYMENT_TARGET = "10.10";
+            OTHER_SWIFT_FLAGS = (
+               "-DXcode",
+            );
+            PRODUCT_NAME = "$(TARGET_NAME)";
+            SUPPORTED_PLATFORMS = (
+               "macosx",
+               "iphoneos",
+               "iphonesimulator",
+               "appletvos",
+               "appletvsimulator",
+               "watchos",
+               "watchsimulator",
+            );
+            SWIFT_OPTIMIZATION_LEVEL = "-O";
+            USE_HEADERMAP = "NO";
+         };
+         name = "Release";
+      };
+      OBJ_5 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_6,
+            OBJ_7,
+            OBJ_10,
+            OBJ_13,
+         );
+         path = "";
+         sourceTree = "<group>";
+      };
+      OBJ_6 = {
+         isa = "PBXFileReference";
+         explicitFileType = "sourcecode.swift";
+         path = "Package.swift";
+         sourceTree = "<group>";
+      };
+      OBJ_7 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_8,
+         );
+         path = "Sources";
+         sourceTree = "<group>";
+      };
+      OBJ_8 = {
+         isa = "PBXGroup";
+         children = (
+            OBJ_9,
+         );
+         name = "CUDA";
+         path = "Sources";
+         sourceTree = "SOURCE_ROOT";
+      };
+      OBJ_9 = {
+         isa = "PBXFileReference";
+         path = "CUDA.swift";
+         sourceTree = "<group>";
+      };
+   };
+   rootObject = OBJ_1;
+}
