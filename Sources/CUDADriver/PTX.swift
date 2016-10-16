@@ -23,7 +23,8 @@ public struct PTX {
     }
 
     public init(contentsOf url: URL) throws {
-        data = try Data(contentsOf: url)
+        do { data = try Data(contentsOf: url) }
+        catch { throw CUDAError.fileNotFound }
         name = url.deletingPathExtension().lastPathComponent
     }
 

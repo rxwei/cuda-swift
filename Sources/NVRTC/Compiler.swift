@@ -12,12 +12,6 @@ import Foundation
 
 public enum CUDACompiler {
 
-    public enum Error : Swift.Error {
-        case wrongSourceFormat
-        case cannotCreateProgram
-        case compilationError
-    }
-
     static func compileSource(_ data: Data,
                               named name: String? = nil,
                               options: [String]? = nil) throws -> PTX {
@@ -30,23 +24,19 @@ public enum CUDACompiler {
             return nvrtcCreateProgram(&program, bytes, "default", 0, nil, nil)
         }
         guard result == NVRTC_SUCCESS else {
-            throw Error.cannotCreateProgram
+            throw NVRTCError(result)
         }
 
         /// Compile with options
         if let options = options {
             try options.withUnsafeBufferPointer { (ptr: UnsafeBufferPointer<String>) in
                 var cStringPtr: [UnsafePointer<Int8>?] = ptr.map{$0.withCString{$0}}
-                guard nvrtcCompileProgram(program, Int32(ptr.count), &cStringPtr) == NVRTC_SUCCESS else {
-                    throw Error.compilationError
-                }
+                try ensureSuccess(nvrtcCompileProgram(program, Int32(ptr.count), &cStringPtr))
             }
         }
         /// Compile without options
         else {
-            guard nvrtcCompileProgram(program, 0, nil) == NVRTC_SUCCESS else {
-                throw Error.compilationError
-            }
+            try ensureSuccess(nvrtcCompileProgram(program, 0, nil))
         }
 
         /// Get PTX size
@@ -67,16 +57,18 @@ public enum CUDACompiler {
                               options: [String]? = nil) throws -> PTX {
         let handle = try FileHandle(forReadingFrom: url)
         let data = handle.readDataToEndOfFile()
-        return try compileSource(data,
-                                 named: url.deletingPathExtension().lastPathComponent,
-                                 options: options)
+        return try compileSource(
+            data,
+            named: url.deletingPathExtension().lastPathComponent,
+            options: options
+        )
     }
 
     static func compileSource(_ source: String,
                               named name: String? = nil,
                               options: [String]? = nil) throws -> PTX {
         guard let data = source.data(using: .utf8, allowLossyConversion: true) else {
-            throw Error.wrongSourceFormat
+            throw NVRTCError.wrongSourceFormat
         }
         return try compileSource(data, named: name, options: options)
     }

@@ -21,20 +21,14 @@ open class Module {
         cuModuleUnload(handle)
     }
 
-    public convenience init?(ptxFile path: String) {
-        guard let ptx = try? PTX(contentsOfFile: path) else {
-            return nil
-        }
-        self.init(ptx: ptx)
+    public convenience init(ptxFile path: String) throws {
+        try self.init(ptx: PTX(contentsOfFile: path))
     }
 
-    public init?(ptx: PTX) {
+    public init(ptx: PTX) throws {
         var handle: CUmodule? = nil
-        let result = ptx.data.withUnsafeBytes { bytes in
-            cuModuleLoadData(&handle, bytes)
-        }
-        guard result == CUDA_SUCCESS else {
-            return nil
+        try ptx.data.withUnsafeBytes { bytes in
+            try ensureSuccess(cuModuleLoadData(&handle, bytes))
         }
         self.handle = handle!
     }

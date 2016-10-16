@@ -1,6 +1,6 @@
 //
 //  Memory.swift
-//  SAD
+//  CUDA
 //
 //  Created by Richard Wei on 9/28/16.
 //

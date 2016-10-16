@@ -27,10 +27,10 @@ public class BLAS {
 
     public func absSum(_ data: [Float]) -> Float {
         var devPtr: UnsafeMutableRawPointer?
-        cudaMalloc(&devPtr, data.count * MemoryLayout<Float>.size)
+        cudaMalloc(&devPtr, data.count * MemoryLayout<Float>.stride)
         data.withUnsafeBufferPointer { dataBuffer -> () in
             cudaMemcpy(devPtr, dataBuffer.baseAddress,
-                       data.count * MemoryLayout<Float>.size,
+                       data.count * MemoryLayout<Float>.stride,
                        cudaMemcpyHostToDevice)
         }
         var result: Float = 0.0
@@ -47,10 +47,10 @@ public class BLAS {
 
     public func absSum(_ data: [Double]) -> Double {
         var devPtr: UnsafeMutableRawPointer?
-        cudaMalloc(&devPtr, data.count * MemoryLayout<Double>.size)
+        cudaMalloc(&devPtr, data.count * MemoryLayout<Double>.stride)
         data.withUnsafeBufferPointer { dataBuffer -> () in
             cudaMemcpy(devPtr, dataBuffer.baseAddress,
-                       data.count * MemoryLayout<Double>.size,
+                       data.count * MemoryLayout<Double>.stride,
                        cudaMemcpyHostToDevice)
         }
         var result: Double = 0.0

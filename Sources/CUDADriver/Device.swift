@@ -8,42 +8,22 @@
 
 import CCUDA
 
-public final class DeviceManager {
+public final class Device {
 
-    public static let devices = (0...deviceCount).flatMap(device(at:))
-
-    private static var deviceCount: Int {
-        var deviceCount: Int32 = 0
-        cuDeviceGetCount(&deviceCount)
-        return Int(deviceCount)
-    }
-
-    private static func device(at index: Int) -> Device? {
-        var handle: CUdevice = 0
-        guard cuDeviceGet(&handle, Int32(index)) == CUDA_SUCCESS else {
-            return nil
-        }
-        return Device(deviceHandle: handle)
-    }
-
-}
-
-
-public struct Device {
-
-    public struct ComputeCapability {
+    public struct ComputeCapability : Equatable {
         let major, minor: Int
+
+        public static func ==(lhs: ComputeCapability,
+                              rhs: ComputeCapability) -> Bool {
+            return lhs.major == rhs.major && lhs.minor == rhs.minor
+        }
     }
 
     public typealias Properties = CUdevprop
 
-    public static var `default`: Device {
-        return DeviceManager.devices.first!
-    }
-
     let handle: CUdevice
 
-    init(deviceHandle: CUdevice) {
+    fileprivate init(deviceHandle: CUdevice) {
         self.handle = deviceHandle
     }
 
@@ -71,4 +51,39 @@ public struct Device {
         return String(cString: id)
     }
 
+}
+
+public final class DeviceManager {
+
+    public static let devices: [Device] =
+        (0..<deviceCount).flatMap { try? device(at:$0) }
+
+    static func device(withHandle handle: CUdevice) -> Device {
+        /// It's a bad assumption to iterate but it's a very tiny search space
+        return devices.first(where: {$0.handle == handle})!
+    }
+
+    fileprivate static var deviceCount: Int {
+        var deviceCount: Int32 = 0
+        cuDeviceGetCount(&deviceCount)
+        return Int(deviceCount)
+    }
+
+    fileprivate static func device(at index: Int) throws -> Device {
+        var handle: CUdevice = 0
+        try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
+        return Device(deviceHandle: handle)
+    }
+
+}
+
+public extension Device {
+
+    public static var `default`: Device {
+        guard let first = try? DeviceManager.device(at: 0) else {
+            fatalError("No CUDA devices available")
+        }
+        return first
+    }
+    
 }
