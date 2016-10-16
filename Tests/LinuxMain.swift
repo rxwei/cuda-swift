@@ -1,6 +1,12 @@
 import XCTest
-@testable import CUDATests
+@testable import CUDADriverTests
+@testable import CUDARuntimeTests
+@testable import CuBLASTests
+@testable import NVRTCTests
 
 XCTMain([
-     testCase(CUDATests.allTests),
+     testCase(CUDADriverTests.allTests),
+     testCase(CUDARuntimeTests.allTests),
+     testCase(CuBLASTests.allTests),
+     testCase(NVRTCTests.allTests),
 ])

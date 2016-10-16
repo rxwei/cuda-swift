@@ -1,33 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Scheme LastUpgradeVersion = "9999" version = "1.3">
-  <BuildAction parallelizeBuildables = "YES" buildImplicitDependencies = "YES">
-    <BuildActionEntries>
-      <BuildActionEntry buildForTesting = "YES" buildForRunning = "YES" buildForProfiling = "YES" buildForArchiving = "YES" buildForAnalyzing = "YES">
-        <BuildableReference
-          BuildableIdentifier = "primary"
-          BuildableName = "'lib$(TARGET_NAME)'"
-          BlueprintName = "CUDA"
-          ReferencedContainer = "container:CUDA.xcodeproj">
-        </BuildableReference>
-      </BuildActionEntry>
-    </BuildActionEntries>
-  </BuildAction>
-  <TestAction
-    buildConfiguration = "Debug"
-    selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-    selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-    shouldUseLaunchSchemeArgsEnv = "YES"
-    codeCoverageEnabled = "NO">
-    <Testables>
-    <TestableReference
-      skipped = "NO">
-      <BuildableReference
-        BuildableIdentifier = "primary"
-        BuildableName = "'$(TARGET_NAME)'"
-        BlueprintName = "CUDATests"
-        ReferencedContainer = "container:CUDA.xcodeproj">
-      </BuildableReference>
-    </TestableReference>
-    </Testables>
-  </TestAction>
+<Scheme
+   LastUpgradeVersion = "9999"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CuBLAS"
+               BuildableName = "CuBLAS.framework"
+               BlueprintName = "CuBLAS"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CUDADriver"
+               BuildableName = "CUDADriver.framework"
+               BlueprintName = "CUDADriver"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CUDARuntime"
+               BuildableName = "CUDARuntime.framework"
+               BlueprintName = "CUDARuntime"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_NVRTC"
+               BuildableName = "NVRTC.framework"
+               BlueprintName = "NVRTC"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CuBLASTests"
+               BuildableName = "CuBLASTests.xctest"
+               BlueprintName = "CuBLASTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CUDADriverTests"
+               BuildableName = "CUDADriverTests.xctest"
+               BlueprintName = "CUDADriverTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_CUDARuntimeTests"
+               BuildableName = "CUDARuntimeTests.xctest"
+               BlueprintName = "CUDARuntimeTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "______Target_NVRTCTests"
+               BuildableName = "NVRTCTests.xctest"
+               BlueprintName = "NVRTCTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <AdditionalOptions>
+      </AdditionalOptions>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "______Target_CuBLAS"
+            BuildableName = "CuBLAS.framework"
+            BlueprintName = "CuBLAS"
+            ReferencedContainer = "container:CUDA.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+      <AdditionalOptions>
+      </AdditionalOptions>
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
 </Scheme>
