@@ -10,13 +10,15 @@ import CCUDA
 
 public final class DeviceManager {
 
-    public static var deviceCount: Int {
+    public static let devices = (0...deviceCount).flatMap(device(at:))
+
+    private static var deviceCount: Int {
         var deviceCount: Int32 = 0
         cuDeviceGetCount(&deviceCount)
         return Int(deviceCount)
     }
 
-    public static func device(at index: Int) -> Device? {
+    private static func device(at index: Int) -> Device? {
         var handle: CUdevice = 0
         guard cuDeviceGet(&handle, Int32(index)) == CUDA_SUCCESS else {
             return nil
@@ -36,7 +38,7 @@ public struct Device {
     public typealias Properties = CUdevprop
 
     public static var `default`: Device {
-        return DeviceManager.device(at: 0)!
+        return DeviceManager.devices.first!
     }
 
     let handle: CUdevice
