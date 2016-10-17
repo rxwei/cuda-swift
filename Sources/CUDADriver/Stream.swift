@@ -10,7 +10,7 @@ import CCUDA
 
 public final class Stream {
 
-    public var handle: CUstream?
+    public var handle: CUstream
 
     private static var streams: [CUstream : Stream] = [:]
 
@@ -19,6 +19,7 @@ public final class Stream {
     }
 
     public required init(priority: Int? = nil) throws {
+        var handle: CUstream?
         if let priority = priority {
             try ensureSuccess(cuStreamCreateWithPriority(
                 &handle, 0, Int32(priority)
@@ -26,10 +27,11 @@ public final class Stream {
         } else {
             try ensureSuccess(cuStreamCreate(&handle, 0))
         }
+        self.handle = handle! // Safe
     }
 
     deinit {
-        Stream.streams.removeValue(forKey: handle!)
+        Stream.streams.removeValue(forKey: handle)
         cuStreamDestroy_v2(handle)
     }
 
