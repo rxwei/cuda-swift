@@ -10,7 +10,7 @@ import CNVRTC
 import CUDADriver
 import Foundation
 
-public enum CUDACompiler {
+public final class Compiler {
 
     static func compileSource(_ data: Data,
                               named name: String? = nil,
@@ -78,30 +78,32 @@ public enum CUDACompiler {
         return try compileSource(from: URL(fileURLWithPath: path), options: options)
     }
 
+    private init() {}
+
 }
 
 public extension PTX {
 
     public init(compilingSourceFile path: String,
                 options: [String]? = nil) throws {
-        self = try CUDACompiler.compileSourceFile(path, options: options)
+        self = try Compiler.compileSourceFile(path, options: options)
     }
 
     public init(compilingSourceFrom url: URL,
                 options: [String]? = nil) throws {
-        self = try CUDACompiler.compileSource(from: url, options: options)
+        self = try Compiler.compileSource(from: url, options: options)
     }
 
     public init(compilingSource source: Data,
                 named name: String? = nil,
                 options: [String]? = nil) throws {
-        self = try CUDACompiler.compileSource(source, named: name, options: options)
+        self = try Compiler.compileSource(source, named: name, options: options)
     }
 
     public init(compilingSource source: String,
                 named name: String? = nil,
                 options: [String]? = nil) throws {
-        self = try CUDACompiler.compileSource(source, named: name, options: options)
+        self = try Compiler.compileSource(source, named: name, options: options)
     }
 
 }

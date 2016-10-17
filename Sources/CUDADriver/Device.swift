@@ -23,8 +23,8 @@ public final class Device {
 
     let handle: CUdevice
 
-    fileprivate init(deviceHandle: CUdevice) {
-        self.handle = deviceHandle
+    fileprivate init(handle: CUdevice) {
+        self.handle = handle
     }
 
     public var name: String {
@@ -55,24 +55,31 @@ public final class Device {
 
 public final class DeviceManager {
 
-    public static let devices: [Device] =
-        (0..<deviceCount).flatMap { try? device(at:$0) }
+    public static let shared = try! DeviceManager()
 
-    static func device(withHandle handle: CUdevice) -> Device {
+    public lazy var devices: [Device] = {
+        (0..<self.deviceCount).flatMap { try? self.device(at:$0) }
+    }()
+
+    internal func device(withHandle handle: CUdevice) -> Device {
         /// It's a bad assumption to iterate but it's a very tiny search space
         return devices.first(where: {$0.handle == handle})!
     }
 
-    fileprivate static var deviceCount: Int {
+    fileprivate var deviceCount: Int {
         var deviceCount: Int32 = 0
         cuDeviceGetCount(&deviceCount)
         return Int(deviceCount)
     }
 
-    fileprivate static func device(at index: Int) throws -> Device {
+    fileprivate func device(at index: Int) throws -> Device {
         var handle: CUdevice = 0
         try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
-        return Device(deviceHandle: handle)
+        return Device(handle: handle)
+    }
+
+    private init() throws {
+        try ensureSuccess(cuInit(0))
     }
 
 }
@@ -80,7 +87,7 @@ public final class DeviceManager {
 public extension Device {
 
     public static var `default`: Device {
-        guard let first = try? DeviceManager.device(at: 0) else {
+        guard let first = try? DeviceManager.shared.device(at: 0) else {
             fatalError("No CUDA devices available")
         }
         return first

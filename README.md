@@ -2,12 +2,14 @@
 
 This project provides a *native* Swift interface to CUDA.
 
+Under active development, not yet ready to use.
+
 ## Components
 
-- [ ] CUDADriver - CUDA Driver
-- [x] CUDARuntime - CUDA Runtime
-- [x] CuBLAS - GPU Basic Linear Algebra Subprograms
-- [ ] NVBLAS - CPU Basic Linear Algebra Subprograms
+- [x] CUDADriver - CUDA Driver
+- [ ] CUDARuntime - CUDA Runtime
+- [ ] CuBLAS - GPU Basic Linear Algebra Subprograms
+- [x] NVBLAS - CPU Basic Linear Algebra Subprograms
 - [x] NVRTC - CUDA Runtime Compiler
 
 ## Dependencies

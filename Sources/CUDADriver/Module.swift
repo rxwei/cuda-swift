@@ -32,5 +32,13 @@ open class Module {
         }
         self.handle = handle!
     }
-    
+
+    public func function(named name: String) throws -> Function {
+        var function: CUfunction?
+        try name.withCString { cStr in
+            try ensureSuccess(cuModuleGetFunction(&function, handle, cStr))
+        }
+        return Function(handle: function!)
+    }
+
 }

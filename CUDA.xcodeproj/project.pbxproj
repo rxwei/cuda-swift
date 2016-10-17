@@ -10,6 +10,9 @@
 		2916993E1DB38C82003A3B37 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2916993D1DB38C82003A3B37 /* Device.swift */; };
 		291699401DB40E30003A3B37 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2916993F1DB40E30003A3B37 /* Error.swift */; };
 		291699421DB4176D003A3B37 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699411DB4176D003A3B37 /* Error.swift */; };
+		291699441DB4270B003A3B37 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699431DB4270B003A3B37 /* Function.swift */; };
+		291699461DB42F9F003A3B37 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699451DB42F9F003A3B37 /* Memory.swift */; };
+		2916994A1DB435C9003A3B37 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699491DB435C9003A3B37 /* Stream.swift */; };
 		_LinkFileRef_CUDADriver_via_CUDADriverTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_NVRTC /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_NVRTCTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
@@ -63,6 +66,9 @@
 		2916993D1DB38C82003A3B37 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		2916993F1DB40E30003A3B37 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		291699411DB4176D003A3B37 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		291699431DB4270B003A3B37 /* Function.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
+		291699451DB42F9F003A3B37 /* Memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		291699491DB435C9003A3B37 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Build /* Build */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Build; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcodeproj/Configs/Project.xcconfig /* CUDA.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CUDA.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
 		__PBXFileRef_Package.swift /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
@@ -211,9 +217,12 @@
 			children = (
 				__PBXFileRef_Sources/CUDADriver/Context.swift /* Context.swift */,
 				2916993D1DB38C82003A3B37 /* Device.swift */,
+				291699451DB42F9F003A3B37 /* Memory.swift */,
 				__PBXFileRef_Sources/CUDADriver/Module.swift /* Module.swift */,
+				291699431DB4270B003A3B37 /* Function.swift */,
 				__PBXFileRef_Sources/CUDADriver/PTX.swift /* PTX.swift */,
 				2916993F1DB40E30003A3B37 /* Error.swift */,
+				291699491DB435C9003A3B37 /* Stream.swift */,
 			);
 			name = CUDADriver;
 			path = Sources/CUDADriver;
@@ -470,6 +479,9 @@
 				__src_cc_ref_Sources/CUDADriver/Context.swift /* Context.swift in Sources */,
 				__src_cc_ref_Sources/CUDADriver/Module.swift /* Module.swift in Sources */,
 				__src_cc_ref_Sources/CUDADriver/PTX.swift /* PTX.swift in Sources */,
+				2916994A1DB435C9003A3B37 /* Stream.swift in Sources */,
+				291699461DB42F9F003A3B37 /* Memory.swift in Sources */,
+				291699441DB4270B003A3B37 /* Function.swift in Sources */,
 				291699401DB40E30003A3B37 /* Error.swift in Sources */,
 				2916993E1DB38C82003A3B37 /* Device.swift in Sources */,
 			);
@@ -582,7 +594,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "/Users/rxwei/Development/ML/CUDA/Packages/CCUDA-1.4.0";
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDADriverTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_VERSION = 3.0;
@@ -707,7 +719,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "/Users/rxwei/Development/ML/CUDA/Packages/CCUDA-1.4.0";
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDADriverTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";

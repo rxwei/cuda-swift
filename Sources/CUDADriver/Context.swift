@@ -10,8 +10,6 @@ import CCUDA
 
 open class Context {
 
-    public let global = Context(device: Device.default)
-
     let handle: CUcontext
 
     init(handle: CUcontext) {
@@ -22,14 +20,25 @@ open class Context {
         cuCtxDestroy_v2(handle)
     }
 
-    public init(device: Device) {
+    public static var priorityRange: Range<Int> {
+        var lowerBound: Int32 = 0
+        var upperBound: Int32 = 0
+        cuCtxGetStreamPriorityRange(&lowerBound, &upperBound)
+        return Int(lowerBound)..<Int(upperBound)
+    }
+
+    public init(device: Device) throws {
         var handle: CUcontext?
-        cuCtxCreate_v2(&handle, 0, device.handle)
+        try ensureSuccess(cuCtxCreate_v2(&handle, 0, device.handle))
         self.handle = handle!
     }
 
     public func attached() -> AttachedContext {
         return AttachedContext(attaching: self)
+    }
+
+    public static func synchronize() {
+        cuCtxSynchronize()
     }
 
 }
