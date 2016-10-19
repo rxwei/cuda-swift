@@ -8,7 +8,7 @@
 
 import CCUDA
 
-public enum CUDAError : UInt32, Error {
+public enum DriverError : UInt32, Error {
 
     /**
      * This indicates that one or more of the parameters passed to the API call
@@ -411,6 +411,6 @@ public enum CUDAError : UInt32, Error {
 
 func ensureSuccess(_ result: CUresult) throws {
     guard result == CUDA_SUCCESS else {
-        throw CUDAError(result)
+        throw DriverError(result)
     }
 }

@@ -45,11 +45,11 @@ public final class Stream {
         return Int(priority)
     }
 
-    public func addCallback(_ callback: @escaping (Stream?, CUDAError?) -> ()) {
+    public func addCallback(_ callback: @escaping (Stream?, DriverError?) -> ()) {
         let cuCallback: CUstreamCallback = { handle, result, ptr in
-            let callback = unsafeBitCast(ptr, to: ((Stream?, CUDAError?) -> ()).self)
+            let callback = unsafeBitCast(ptr, to: ((Stream?, DriverError?) -> ()).self)
             callback(Stream.stream(withHandle: handle!),
-                     result == CUDA_SUCCESS ? nil : CUDAError(result))
+                     result == CUDA_SUCCESS ? nil : DriverError(result))
         }
         cuStreamAddCallback(handle, cuCallback,
                             unsafeBitCast(callback, to: UnsafeMutableRawPointer.self), 0)

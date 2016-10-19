@@ -24,7 +24,7 @@ public struct PTX {
 
     public init(contentsOf url: URL) throws {
         do { data = try Data(contentsOf: url) }
-        catch { throw CUDAError.fileNotFound }
+        catch { throw DriverError.fileNotFound }
         name = url.deletingPathExtension().lastPathComponent
     }
 
