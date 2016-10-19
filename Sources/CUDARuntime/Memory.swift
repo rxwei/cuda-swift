@@ -14,60 +14,98 @@ import CCUDARuntime
 /// - For this, we created the `!!` operator!
 
 /// Mutable Device Pointer using Runtime API
-public struct UnsafeMutableDevicePointer<Pointee> {
+public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Strideable {
 
-    public var pointer: UnsafeMutablePointer<Pointee>?
+    public typealias Stride = Int
 
-    internal init(rawPointer: UnsafeMutableRawPointer) {
-        self.pointer = rawPointer.assumingMemoryBound(to: Pointee.self)
+    public var baseAddress: UnsafeMutablePointer<Pointee>
+
+    /// For other CUDA Runtime API calls within the module
+    internal init(baseAddress: UnsafeMutableRawPointer) {
+        self.baseAddress = baseAddress.assumingMemoryBound(to: Pointee.self)
     }
 
     public static func allocate(capacity: Int) -> UnsafeMutableDevicePointer<Pointee> {
         var pointer: UnsafeMutableRawPointer?
-        !!cudaMalloc(&pointer, capacity * MemoryLayout<Pointee>.size)
-        return UnsafeMutableDevicePointer(rawPointer: pointer!)
+        !!cudaMalloc(&pointer, capacity * MemoryLayout<Pointee>.stride)
+        return UnsafeMutableDevicePointer(baseAddress: pointer!)
     }
 
     public func deallocate() {
-        !!cudaFree(pointer)
+        !!cudaFree(baseAddress)
     }
 
-    public func initialize(to value: Int32, count: Int = 1) {
-        !!cudaMemset(pointer, value, count)
+    public var hashValue: Int {
+        return baseAddress.hashValue
     }
-    
-    public func initialize(to value: Float32, count: Int = 1) {
-        !!cudaMemset(pointer, unsafeBitCast(value, to: Int32.self), count)
+
+    public static func ==(lhs: UnsafeMutableDevicePointer<Pointee>,
+                          rhs: UnsafeMutableDevicePointer<Pointee>) -> Bool {
+        return lhs.baseAddress == rhs.baseAddress
+    }
+
+    public func advanced(by n: Int) -> UnsafeMutableDevicePointer {
+        return UnsafeMutableDevicePointer(baseAddress: baseAddress.advanced(by: n))
+    }
+
+    public func distance(to other: UnsafeMutableDevicePointer<Pointee>) -> Int {
+        return self.baseAddress.distance(to: other.baseAddress)
+    }
+
+    public func predecessor() -> UnsafeMutableDevicePointer {
+        return UnsafeMutableDevicePointer(baseAddress: baseAddress.predecessor())
+    }
+
+    public func successor() -> UnsafeMutableDevicePointer {
+        return UnsafeMutableDevicePointer(baseAddress: baseAddress.successor())
+    }
+
+    public var pointee: Pointee {
+        var pointee: Pointee?
+        !!cudaMemcpy(&pointee, baseAddress, MemoryLayout<Pointee>.stride, cudaMemcpyDeviceToHost)
+        return pointee!
+    }
+
+    public func move() -> Pointee {
+        defer { !!cudaFree(baseAddress) }
+        return pointee
     }
 
     public func initialize(to value: Pointee, count: Int = 1) {
         var value = value
-        !!cudaMemcpy(pointer, &value, count * MemoryLayout<Pointee>.stride,
+        !!cudaMemcpy(baseAddress, &value, count * MemoryLayout<Pointee>.stride,
                      cudaMemcpyHostToDevice)
     }
 
-    public func initialize(from pointer: UnsafePointer<Pointee>, count: Int) {
-        !!cudaMemcpy(self.pointer, pointer,
-                     count * MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
-    }
+    /// TODO: Change argument type to UnsafeDevicePointer once it's implemented
+//    public func initialize(from pointer: UnsafePointer<Pointee>, count: Int) {
+//        !!cudaMemcpy(self.pointer, pointer,
+//                     count * MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
+//    }
 
     public func initialize<C: Collection>(from elements: C)
         where C.Iterator.Element == Pointee, C.IndexDistance == Int {
         ContiguousArray(elements).withUnsafeBufferPointer { ptr in
-            !!cudaMemcpy(self.pointer, ptr.baseAddress,
+            !!cudaMemcpy(self.baseAddress, ptr.baseAddress,
                          elements.count * MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
         }
     }
 
     public func assign(from pointer: UnsafePointer<Pointee>, count: Int) {
-        !!cudaMemcpy(self.pointer, pointer,
+        !!cudaMemcpy(self.baseAddress, pointer,
                      count * MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
     }
 
-    public var pointee: Pointee {
-        var pointee: Pointee?
-        !!cudaMemcpy(&pointee, pointer, MemoryLayout<Pointee>.size, cudaMemcpyDeviceToHost)
-        return pointee!
+    public subscript(i: Int) -> Pointee {
+        get {
+            return self.advanced(by: i).pointee
+        }
+        nonmutating set {
+            var newValue = newValue
+            !!cudaMemcpy(advanced(by: i).baseAddress, &newValue,
+                         MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
+        }
     }
-
+    
 }
+
