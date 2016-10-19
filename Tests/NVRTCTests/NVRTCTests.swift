@@ -3,7 +3,7 @@ import XCTest
 
 class NVRTCTests: XCTestCase {
 
-    func testCompile() throws {
+    func testCompile() {
         let source: String =
             "__global__ void gIncr(float *d, size_t ind, float delta) {"
           + "    d[ind] += delta;"
@@ -14,9 +14,16 @@ class NVRTCTests: XCTestCase {
           + "        *total += d[i];"
           + "    }"
           + "}"
-        let ptx = try Compiler.compileSource(source, named: "sum")
-        XCTAssertEqual(ptx.name, "sum")
-        /// TODO: Compare PTX
+        measure {
+            do {
+                let ptx = try Compiler.compileSource(source, named: "sum")
+                XCTAssertEqual(ptx.name, "sum")
+                /// TODO: Compare PTX
+            }
+            catch {
+                XCTFail(error.localizedDescription)
+            }
+        }
     }
 
     static var allTests : [(String, (NVRTCTests) -> () throws -> Void)] {
