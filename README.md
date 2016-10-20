@@ -7,9 +7,9 @@ Under active development, not yet ready to use.
 ## Components
 
 - [x] CUDADriver - CUDA Driver
-- [ ] CUDARuntime - CUDA Runtime
-- [ ] CuBLAS - GPU Basic Linear Algebra Subprograms
-- [x] NVBLAS - CPU Basic Linear Algebra Subprograms
+- [ ] CUDARuntime - CUDA Runtime (in-progress)
+- [ ] CuBLAS - GPU Basic Linear Algebra Subprograms (in-progress)
+- [ ] NVBLAS - CPU Basic Linear Algebra Subprograms
 - [x] NVRTC - CUDA Runtime Compiler
 
 ## Dependencies
