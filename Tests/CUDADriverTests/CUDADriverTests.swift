@@ -35,34 +35,13 @@ class CUDADriverTests: XCTestCase {
         let numbers: [Float] = [1, 2, 3, 4, 5]
         var result: Float = 0
 
-        /// Temporary C CUDA memory management
-        /// Will be removed when DevicePointer is implemented
-        var numbersOnDevice: CUdeviceptr = 0
-        cuMemAlloc_v2(&numbersOnDevice, numbers.count * MemoryLayout<Float>.stride)
-        cuMemcpyHtoD_v2(numbersOnDevice, numbers, numbers.count * MemoryLayout<Float>.stride)
-
-        var size = numbers.count
-
-        var resultOnDevice: CUdeviceptr = 0
-        cuMemAlloc_v2(&resultOnDevice, MemoryLayout<Float>.size)
-
-        try withUnsafePointer(to: &numbersOnDevice) { nums in
-            try withUnsafePointer(to: &size) { size in
-                try withUnsafePointer(to: &resultOnDevice) { result in
-                    try function.launch(onArguments: [nums, size, result],
-                                        inGrid: Function.GridSize(x: 1, y: 1, z: 1),
-                                        ofBlocks: Function.BlockSize(x: 1, y: 1, z: 1, sharedMemorySize: 64),
-                                        stream: nil)
-            }
-        }
-
-        }
         Context.synchronize()
     }
 
     static var allTests : [(String, (CUDADriverTests) -> () throws -> Void)] {
         return [
-            ("testDevice", testDevice)
+            ("testDevice", testDevice),
+            ("testModule", testModule),
         ]
     }
 }

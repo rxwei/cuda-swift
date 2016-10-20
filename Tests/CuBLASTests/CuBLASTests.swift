@@ -22,6 +22,8 @@ class CuBLASTests: XCTestCase {
 
     static var allTests : [(String, (CuBLASTests) -> () throws -> Void)] {
         return [
+            ("testInitialization", testInitialization),
+            ("testSum", testSum),
         ]
     }
 }

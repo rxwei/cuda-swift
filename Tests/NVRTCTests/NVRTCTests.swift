@@ -28,6 +28,7 @@ class NVRTCTests: XCTestCase {
 
     static var allTests : [(String, (NVRTCTests) -> () throws -> Void)] {
         return [
+            ("testCompile", testCompile),
         ]
     }
 }

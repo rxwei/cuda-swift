@@ -23,6 +23,7 @@ class CUDARuntimeTests: XCTestCase {
 
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {
         return [
+            ("testPointer", testPointer)
         ]
     }
 }
