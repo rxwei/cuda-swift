@@ -29,7 +29,7 @@ open class Context {
 
     public init(device: Device) throws {
         var handle: CUcontext?
-        try ensureSuccess(cuCtxCreate_v2(&handle, 0, device.handle))
+        try ensureSuccess(cuCtxCreate_v2(&handle, 0, device.unsafeHandle))
         self.handle = handle!
     }
 

@@ -1,7 +1,7 @@
 OS=$(shell uname)
 ifeq ($(OS), Linux)
-INCDIR := /usr/lib/cuda/include
-LIBDIR := /usr/lib/cuda/lib
+INCDIR := /usr/local/cuda/include
+LIBDIR := /usr/local/cuda/lib
 else
 INCDIR := /usr/local/cuda/include
 LIBDIR := /usr/local/cuda/lib

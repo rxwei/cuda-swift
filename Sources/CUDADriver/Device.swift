@@ -8,7 +8,7 @@
 
 import CCUDA
 
-public final class Device {
+public struct Device : Equatable {
 
     public struct ComputeCapability : Equatable {
         let major, minor: Int
@@ -21,34 +21,38 @@ public final class Device {
 
     public typealias Properties = CUdevprop
 
-    let handle: CUdevice
+    public let unsafeHandle: CUdevice
 
-    fileprivate init(handle: CUdevice) {
-        self.handle = handle
+    internal init(handle: CUdevice) {
+        self.unsafeHandle = handle
     }
 
     public var name: String {
         var name: [CChar] = Array(repeating: 0, count: 32)
-        cuDeviceGetName(&name, 32, handle)
+        cuDeviceGetName(&name, 32, unsafeHandle)
         return String(cString: name)
     }
 
     public var computeCapability: ComputeCapability {
         var major: Int32 = 0, minor: Int32 = 0
-        cuDeviceComputeCapability(&major, &minor, handle)
+        cuDeviceComputeCapability(&major, &minor, unsafeHandle)
         return ComputeCapability(major: Int(major), minor: Int(minor))
     }
 
     public var properties: Properties {
         var props: CUdevprop = CUdevprop()
-        cuDeviceGetProperties(&props, handle)
+        cuDeviceGetProperties(&props, unsafeHandle)
         return props
     }
 
     public var pciBusID: String {
         var id: [CChar] = Array(repeating: 0, count: 32)
-        cuDeviceGetPCIBusId(&id, 32, handle)
+        cuDeviceGetPCIBusId(&id, 32, unsafeHandle)
         return String(cString: id)
+    }
+
+    public static func ==(lhs: Device, rhs: Device) -> Bool {
+        return lhs.unsafeHandle == rhs.unsafeHandle
     }
 
 }
@@ -58,13 +62,8 @@ public final class DeviceManager {
     public static let shared = try! DeviceManager()
 
     public lazy var devices: [Device] = {
-        (0..<self.deviceCount).flatMap { try? self.device(at:$0) }
+        (0..<self.deviceCount).flatMap { try? self.device(at: $0) }
     }()
-
-    internal func device(withHandle handle: CUdevice) -> Device {
-        /// It's a bad assumption to iterate but it's a very tiny search space
-        return devices.first(where: {$0.handle == handle})!
-    }
 
     fileprivate var deviceCount: Int {
         var deviceCount: Int32 = 0
