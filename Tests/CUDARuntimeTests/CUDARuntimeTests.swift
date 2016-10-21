@@ -5,7 +5,7 @@ class CUDARuntimeTests: XCTestCase {
 
     func testPointer() {
         measure {
-            let localArray = [1, 2, 3, 4, 5, 6, 7, 8]
+            let localArray: ContiguousArray = [1, 2, 3, 4, 5, 6, 7, 8]
             let pointer = UnsafeMutableDevicePointer<Int>.allocate(capacity: 8)
             pointer.initialize(from: localArray)
             XCTAssertEqual(pointer.pointee, 1)
