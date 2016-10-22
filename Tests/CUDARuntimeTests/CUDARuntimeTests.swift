@@ -3,6 +3,12 @@ import XCTest
 
 class CUDARuntimeTests: XCTestCase {
 
+    func testDevice() {
+        let computability = Device.current.computeCapability
+        XCTAssertGreaterThanOrEqual(computability.major, 1)
+        XCTAssertGreaterThanOrEqual(computability.minor, 0)
+    }
+
     func testPointer() {
         measure {
             let localArray: ContiguousArray = [1, 2, 3, 4, 5, 6, 7, 8]

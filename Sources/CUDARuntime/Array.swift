@@ -16,7 +16,7 @@ import CCUDARuntime
 ///   - public struct UnsafeMutableDeviceBufferPointer<Element>
 ///   - public struct UnsafeMutableDevicePointer<Element>
 
-public struct UnsafeMutableDeviceBufferPointer<Element> {
+public struct UnsafeMutableDeviceBufferPointer<Element> : RandomAccessCollection {
 
     public let baseAddress: UnsafeMutableDevicePointer<Element>?
 

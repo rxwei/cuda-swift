@@ -8,13 +8,13 @@
 
 import CCUDA
 
-public final class Stream {
+open class Stream {
 
-    public var handle: CUstream
+    public let handle: CUstream
 
     private static var streams: [CUstream : Stream] = [:]
 
-    private static func stream(withHandle handle: CUstream) -> Stream {
+    private static func current(withHandle handle: CUstream) -> Stream {
         return Stream.streams[handle]!
     }
 
@@ -48,7 +48,7 @@ public final class Stream {
     public func addCallback(_ callback: @escaping (Stream?, DriverError?) -> ()) {
         let cuCallback: CUstreamCallback = { handle, result, ptr in
             let callback = unsafeBitCast(ptr, to: ((Stream?, DriverError?) -> ()).self)
-            callback(Stream.stream(withHandle: handle!),
+            callback(Stream.current(withHandle: handle!),
                      result == CUDA_SUCCESS ? nil : DriverError(result))
         }
         cuStreamAddCallback(handle, cuCallback,

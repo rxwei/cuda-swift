@@ -23,7 +23,7 @@ public struct Device : Equatable {
 
     public let unsafeHandle: CUdevice
 
-    internal init(handle: CUdevice) {
+    internal init(from handle: CUdevice) {
         self.unsafeHandle = handle
     }
 
@@ -74,7 +74,7 @@ public final class DeviceManager {
     fileprivate func device(at index: Int) throws -> Device {
         var handle: CUdevice = 0
         try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
-        return Device(handle: handle)
+        return Device(from: handle)
     }
 
     private init() throws {

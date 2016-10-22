@@ -15,7 +15,7 @@ public struct Function {
     public enum CachePreference : UInt32 {
         case none = 0x00
         case shared = 0x01
-        case L1 = 0x02
+        case l1 = 0x02
         case equal = 0x03
     }
 
@@ -36,7 +36,7 @@ public struct Function {
         }
     }
 
-    init(handle: CUfunction) {
+    init(from handle: CUfunction) {
         self.handle = handle
     }
 

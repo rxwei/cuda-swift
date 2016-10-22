@@ -13,7 +13,7 @@ open class Module {
 
     let handle: CUmodule
 
-    init(handle: CUmodule) {
+    init(from handle: CUmodule) {
         self.handle = handle
     }
 
@@ -38,7 +38,7 @@ open class Module {
         try name.withCString { cStr in
             try ensureSuccess(cuModuleGetFunction(&function, handle, cStr))
         }
-        return Function(handle: function!)
+        return Function(from: function!)
     }
 
 }
