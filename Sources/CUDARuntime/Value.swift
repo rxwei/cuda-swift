@@ -58,7 +58,8 @@ public struct DeviceValue<Wrapped> {
         self = other
     }
 
-    @inline(__always)
+    /// This should be @inline(__always)
+    /// But it crashes Swift SIL verfication as of Swift 3.0.1-PREVIEW-3
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (UnsafeMutableDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
         return try body(cowBuffer.address)

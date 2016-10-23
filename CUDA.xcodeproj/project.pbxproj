@@ -66,6 +66,13 @@
 			remoteGlobalIDString = "______Target_NVRTC";
 			remoteInfo = NVRTC;
 		};
+		2969E84F1DBD79F800AF60E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = __RootObject_ /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "______Target_CUDARuntime";
+			remoteInfo = CUDARuntime;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -400,6 +407,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				2969E8501DBD79F800AF60E6 /* PBXTargetDependency */,
 			);
 			name = CuBLAS;
 			productName = CuBLAS;
@@ -571,6 +579,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		2969E8501DBD79F800AF60E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "______Target_CUDARuntime" /* CUDARuntime */;
+			targetProxy = 2969E84F1DBD79F800AF60E6 /* PBXContainerItemProxy */;
+		};
 		__Dependency_CUDADriver /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_CUDADriver" /* CUDADriver */;
