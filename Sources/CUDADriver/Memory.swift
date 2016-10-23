@@ -86,7 +86,7 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     public func assign(_ value: Pointee) throws {
         var value = value
         try ensureSuccess(
-            cuMemcpyHtoD_v2(deviceAddress, &value, MemoryLayout<Pointee>.stride)
+            cuMemcpyHtoD_v2(deviceAddress, &value, MemoryLayout<Pointee>.size)
         )
     }
 
@@ -107,6 +107,13 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         }
     }
 
+    public func assign(fromHost pointer: UnsafePointer<Pointee>) throws {
+        try ensureSuccess(
+            cuMemcpyHtoD_v2(self.deviceAddress, pointer,
+                            MemoryLayout<Pointee>.size)
+        )
+    }
+
     public func assign(fromHost pointer: UnsafePointer<Pointee>, count: Int) throws {
         try ensureSuccess(
             cuMemcpyHtoD_v2(self.deviceAddress, pointer,
@@ -114,7 +121,14 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         )
     }
 
-    public func assign(from pointer: UnsafeMutableDevicePointer<Pointee>, count: Int = 1) throws {
+    public func assign(from pointer: UnsafeMutableDevicePointer<Pointee>) throws {
+        try ensureSuccess(
+            cuMemcpyDtoD_v2(self.deviceAddress, pointer.deviceAddress,
+                            MemoryLayout<Pointee>.stride)
+        )
+    }
+
+    public func assign(from pointer: UnsafeMutableDevicePointer<Pointee>, count: Int) throws {
         try ensureSuccess(
             cuMemcpyDtoD_v2(self.deviceAddress, pointer.deviceAddress,
                             count * MemoryLayout<Pointee>.stride)

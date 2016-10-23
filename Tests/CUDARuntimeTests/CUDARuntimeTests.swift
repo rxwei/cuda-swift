@@ -50,12 +50,11 @@ class CUDARuntimeTests: XCTestCase {
 
     func testValue() {
         var val = DeviceValue<Int>(1)
-        val.value += 1
         XCTAssertEqual(val.value, 1)
         var val2 = val
-        val2.value += 10
-        XCTAssertEqual(val.value, 2)
-        XCTAssertEqual(val2.value, 12)
+        val2.value = 10
+        XCTAssertEqual(val.value, 1)
+        XCTAssertEqual(val2.value, 10)
     }
 
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {

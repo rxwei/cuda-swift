@@ -48,12 +48,16 @@ public struct DeviceValue<Wrapped> {
             return buffer.address.load()
         }
         set {
-            cowBuffer.address.assign(value)
+            cowBuffer.address.assign(newValue)
         }
     }
 
     public init(_ initial: Wrapped? = nil) {
         buffer = DeviceValueBuffer(initial)
+    }
+
+    public init(_ other: DeviceValue<Wrapped>) {
+        self = other
     }
 
 }
