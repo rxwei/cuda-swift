@@ -8,46 +8,6 @@
 
 import CCUDARuntime
 
-/// A non-owning pointer to a buffer of mutable elements stored contiguously
-/// in graphic device memory, presenting a collection interface to the underlying 
-/// elements.
-public struct UnsafeMutableDeviceBufferPointer<Element> : RandomAccessCollection {
-
-    public let baseAddress: UnsafeMutableDevicePointer<Element>?
-    public let count: Int
-
-    public init(start: UnsafeMutableDevicePointer<Element>?, count: Int) {
-        self.baseAddress = start
-        self.count = start == nil ? 0 : count
-    }
-
-    public func index(after i: Int) -> Int {
-        return i + 1
-    }
-
-    public func index(before i: Int) -> Int {
-        return i - 1
-    }
-
-    public var startIndex: Int {
-        return 0
-    }
-
-    public var endIndex: Int {
-        return count
-    }
-
-    public subscript(i: Int) -> Element {
-        get {
-            return baseAddress![i]
-        }
-        nonmutating set {
-            baseAddress![i] = newValue
-        }
-    }
-
-}
-
 fileprivate final class DeviceArrayBuffer<Element> : RandomAccessCollection {
 
     typealias Index = Int
@@ -180,11 +140,27 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         }
     }
 
-    public func withUnsafeDeviceMutableBufferPointer<Result>
-        (_ body: (UnsafeMutableDeviceBufferPointer<Element>) throws -> Result) rethrows -> Result {
-        return try body(UnsafeMutableDeviceBufferPointer(start: buffer.baseAddress, count: count))
+    public func withUnsafeDevicePointer<Result>
+        (_ body: (UnsafePointer<Element>) throws -> Result) rethrows -> Result {
+        return try body(buffer.baseAddress.deviceAddress)
     }
 
+}
+
+public extension DeviceArray {
+
+    public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+        return try makeHostArray().reduce(initialResult, nextPartialResult)
+    }
+
+    public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
+        return try makeHostArray().map(transform)
+    }
+
+    public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+        return try makeHostArray().flatMap(transform)
+    }
+    
 }
 
 public extension Array {

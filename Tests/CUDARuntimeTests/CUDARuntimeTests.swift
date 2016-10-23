@@ -48,9 +48,21 @@ class CUDARuntimeTests: XCTestCase {
         XCTAssertEqual(Array(devArray3), [4, 2, 3, 4, 5])
     }
 
+    func testValue() {
+        var val = DeviceValue<Int>(1)
+        val.value += 1
+        XCTAssertEqual(val.value, 1)
+        var val2 = val
+        val2.value += 10
+        XCTAssertEqual(val.value, 2)
+        XCTAssertEqual(val2.value, 12)
+    }
+
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {
         return [
-            ("testPointer", testPointer)
+            ("testDevice", testDevice),
+            ("testPointer", testPointer),
+            ("testArray", testArray)
         ]
     }
 }

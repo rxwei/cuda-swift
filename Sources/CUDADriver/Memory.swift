@@ -83,7 +83,14 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         return pointee!
     }
 
-    public func initialize(to value: Pointee, count: Int = 1) throws {
+    public func assign(_ value: Pointee) throws {
+        var value = value
+        try ensureSuccess(
+            cuMemcpyHtoD_v2(deviceAddress, &value, MemoryLayout<Pointee>.stride)
+        )
+    }
+
+    public func assign(_ value: Pointee, count: Int) throws {
         var value = value
         try ensureSuccess(
             cuMemcpyHtoD_v2(deviceAddress, &value, count * MemoryLayout<Pointee>.stride)
@@ -107,7 +114,7 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         )
     }
 
-    public func assign(from pointer: UnsafeMutableDevicePointer<Pointee>, count: Int) throws {
+    public func assign(from pointer: UnsafeMutableDevicePointer<Pointee>, count: Int = 1) throws {
         try ensureSuccess(
             cuMemcpyDtoD_v2(self.deviceAddress, pointer.deviceAddress,
                             count * MemoryLayout<Pointee>.stride)

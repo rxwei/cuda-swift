@@ -17,6 +17,7 @@
 		2942BA081DB78158008B729B /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2942BA071DB78158008B729B /* Array.swift */; };
 		2969E84A1DBCB90500AF60E6 /* CHandleCarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E8491DBCB90500AF60E6 /* CHandleCarrier.swift */; };
 		2969E84C1DBCC22500AF60E6 /* Driver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E84B1DBCC22500AF60E6 /* Driver.swift */; };
+		2969E84E1DBCEF8700AF60E6 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E84D1DBCEF8700AF60E6 /* Value.swift */; };
 		29FA39901DB7FFFD00A34503 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FA398F1DB7FFFD00A34503 /* Device.swift */; };
 		_LinkFileRef_CUDADriver_via_CUDADriverTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_NVRTC /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
@@ -78,6 +79,7 @@
 		2942BA071DB78158008B729B /* Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 		2969E8491DBCB90500AF60E6 /* CHandleCarrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CHandleCarrier.swift; sourceTree = "<group>"; };
 		2969E84B1DBCC22500AF60E6 /* Driver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Driver.swift; sourceTree = "<group>"; };
+		2969E84D1DBCEF8700AF60E6 /* Value.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Value.swift; path = Sources/CUDARuntime/Value.swift; sourceTree = SOURCE_ROOT; };
 		29FA398F1DB7FFFD00A34503 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Build /* Build */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Build; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcodeproj/Configs/Project.xcconfig /* CUDA.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CUDA.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 				29FA398F1DB7FFFD00A34503 /* Device.swift */,
 				2942BA051DB77940008B729B /* Error.swift */,
 				2942BA071DB78158008B729B /* Array.swift */,
+				2969E84D1DBCEF8700AF60E6 /* Value.swift */,
 			);
 			name = CUDARuntime;
 			path = Sources/CUDARuntime;
@@ -518,6 +521,7 @@
 			files = (
 				2942BA081DB78158008B729B /* Array.swift in Sources */,
 				2942BA061DB77940008B729B /* Error.swift in Sources */,
+				2969E84E1DBCEF8700AF60E6 /* Value.swift in Sources */,
 				__src_cc_ref_Sources/CUDARuntime/Device.swift /* Memory.swift in Sources */,
 				29FA39901DB7FFFD00A34503 /* Device.swift in Sources */,
 			);
