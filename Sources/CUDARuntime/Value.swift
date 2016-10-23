@@ -6,21 +6,19 @@
 //
 //
 
-/// Tests broken
-
 fileprivate final class DeviceValueBuffer<Wrapped> {
 
     let address: UnsafeMutableDevicePointer<Wrapped>
 
     init(_ initial: Wrapped? = nil) {
-        address = UnsafeMutableDevicePointer.allocate(capacity: MemoryLayout<Wrapped>.size)
+        address = UnsafeMutableDevicePointer.allocate(capacity: 1)
         if let initial = initial {
             address.assign(initial)
         }
     }
 
     init(_ other: DeviceValueBuffer<Wrapped>) {
-        address = UnsafeMutableDevicePointer.allocate(capacity: MemoryLayout<Wrapped>.size)
+        address = UnsafeMutableDevicePointer.allocate(capacity: 1)
         address.assign(from: other.address)
     }
 
@@ -47,7 +45,7 @@ public struct DeviceValue<Wrapped> {
         get {
             return buffer.address.load()
         }
-        set {
+        mutating set {
             cowBuffer.address.assign(newValue)
         }
     }
@@ -58,6 +56,12 @@ public struct DeviceValue<Wrapped> {
 
     public init(_ other: DeviceValue<Wrapped>) {
         self = other
+    }
+
+    @inline(__always)
+    public mutating func withUnsafeMutableDevicePointer<Result>
+        (_ body: (UnsafeMutableDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
+        return try body(cowBuffer.address)
     }
 
 }

@@ -19,9 +19,17 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     public typealias Stride = Int
 
     /// Raw address on CUDA device
-    let deviceAddress: UnsafeMutablePointer<Pointee>
+    public let deviceAddress: UnsafeMutablePointer<Pointee>
 
-    /// Initializer for other CUDA Runtime API calls within the module
+    /// Convert from raw memory address on graphic device
+    /// - parameter deviceAddress: address on graphic device
+    /// - note: Initializer for other CUDA Runtime API calls within the module
+    /// Maybe we need a safer solution, e.g. only treat 
+    /// `init(_: UnsafeMutablePointer<Float>)` as value preserving type conversion,
+    /// while using an argument-labeled initializer for conversion from
+    /// UnsafeMutableRawPointer, e.g.
+    /// `init(assumingMemoryBoundFrom: UnsafeMutableRawPointer)`
+    /// For now, let's leave it as is
     public init(_ deviceAddress: UnsafeMutableRawPointer) {
         self.deviceAddress = deviceAddress.assumingMemoryBound(to: Pointee.self)
     }
@@ -119,11 +127,6 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
                      count * MemoryLayout<Pointee>.stride, cudaMemcpyDeviceToHost)
     }
 
-    public func withDeviceAddress<Result>
-        (body: (UnsafePointer<Pointee>) throws -> Result) rethrows -> Result {
-        return try body(deviceAddress)
-    }
-
     public subscript(i: Int) -> Pointee {
         get {
             return self.advanced(by: i).load()
@@ -135,6 +138,23 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         }
     }
     
+}
+
+public extension UnsafeMutableDevicePointer {
+
+    public func withDeviceAddress<Result>
+        (body: (UnsafePointer<Pointee>) throws -> Result) rethrows -> Result {
+        return try body(deviceAddress)
+    }
+
+    public func withMemoryRebound<T, Result>
+        (to type: T.Type, capacity: Int,
+         _ body: (UnsafeMutableDevicePointer<T>) throws -> Result) rethrows -> Result {
+        return try deviceAddress.withMemoryRebound(to: T.self, capacity: capacity) { ptr -> Result in
+            try body(UnsafeMutableDevicePointer<T>(ptr))
+        }
+    }
+
 }
 
 public extension UnsafeMutablePointer {

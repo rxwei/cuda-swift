@@ -140,23 +140,27 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         }
     }
 
-    public func withUnsafeDevicePointer<Result>
-        (_ body: (UnsafePointer<Element>) throws -> Result) rethrows -> Result {
-        return try body(buffer.baseAddress.deviceAddress)
+    @inline(__always)
+    public mutating func withUnsafeMutableDevicePointer<Result>
+        (_ body: (UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
+        return try body(cowBuffer.baseAddress)
     }
 
 }
 
 public extension DeviceArray {
 
+    @inline(__always)
     public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
         return try makeHostArray().reduce(initialResult, nextPartialResult)
     }
 
+    @inline(__always)
     public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
         return try makeHostArray().map(transform)
     }
 
+    @inline(__always)
     public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
         return try makeHostArray().flatMap(transform)
     }

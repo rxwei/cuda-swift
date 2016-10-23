@@ -55,6 +55,21 @@ class CUDARuntimeTests: XCTestCase {
         val2.value = 10
         XCTAssertEqual(val.value, 1)
         XCTAssertEqual(val2.value, 10)
+
+        /// Test memory mutation
+        val.withUnsafeMutableDevicePointer { ptr in
+            ptr.assign(100)
+        }
+        XCTAssertEqual(val.value, 100)
+        XCTAssertNotEqual(val2.value, val.value)
+
+        /// Test CoW memory mutation
+        var val3 = val
+        val3.withUnsafeMutableDevicePointer { ptr in
+            ptr.assign(1000)
+        }
+        XCTAssertEqual(val3.value, 1000)
+        XCTAssertNotEqual(val3.value, val.value)
     }
 
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {
