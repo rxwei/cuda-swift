@@ -76,7 +76,8 @@ class CUDARuntimeTests: XCTestCase {
         return [
             ("testDevice", testDevice),
             ("testPointer", testPointer),
-            ("testArray", testArray)
+            ("testArray", testArray),
+            ("testValue", testValue)
         ]
     }
 }
