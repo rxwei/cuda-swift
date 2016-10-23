@@ -8,7 +8,9 @@
 
 import CCUDA
 
-public struct Device : Equatable {
+public struct Device : Equatable, CHandleCarrier {
+
+    public typealias Handle = CUdevice
 
     public struct ComputeCapability : Equatable {
         let major, minor: Int
@@ -21,75 +23,59 @@ public struct Device : Equatable {
 
     public typealias Properties = CUdevprop
 
-    public let unsafeHandle: CUdevice
+    let handle: CUdevice
 
-    internal init(from handle: CUdevice) {
-        self.unsafeHandle = handle
+    init(_ handle: CUdevice) {
+        self.handle = handle
     }
 
     public var name: String {
         var name: [CChar] = Array(repeating: 0, count: 32)
-        cuDeviceGetName(&name, 32, unsafeHandle)
+        cuDeviceGetName(&name, 32, handle)
         return String(cString: name)
     }
 
     public var computeCapability: ComputeCapability {
         var major: Int32 = 0, minor: Int32 = 0
-        cuDeviceComputeCapability(&major, &minor, unsafeHandle)
+        cuDeviceComputeCapability(&major, &minor, handle)
         return ComputeCapability(major: Int(major), minor: Int(minor))
     }
 
     public var properties: Properties {
         var props: CUdevprop = CUdevprop()
-        cuDeviceGetProperties(&props, unsafeHandle)
+        cuDeviceGetProperties(&props, handle)
         return props
     }
 
     public var pciBusID: String {
         var id: [CChar] = Array(repeating: 0, count: 32)
-        cuDeviceGetPCIBusId(&id, 32, unsafeHandle)
+        cuDeviceGetPCIBusId(&id, 32, handle)
         return String(cString: id)
     }
 
     public static func ==(lhs: Device, rhs: Device) -> Bool {
-        return lhs.unsafeHandle == rhs.unsafeHandle
+        return lhs.handle == rhs.handle
     }
 
-}
+    public init(atIndex index: Int) throws {
+        var handle: CUdevice = 0
+        try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
+        self.handle = handle
+    }
 
-public final class DeviceManager {
+    public func withUnsafeHandle<Result>
+        (_ body: (Handle) throws -> Result) rethrows -> Result {
+        return try body(handle)
+    }
 
-    public static let shared = try! DeviceManager()
-
-    public lazy var devices: [Device] = {
-        (0..<self.deviceCount).flatMap { try? self.device(at: $0) }
-    }()
-
-    fileprivate var deviceCount: Int {
+    public static var count: Int {
         var deviceCount: Int32 = 0
         cuDeviceGetCount(&deviceCount)
         return Int(deviceCount)
     }
 
-    fileprivate func device(at index: Int) throws -> Device {
-        var handle: CUdevice = 0
-        try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
-        return Device(from: handle)
-    }
-
-    private init() throws {
-        try ensureSuccess(cuInit(0))
-    }
-
-}
-
-public extension Device {
-
     public static var `default`: Device {
-        guard let first = try? DeviceManager.shared.device(at: 0) else {
-            fatalError("No CUDA devices available")
-        }
-        return first
+        return try! Device(atIndex: 0)
     }
-    
+
 }

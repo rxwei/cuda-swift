@@ -1,9 +1,16 @@
 import XCTest
 @testable import CUDADriver
 @testable import class NVRTC.Compiler
-import CCUDA
 
 class CUDADriverTests: XCTestCase {
+
+    override func setUp() {
+        try! Driver.initialize()
+    }
+
+    func testDeviceCount() {
+        XCTAssertGreaterThanOrEqual(Device.count, 1)
+    }
 
     func testDevice() {
         let computability = Device.default.computeCapability

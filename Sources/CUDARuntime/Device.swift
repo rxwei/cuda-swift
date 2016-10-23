@@ -32,17 +32,15 @@ public struct Device : Equatable {
     public static var current: Device {
         var index: Int32 = 0
         !!cudaGetDevice(&index)
-        return Device(fromIndex: index)
+        return Device(assumingIndex: index)
     }
 
-    internal init(fromIndex index: Int32) {
+    internal init(assumingIndex index: Int32) {
         self.index = index
     }
 
-
-
     public init?(atIndex index: Int) {
-        guard (0..<Device.count).contains(index) else {
+        guard index >= 0 && index < Device.count else {
             return nil
         }
         self.index = Int32(index)

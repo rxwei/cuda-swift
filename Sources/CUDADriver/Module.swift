@@ -9,13 +9,11 @@
 import Foundation
 import CCUDA
 
-open class Module {
+open class Module : CHandleCarrier {
+
+    public typealias Handle = CUmodule
 
     let handle: CUmodule
-
-    init(from handle: CUmodule) {
-        self.handle = handle
-    }
 
     deinit {
         cuModuleUnload(handle)
@@ -33,12 +31,17 @@ open class Module {
         self.handle = handle!
     }
 
-    public func function(named name: String) throws -> Function {
+    open func withUnsafeHandle<Result>
+        (_ body: (CUmodule) throws -> Result) rethrows -> Result {
+        return try body(handle)
+    }
+
+    open func function(named name: String) throws -> Function {
         var function: CUfunction?
         try name.withCString { cStr in
             try ensureSuccess(cuModuleGetFunction(&function, handle, cStr))
         }
-        return Function(from: function!)
+        return Function(function!)
     }
 
 }

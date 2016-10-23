@@ -8,7 +8,9 @@
 
 import CCUDA
 
-public struct Function {
+public struct Function : CHandleCarrier {
+
+    public typealias Handle = CUfunction
 
     let handle: CUfunction
 
@@ -36,7 +38,7 @@ public struct Function {
         }
     }
 
-    init(from handle: CUfunction) {
+    public init(_ handle: CUfunction) {
         self.handle = handle
     }
 
@@ -50,6 +52,10 @@ public struct Function {
         let x: Int, y: Int, z: Int
         /// Shared memory size per thread
         let sharedMemorySize: Int
+    }
+    
+    public func withUnsafeHandle<Result>(_ body: (Handle) throws -> Result) rethrows -> Result {
+        return try body(handle)
     }
 
     public func launch(onArguments arguments: [Any], inGrid gridSize: GridSize,

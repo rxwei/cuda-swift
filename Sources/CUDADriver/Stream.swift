@@ -8,14 +8,16 @@
 
 import CCUDA
 
-open class Stream {
+open class Stream : CHandleCarrier {
 
-    public let handle: CUstream
+    public typealias Handle = CUstream
 
-    private static var streams: [CUstream : Stream] = [:]
+    let handle: CUstream
+
+    private static var instances: [CUstream : Stream] = [:]
 
     private static func current(withHandle handle: CUstream) -> Stream {
-        return Stream.streams[handle]!
+        return Stream.instances[handle]!
     }
 
     public required init(priority: Int? = nil) throws {
@@ -31,21 +33,21 @@ open class Stream {
     }
 
     deinit {
-        Stream.streams.removeValue(forKey: handle)
+        Stream.instances.removeValue(forKey: handle)
         cuStreamDestroy_v2(handle)
     }
 
-    public func synchronize() throws {
+    open func synchronize() throws {
         try ensureSuccess(cuStreamSynchronize(handle))
     }
 
-    public var priority: Int {
+    open var priority: Int {
         var priority: Int32 = 0
         cuStreamGetPriority(handle, &priority)
         return Int(priority)
     }
 
-    public func addCallback(_ callback: @escaping (Stream?, DriverError?) -> ()) {
+    open func addCallback(_ callback: (Stream?, DriverError?) -> ()) {
         let cuCallback: CUstreamCallback = { handle, result, ptr in
             let callback = unsafeBitCast(ptr, to: ((Stream?, DriverError?) -> ()).self)
             callback(Stream.current(withHandle: handle!),
@@ -53,6 +55,11 @@ open class Stream {
         }
         cuStreamAddCallback(handle, cuCallback,
                             unsafeBitCast(callback, to: UnsafeMutableRawPointer.self), 0)
+    }
+
+    public func withUnsafeHandle<Result>
+        (_ body: (OpaquePointer) throws -> Result) rethrows -> Result {
+        return try body(handle)
     }
 
 }

@@ -13,8 +13,8 @@ class CUDARuntimeTests: XCTestCase {
         measure {
             let localArray: ContiguousArray = [1, 2, 3, 4, 5, 6, 7, 8]
             let pointer = UnsafeMutableDevicePointer<Int>.allocate(capacity: 8)
-            pointer.initialize(from: localArray)
-            XCTAssertEqual(pointer.pointee, 1)
+            pointer.assign(fromHost: localArray)
+            XCTAssertEqual(pointer.load(), 1)
             for i in localArray.indices {
                 XCTAssertEqual(localArray[i], pointer[i])
             }
@@ -25,6 +25,27 @@ class CUDARuntimeTests: XCTestCase {
             }
             pointer.deallocate()
         }
+    }
+
+    func testArray() {
+        let hostArray: [Int] = [1, 2, 3, 4, 5]
+        /// Array literal initialization!
+        let devArray: DeviceArray<Int> = [1, 2, 3, 4, 5]
+        XCTAssertEqual(hostArray, Array(devArray))
+        let hostArrayFromDev: [Int] = devArray.makeHostArray()
+        XCTAssertEqual(hostArray, hostArrayFromDev)
+
+        /// Test copy-on-write
+        var devArray2 = devArray
+        var devArray3 = devArray
+        devArray2[0] = 3
+        XCTAssertNotEqual(Array(devArray), Array(devArray2))
+        devArray3[0] = 4
+        XCTAssertNotEqual(Array(devArray2), Array(devArray3))
+        XCTAssertEqual(Array(devArray), Array(devArray))
+        XCTAssertEqual(Array(devArray), [1, 2, 3, 4, 5])
+        XCTAssertEqual(Array(devArray2), [3, 2, 3, 4, 5])
+        XCTAssertEqual(Array(devArray3), [4, 2, 3, 4, 5])
     }
 
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {
