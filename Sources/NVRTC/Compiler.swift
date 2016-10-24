@@ -7,25 +7,31 @@
 //
 
 import CNVRTC
-import CUDADriver
+@_exported import struct CUDADriver.PTX
 import Foundation
 
-public final class Compiler {
+open class Compiler {
 
-    static func compileSource(_ data: Data,
-                              named name: String? = nil,
-                              options: [String]? = nil) throws -> PTX {
+    open class var version: (major: Int, minor: Int) {
+        var major: Int32 = 0
+        var minor: Int32 = 0
+        nvrtcVersion(&major, &minor)
+        return (major: Int(major), minor: Int(minor))
+    }
+    
+    open class func compile(_ data: Data,
+                            named name: String? = nil,
+                            options: [String]? = nil) throws -> PTX {
         /// Create program
         var program: nvrtcProgram?
-        let result = data.withUnsafeBytes { (bytes: UnsafePointer<Int8>) -> (nvrtcResult) in
-            if var nameStr = name?.utf8CString.map({$0}) {
-                return nvrtcCreateProgram(&program, bytes, &nameStr, 0, nil, nil)
+        try ensureSuccess(
+            data.withUnsafeBytes { (bytes: UnsafePointer<Int8>) in
+                if var nameStr = name?.utf8CString.map({$0}) {
+                    return nvrtcCreateProgram(&program, bytes, &nameStr, 0, nil, nil)
+                }
+                return nvrtcCreateProgram(&program, bytes, "default", 0, nil, nil)
             }
-            return nvrtcCreateProgram(&program, bytes, "default", 0, nil, nil)
-        }
-        guard result == NVRTC_SUCCESS else {
-            throw NVRTCError(result)
-        }
+        )
 
         /// Compile with options
         if let options = options {
@@ -52,58 +58,30 @@ public final class Compiler {
         nvrtcDestroyProgram(&program)
         return PTX(data: outData, name: name)
     }
-
-    static func compileSource(from url: URL,
-                              options: [String]? = nil) throws -> PTX {
+    
+    open class func compile(from url: URL,
+                            options: [String]? = nil) throws -> PTX {
         let handle = try FileHandle(forReadingFrom: url)
         let data = handle.readDataToEndOfFile()
-        return try compileSource(
+        return try compile(
             data,
             named: url.deletingPathExtension().lastPathComponent,
             options: options
         )
     }
-
-    static func compileSource(_ source: String,
-                              named name: String? = nil,
-                              options: [String]? = nil) throws -> PTX {
+    
+    open class func compile(_ source: String,
+                            named name: String? = nil,
+                            options: [String]? = nil) throws -> PTX {
         guard let data = source.data(using: .utf8, allowLossyConversion: true) else {
-            throw NVRTCError.wrongSourceFormat
+            throw CompilerError.wrongSourceFormat
         }
-        return try compileSource(data, named: name, options: options)
+        return try compile(data, named: name, options: options)
     }
-
-    static func compileSourceFile(_ path: String,
-                                  options: [String]? = nil) throws -> PTX {
-        return try compileSource(from: URL(fileURLWithPath: path), options: options)
-    }
-
-    private init() {}
-
-}
-
-public extension PTX {
-
-    public init(compilingSourceFile path: String,
-                options: [String]? = nil) throws {
-        self = try Compiler.compileSourceFile(path, options: options)
-    }
-
-    public init(compilingSourceFrom url: URL,
-                options: [String]? = nil) throws {
-        self = try Compiler.compileSource(from: url, options: options)
-    }
-
-    public init(compilingSource source: Data,
-                named name: String? = nil,
-                options: [String]? = nil) throws {
-        self = try Compiler.compileSource(source, named: name, options: options)
-    }
-
-    public init(compilingSource source: String,
-                named name: String? = nil,
-                options: [String]? = nil) throws {
-        self = try Compiler.compileSource(source, named: name, options: options)
+    
+    open class func compileSourceFile(_ path: String,
+                                      options: [String]? = nil) throws -> PTX {
+        return try compile(from: URL(fileURLWithPath: path), options: options)
     }
 
 }

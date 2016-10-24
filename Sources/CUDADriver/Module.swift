@@ -36,10 +36,14 @@ open class Module : CHandleCarrier {
         return try body(handle)
     }
 
-    open func function(named name: String) throws -> Function {
+    open func function(named name: String) -> Function? {
         var function: CUfunction?
-        try name.withCString { cStr in
-            try ensureSuccess(cuModuleGetFunction(&function, handle, cStr))
+        do {
+            try name.withCString { cStr in
+                try ensureSuccess(cuModuleGetFunction(&function, handle, cStr))
+            }
+        } catch {
+            return nil
         }
         return Function(function!)
     }

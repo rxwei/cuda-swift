@@ -9,7 +9,6 @@
 import CCUDA
 
 public enum DriverError : UInt32, Error {
-
     /**
      * This indicates that one or more of the parameters passed to the API call
      * is not within an acceptable range of values.

@@ -43,8 +43,8 @@ open class Stream : CHandleCarrier {
         cuStreamDestroy_v2(handle)
     }
 
-    open func synchronize() throws {
-        try ensureSuccess(cuStreamSynchronize(handle))
+    open func synchronize() {
+        !!cuStreamSynchronize(handle)
     }
 
     open var priority: Int {

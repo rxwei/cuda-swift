@@ -57,13 +57,13 @@ public struct Function : CHandleCarrier {
     public struct BlockSize {
         public let x: Int, y: Int, z: Int
         /// Shared memory size per thread
-        public let sharedMemorySize: Int
+        public let sharedMemory: Int
         
         public init(x: Int, y: Int, z: Int, sharedMemorySize: Int) {
             self.x = x
             self.y = y
             self.z = z
-            self.sharedMemorySize = sharedMemorySize
+            self.sharedMemory = sharedMemorySize
         }
     }
     
@@ -71,6 +71,9 @@ public struct Function : CHandleCarrier {
         return try body(handle)
     }
 
+    /// - note:
+    /// Needs rewriting
+    /// Does not work
     public func launch(withArguments arguments: [Any], inGrid gridSize: GridSize,
                        ofBlocks blockSize: BlockSize, stream: Stream?) throws {
         try arguments.withUnsafeBufferPointer { ptr in
@@ -78,7 +81,7 @@ public struct Function : CHandleCarrier {
             try ensureSuccess(
                 cuLaunchKernel(handle, UInt32(gridSize.x), UInt32(gridSize.y), UInt32(gridSize.z),
                                UInt32(blockSize.x), UInt32(blockSize.y), UInt32(blockSize.z),
-                               UInt32(blockSize.sharedMemorySize), stream?.handle ?? nil, argPtr, nil)
+                               UInt32(blockSize.sharedMemory), stream?.handle ?? nil, argPtr, nil)
             )
         }
     }

@@ -16,7 +16,7 @@ class NVRTCTests: XCTestCase {
           + "}"
         /// If we use measure block here, Linux tests will fail under Swift 3.0.1-preview2
         do {
-            let ptx = try Compiler.compileSource(source, named: "sum")
+            let ptx = try Compiler.compile(source, named: "sum")
             XCTAssertEqual(ptx.name, "sum")
             /// TODO: Compare PTX
         }

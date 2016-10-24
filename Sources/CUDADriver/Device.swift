@@ -12,15 +12,6 @@ public struct Device : Equatable, CHandleCarrier {
 
     public typealias Handle = CUdevice
 
-    public struct ComputeCapability : Equatable {
-        let major, minor: Int
-
-        public static func ==(lhs: ComputeCapability,
-                              rhs: ComputeCapability) -> Bool {
-            return lhs.major == rhs.major && lhs.minor == rhs.minor
-        }
-    }
-
     public typealias Properties = CUdevprop
 
     let handle: CUdevice
@@ -35,10 +26,10 @@ public struct Device : Equatable, CHandleCarrier {
         return String(cString: name)
     }
 
-    public var computeCapability: ComputeCapability {
+    public var computeCapability: (major: Int, minor: Int) {
         var major: Int32 = 0, minor: Int32 = 0
         cuDeviceComputeCapability(&major, &minor, handle)
-        return ComputeCapability(major: Int(major), minor: Int(minor))
+        return (major: Int(major), minor: Int(minor))
     }
 
     public var properties: Properties {
@@ -53,14 +44,24 @@ public struct Device : Equatable, CHandleCarrier {
         return String(cString: id)
     }
 
+    public func makeContext() -> Context {
+        var ctxHandle: CUcontext?
+        !!cuCtxCreate_v2(&ctxHandle, 0, handle)
+        return Context(binding: ctxHandle!)
+    }
+
     public static func ==(lhs: Device, rhs: Device) -> Bool {
         return lhs.handle == rhs.handle
     }
 
-    public init(atIndex index: Int) throws {
+    public init?(atIndex index: Int) {
         var handle: CUdevice = 0
-        try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
-        self.handle = handle
+        do {
+            try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
+            self.handle = handle
+        } catch {
+            return nil
+        }
     }
 
     public func withUnsafeHandle<Result>
@@ -74,8 +75,6 @@ public struct Device : Equatable, CHandleCarrier {
         return Int(deviceCount)
     }
 
-    public static var `default`: Device {
-        return try! Device(atIndex: 0)
-    }
+    public static var main: Device = Device(atIndex: 0)!
 
 }

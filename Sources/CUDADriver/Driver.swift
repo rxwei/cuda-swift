@@ -12,8 +12,8 @@ public enum Driver {
 
     /// Initialize driver API
     /// Call this before using any driver API!
-    public static func initialize() throws {
-        try ensureSuccess(cuInit(0))
+    public static func initialize() {
+        !!cuInit(0)
     }
 
 }

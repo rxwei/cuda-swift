@@ -5,7 +5,7 @@ import XCTest
 class CUDADriverTests: XCTestCase {
 
     override func setUp() {
-        try! Driver.initialize()
+        Driver.initialize()
     }
 
     func testDeviceCount() {
@@ -34,13 +34,15 @@ class CUDADriverTests: XCTestCase {
           + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
           + "}";
 
-        let ptx = try PTX(compilingSource: source, named: "test")
-        let ctx = try Context(device: Device.default)
+        let ptx = try Compiler.compile(source)
+        let ctx = Device.default.makeContext()
         let module = try Module(ptx: ptx)
-        let function = try module.function(named: "gSum")
+        let function = module.function(named: "gSum")
 
         let numbers: [Float] = [1, 2, 3, 4, 5]
         var result: Float = 0
+
+        /// TODO: launch kernel
 
         Context.synchronize()
     }

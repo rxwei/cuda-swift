@@ -8,7 +8,7 @@
 
 import CNVRTC
 
-public enum NVRTCError : UInt32, Error {
+public enum CompilerError : UInt32, Error {
 
     case outOfMemory = 1
     case programCreationFailure = 2
@@ -31,6 +31,20 @@ public enum NVRTCError : UInt32, Error {
 
 func ensureSuccess(_ result: nvrtcResult) throws {
     guard result == NVRTC_SUCCESS else {
-        throw NVRTCError(result)
+        throw CompilerError(result)
     }
+}
+
+
+func forceSuccess(_ result: nvrtcResult) {
+    guard result == NVRTC_SUCCESS else {
+        fatalError(String(describing: CompilerError(result)))
+    }
+}
+
+prefix operator !!
+
+@inline(__always)
+prefix func !!(result: nvrtcResult) {
+    forceSuccess(result)
 }

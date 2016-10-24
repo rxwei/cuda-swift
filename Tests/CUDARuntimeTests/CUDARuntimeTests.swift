@@ -32,7 +32,7 @@ class CUDARuntimeTests: XCTestCase {
         /// Array literal initialization!
         let devArray: DeviceArray<Int> = [1, 2, 3, 4, 5]
         XCTAssertEqual(hostArray, Array(devArray))
-        let hostArrayFromDev: [Int] = devArray.makeHostArray()
+        let hostArrayFromDev: [Int] = devArray.copyToHost()
         XCTAssertEqual(hostArray, hostArrayFromDev)
 
         /// Test copy-on-write

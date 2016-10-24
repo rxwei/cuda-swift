@@ -10,15 +10,6 @@ import CCUDARuntime
 
 public struct Device : Equatable {
 
-    public struct ComputeCapability : Equatable {
-        let major, minor: Int
-
-        public static func ==(lhs: ComputeCapability,
-                              rhs: ComputeCapability) -> Bool {
-            return lhs.major == rhs.major && lhs.minor == rhs.minor
-        }
-    }
-
     public typealias Properties = cudaDeviceProp
 
     public let index: Int32
@@ -63,16 +54,16 @@ public struct Device : Equatable {
         return prop
     }
 
-    public var computeCapability: ComputeCapability {
+    public var computeCapability: (major: Int, minor: Int) {
         var major: Int32 = 0
         !!cudaDeviceGetAttribute(&major, cudaDevAttrComputeCapabilityMajor, index)
         var minor: Int32 = 0
         !!cudaDeviceGetAttribute(&minor, cudaDevAttrComputeCapabilityMinor, index)
-        return ComputeCapability(major: Int(major), minor: Int(minor))
+        return (major: Int(major), minor: Int(minor))
     }
 
     public static func ==(lhs: Device, rhs: Device) -> Bool {
         return lhs.index == rhs.index
     }
-
+    
 }
