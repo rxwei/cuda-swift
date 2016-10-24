@@ -6,7 +6,7 @@
 //
 //
 
-fileprivate final class DeviceValueBuffer<Wrapped> {
+final class DeviceValueBuffer<Wrapped> {
 
     let address: UnsafeMutableDevicePointer<Wrapped>
 

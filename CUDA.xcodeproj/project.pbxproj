@@ -7,34 +7,40 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2916993E1DB38C82003A3B37 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2916993D1DB38C82003A3B37 /* Device.swift */; };
-		291699401DB40E30003A3B37 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2916993F1DB40E30003A3B37 /* Error.swift */; };
-		291699421DB4176D003A3B37 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699411DB4176D003A3B37 /* Error.swift */; };
-		291699441DB4270B003A3B37 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699431DB4270B003A3B37 /* Function.swift */; };
-		291699461DB42F9F003A3B37 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699451DB42F9F003A3B37 /* Memory.swift */; };
-		2916994A1DB435C9003A3B37 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291699491DB435C9003A3B37 /* Stream.swift */; };
-		2942BA061DB77940008B729B /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2942BA051DB77940008B729B /* Error.swift */; };
-		2942BA081DB78158008B729B /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2942BA071DB78158008B729B /* Array.swift */; };
-		2969E84A1DBCB90500AF60E6 /* CHandleCarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E8491DBCB90500AF60E6 /* CHandleCarrier.swift */; };
-		2969E84C1DBCC22500AF60E6 /* Driver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E84B1DBCC22500AF60E6 /* Driver.swift */; };
-		2969E84E1DBCEF8700AF60E6 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E84D1DBCEF8700AF60E6 /* Value.swift */; };
-		2969E8521DBD827F00AF60E6 /* Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E8511DBD827F00AF60E6 /* Module.swift */; };
-		2969E8541DBD841800AF60E6 /* Vectors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E8531DBD841800AF60E6 /* Vectors.swift */; };
-		2969E8561DBD849400AF60E6 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E8551DBD849400AF60E6 /* Stream.swift */; };
-		2969E8591DBD877F00AF60E6 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2969E8571DBD877800AF60E6 /* Error.swift */; };
-		29FA39901DB7FFFD00A34503 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29FA398F1DB7FFFD00A34503 /* Device.swift */; };
 		_LinkFileRef_CUDADriver_via_CUDADriverTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
+		_LinkFileRef_CUDADriver_via_CUDARuntime /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
+		_LinkFileRef_CUDADriver_via_CUDARuntimeTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
+		_LinkFileRef_CUDADriver_via_CuBLAS /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
+		_LinkFileRef_CUDADriver_via_CuBLASTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_NVRTC /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_NVRTCTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDARuntime_via_CUDARuntimeTests /* CUDARuntime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDARuntime" /* CUDARuntime.framework */; };
+		_LinkFileRef_CUDARuntime_via_CuBLAS /* CUDARuntime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDARuntime" /* CUDARuntime.framework */; };
+		_LinkFileRef_CUDARuntime_via_CuBLASTests /* CUDARuntime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDARuntime" /* CUDARuntime.framework */; };
 		_LinkFileRef_CuBLAS_via_CuBLASTests /* CuBLAS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CuBLAS" /* CuBLAS.framework */; };
 		_LinkFileRef_NVRTC_via_NVRTCTests /* NVRTC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_NVRTC" /* NVRTC.framework */; };
+		__src_cc_ref_Sources/CUDADriver/CHandleCarrier.swift /* CHandleCarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/CHandleCarrier.swift /* CHandleCarrier.swift */; };
 		__src_cc_ref_Sources/CUDADriver/Context.swift /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Context.swift /* Context.swift */; };
+		__src_cc_ref_Sources/CUDADriver/Device.swift /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Device.swift /* Device.swift */; };
+		__src_cc_ref_Sources/CUDADriver/Driver.swift /* Driver.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Driver.swift /* Driver.swift */; };
+		__src_cc_ref_Sources/CUDADriver/Error.swift /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Error.swift /* Error.swift */; };
+		__src_cc_ref_Sources/CUDADriver/Function.swift /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Function.swift /* Function.swift */; };
+		__src_cc_ref_Sources/CUDADriver/Memory.swift /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Memory.swift /* Memory.swift */; };
 		__src_cc_ref_Sources/CUDADriver/Module.swift /* Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Module.swift /* Module.swift */; };
 		__src_cc_ref_Sources/CUDADriver/PTX.swift /* PTX.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/PTX.swift /* PTX.swift */; };
-		__src_cc_ref_Sources/CUDARuntime/Device.swift /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Device.swift /* Memory.swift */; };
+		__src_cc_ref_Sources/CUDADriver/Stream.swift /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDADriver/Stream.swift /* Stream.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Array.swift /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Device.swift /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Device.swift /* Device.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Error.swift /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Error.swift /* Error.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Memory.swift /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Memory.swift /* Memory.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Module.swift /* Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Module.swift /* Module.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Stream.swift /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Stream.swift /* Stream.swift */; };
+		__src_cc_ref_Sources/CUDARuntime/Value.swift /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CUDARuntime/Value.swift /* Value.swift */; };
 		__src_cc_ref_Sources/CuBLAS/BLAS.swift /* BLAS.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CuBLAS/BLAS.swift /* BLAS.swift */; };
+		__src_cc_ref_Sources/CuBLAS/Error.swift /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CuBLAS/Error.swift /* Error.swift */; };
+		__src_cc_ref_Sources/CuBLAS/Vectors.swift /* Vectors.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/CuBLAS/Vectors.swift /* Vectors.swift */; };
 		__src_cc_ref_Sources/NVRTC/Compiler.swift /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/NVRTC/Compiler.swift /* Compiler.swift */; };
+		__src_cc_ref_Sources/NVRTC/Error.swift /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/NVRTC/Error.swift /* Error.swift */; };
 		__src_cc_ref_Tests/CUDADriverTests/CUDADriverTests.swift /* CUDADriverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Tests/CUDADriverTests/CUDADriverTests.swift /* CUDADriverTests.swift */; };
 		__src_cc_ref_Tests/CUDARuntimeTests/CUDARuntimeTests.swift /* CUDARuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Tests/CUDARuntimeTests/CUDARuntimeTests.swift /* CUDARuntimeTests.swift */; };
 		__src_cc_ref_Tests/CuBLASTests/CuBLASTests.swift /* CuBLASTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Tests/CuBLASTests/CuBLASTests.swift /* CuBLASTests.swift */; };
@@ -42,69 +48,64 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		296275C21DB37A360084EDC2 /* PBXContainerItemProxy */ = {
+		2931725B1DBDE083004A4AC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = __RootObject_ /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "______Target_CUDARuntime";
+			remoteInfo = CUDARuntime;
+		};
+		2931725C1DBDE083004A4AC5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = __RootObject_ /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = "______Target_CUDADriver";
 			remoteInfo = CUDADriver;
 		};
-		296275C31DB37A360084EDC2 /* PBXContainerItemProxy */ = {
+		2931725D1DBDE083004A4AC5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = __RootObject_ /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = "______Target_CuBLAS";
 			remoteInfo = CuBLAS;
 		};
-		296275C41DB37A360084EDC2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = __RootObject_ /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "______Target_CUDARuntime";
-			remoteInfo = CUDARuntime;
-		};
-		296275C51DB37A360084EDC2 /* PBXContainerItemProxy */ = {
+		2931725E1DBDE083004A4AC5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = __RootObject_ /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = "______Target_NVRTC";
 			remoteInfo = NVRTC;
 		};
-		2969E84F1DBD79F800AF60E6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = __RootObject_ /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "______Target_CUDARuntime";
-			remoteInfo = CUDARuntime;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2916993D1DB38C82003A3B37 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
-		2916993F1DB40E30003A3B37 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
-		291699411DB4176D003A3B37 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
-		291699431DB4270B003A3B37 /* Function.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
-		291699451DB42F9F003A3B37 /* Memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
-		291699491DB435C9003A3B37 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
-		2942BA051DB77940008B729B /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
-		2942BA071DB78158008B729B /* Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
-		2969E8491DBCB90500AF60E6 /* CHandleCarrier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CHandleCarrier.swift; sourceTree = "<group>"; };
-		2969E84B1DBCC22500AF60E6 /* Driver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Driver.swift; sourceTree = "<group>"; };
-		2969E84D1DBCEF8700AF60E6 /* Value.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Value.swift; path = Sources/CUDARuntime/Value.swift; sourceTree = SOURCE_ROOT; };
-		2969E8511DBD827F00AF60E6 /* Module.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Module.swift; sourceTree = "<group>"; };
-		2969E8531DBD841800AF60E6 /* Vectors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vectors.swift; sourceTree = "<group>"; };
-		2969E8551DBD849400AF60E6 /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
-		2969E8571DBD877800AF60E6 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
-		29FA398F1DB7FFFD00A34503 /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
-		__PBXFileRef_Build /* Build */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Build; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcodeproj/Configs/Project.xcconfig /* CUDA.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CUDA.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
+		__PBXFileRef_CUDA.xcworkspace /* CUDA.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CUDA.xcworkspace; sourceTree = "<group>"; };
+		__PBXFileRef_Frameworks /* Frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Frameworks; sourceTree = "<group>"; };
 		__PBXFileRef_Package.swift /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Resources /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/CHandleCarrier.swift /* CHandleCarrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHandleCarrier.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/CUDADriver/Context.swift /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/Device.swift /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/Driver.swift /* Driver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Driver.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/Error.swift /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/Function.swift /* Function.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/Memory.swift /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/CUDADriver/Module.swift /* Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Module.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/CUDADriver/PTX.swift /* PTX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PTX.swift; sourceTree = "<group>"; };
-		__PBXFileRef_Sources/CUDARuntime/Device.swift /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDADriver/Stream.swift /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Device.swift /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Error.swift /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Memory.swift /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Module.swift /* Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Module.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Stream.swift /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CUDARuntime/Value.swift /* Value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/CuBLAS/BLAS.swift /* BLAS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLAS.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CuBLAS/Error.swift /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/CuBLAS/Vectors.swift /* Vectors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vectors.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/NVRTC/Compiler.swift /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/NVRTC/Error.swift /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Tests/CUDADriverTests/CUDADriverTests.swift /* CUDADriverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CUDADriverTests.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Tests/CUDARuntimeTests/CUDARuntimeTests.swift /* CUDARuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CUDARuntimeTests.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Tests/CuBLASTests/CuBLASTests.swift /* CuBLASTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuBLASTests.swift; sourceTree = "<group>"; };
@@ -139,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
+				_LinkFileRef_CUDADriver_via_CUDARuntime /* CUDADriver.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,6 +148,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
+				_LinkFileRef_CUDADriver_via_CUDARuntimeTests /* CUDADriver.framework in Frameworks */,
 				_LinkFileRef_CUDARuntime_via_CUDARuntimeTests /* CUDARuntime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -154,6 +157,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
+				_LinkFileRef_CUDADriver_via_CuBLAS /* CUDADriver.framework in Frameworks */,
+				_LinkFileRef_CUDARuntime_via_CuBLAS /* CUDARuntime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +166,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
+				_LinkFileRef_CUDADriver_via_CuBLASTests /* CUDADriver.framework in Frameworks */,
+				_LinkFileRef_CUDARuntime_via_CuBLASTests /* CUDARuntime.framework in Frameworks */,
 				_LinkFileRef_CuBLAS_via_CuBLASTests /* CuBLAS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -202,7 +209,9 @@
 				__PBXFileRef_Package.swift /* Package.swift */,
 				"_____Configs_" /* Configs */,
 				"_____Sources_" /* Sources */,
-				__PBXFileRef_Build /* Build */,
+				__PBXFileRef_CUDA.xcworkspace /* CUDA.xcworkspace */,
+				__PBXFileRef_Frameworks /* Frameworks */,
+				__PBXFileRef_Resources /* Resources */,
 				"_______Tests_" /* Tests */,
 				"____Products_" /* Products */,
 			);
@@ -242,16 +251,16 @@
 		"_______Group_CUDADriver" /* CUDADriver */ = {
 			isa = PBXGroup;
 			children = (
-				2969E84B1DBCC22500AF60E6 /* Driver.swift */,
-				2969E8491DBCB90500AF60E6 /* CHandleCarrier.swift */,
+				__PBXFileRef_Sources/CUDADriver/CHandleCarrier.swift /* CHandleCarrier.swift */,
 				__PBXFileRef_Sources/CUDADriver/Context.swift /* Context.swift */,
-				2916993D1DB38C82003A3B37 /* Device.swift */,
-				291699451DB42F9F003A3B37 /* Memory.swift */,
+				__PBXFileRef_Sources/CUDADriver/Device.swift /* Device.swift */,
+				__PBXFileRef_Sources/CUDADriver/Driver.swift /* Driver.swift */,
+				__PBXFileRef_Sources/CUDADriver/Error.swift /* Error.swift */,
+				__PBXFileRef_Sources/CUDADriver/Function.swift /* Function.swift */,
+				__PBXFileRef_Sources/CUDADriver/Memory.swift /* Memory.swift */,
 				__PBXFileRef_Sources/CUDADriver/Module.swift /* Module.swift */,
-				291699431DB4270B003A3B37 /* Function.swift */,
 				__PBXFileRef_Sources/CUDADriver/PTX.swift /* PTX.swift */,
-				2916993F1DB40E30003A3B37 /* Error.swift */,
-				291699491DB435C9003A3B37 /* Stream.swift */,
+				__PBXFileRef_Sources/CUDADriver/Stream.swift /* Stream.swift */,
 			);
 			name = CUDADriver;
 			path = Sources/CUDADriver;
@@ -269,13 +278,13 @@
 		"_______Group_CUDARuntime" /* CUDARuntime */ = {
 			isa = PBXGroup;
 			children = (
-				__PBXFileRef_Sources/CUDARuntime/Device.swift /* Memory.swift */,
-				2969E8511DBD827F00AF60E6 /* Module.swift */,
-				29FA398F1DB7FFFD00A34503 /* Device.swift */,
-				2969E8551DBD849400AF60E6 /* Stream.swift */,
-				2942BA071DB78158008B729B /* Array.swift */,
-				2969E84D1DBCEF8700AF60E6 /* Value.swift */,
-				2942BA051DB77940008B729B /* Error.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Device.swift /* Device.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Error.swift /* Error.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Memory.swift /* Memory.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Module.swift /* Module.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Stream.swift /* Stream.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Value.swift /* Value.swift */,
 			);
 			name = CUDARuntime;
 			path = Sources/CUDARuntime;
@@ -294,8 +303,8 @@
 			isa = PBXGroup;
 			children = (
 				__PBXFileRef_Sources/CuBLAS/BLAS.swift /* BLAS.swift */,
-				2969E8571DBD877800AF60E6 /* Error.swift */,
-				2969E8531DBD841800AF60E6 /* Vectors.swift */,
+				__PBXFileRef_Sources/CuBLAS/Error.swift /* Error.swift */,
+				__PBXFileRef_Sources/CuBLAS/Vectors.swift /* Vectors.swift */,
 			);
 			name = CuBLAS;
 			path = Sources/CuBLAS;
@@ -314,7 +323,7 @@
 			isa = PBXGroup;
 			children = (
 				__PBXFileRef_Sources/NVRTC/Compiler.swift /* Compiler.swift */,
-				291699411DB4176D003A3B37 /* Error.swift */,
+				__PBXFileRef_Sources/NVRTC/Error.swift /* Error.swift */,
 			);
 			name = NVRTC;
 			path = Sources/NVRTC;
@@ -386,6 +395,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				__Dependency_CUDADriver /* PBXTargetDependency */,
 			);
 			name = CUDARuntime;
 			productName = CUDARuntime;
@@ -419,7 +429,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				2969E8501DBD79F800AF60E6 /* PBXTargetDependency */,
+				__Dependency_CUDARuntime /* PBXTargetDependency */,
 			);
 			name = CuBLAS;
 			productName = CuBLAS;
@@ -514,16 +524,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				__src_cc_ref_Sources/CUDADriver/CHandleCarrier.swift /* CHandleCarrier.swift in Sources */,
 				__src_cc_ref_Sources/CUDADriver/Context.swift /* Context.swift in Sources */,
-				2969E84A1DBCB90500AF60E6 /* CHandleCarrier.swift in Sources */,
+				__src_cc_ref_Sources/CUDADriver/Device.swift /* Device.swift in Sources */,
+				__src_cc_ref_Sources/CUDADriver/Driver.swift /* Driver.swift in Sources */,
+				__src_cc_ref_Sources/CUDADriver/Error.swift /* Error.swift in Sources */,
+				__src_cc_ref_Sources/CUDADriver/Function.swift /* Function.swift in Sources */,
+				__src_cc_ref_Sources/CUDADriver/Memory.swift /* Memory.swift in Sources */,
 				__src_cc_ref_Sources/CUDADriver/Module.swift /* Module.swift in Sources */,
 				__src_cc_ref_Sources/CUDADriver/PTX.swift /* PTX.swift in Sources */,
-				2916994A1DB435C9003A3B37 /* Stream.swift in Sources */,
-				2969E84C1DBCC22500AF60E6 /* Driver.swift in Sources */,
-				291699461DB42F9F003A3B37 /* Memory.swift in Sources */,
-				291699441DB4270B003A3B37 /* Function.swift in Sources */,
-				291699401DB40E30003A3B37 /* Error.swift in Sources */,
-				2916993E1DB38C82003A3B37 /* Device.swift in Sources */,
+				__src_cc_ref_Sources/CUDADriver/Stream.swift /* Stream.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,13 +549,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				2942BA081DB78158008B729B /* Array.swift in Sources */,
-				2942BA061DB77940008B729B /* Error.swift in Sources */,
-				2969E84E1DBCEF8700AF60E6 /* Value.swift in Sources */,
-				__src_cc_ref_Sources/CUDARuntime/Device.swift /* Memory.swift in Sources */,
-				29FA39901DB7FFFD00A34503 /* Device.swift in Sources */,
-				2969E8521DBD827F00AF60E6 /* Module.swift in Sources */,
-				2969E8561DBD849400AF60E6 /* Stream.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Array.swift /* Array.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Device.swift /* Device.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Error.swift /* Error.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Memory.swift /* Memory.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Module.swift /* Module.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Stream.swift /* Stream.swift in Sources */,
+				__src_cc_ref_Sources/CUDARuntime/Value.swift /* Value.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,9 +571,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				2969E8541DBD841800AF60E6 /* Vectors.swift in Sources */,
-				2969E8591DBD877F00AF60E6 /* Error.swift in Sources */,
 				__src_cc_ref_Sources/CuBLAS/BLAS.swift /* BLAS.swift in Sources */,
+				__src_cc_ref_Sources/CuBLAS/Error.swift /* Error.swift in Sources */,
+				__src_cc_ref_Sources/CuBLAS/Vectors.swift /* Vectors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,8 +589,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				291699421DB4176D003A3B37 /* Error.swift in Sources */,
 				__src_cc_ref_Sources/NVRTC/Compiler.swift /* Compiler.swift in Sources */,
+				__src_cc_ref_Sources/NVRTC/Error.swift /* Error.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -595,30 +605,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2969E8501DBD79F800AF60E6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "______Target_CUDARuntime" /* CUDARuntime */;
-			targetProxy = 2969E84F1DBD79F800AF60E6 /* PBXContainerItemProxy */;
-		};
 		__Dependency_CUDADriver /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_CUDADriver" /* CUDADriver */;
-			targetProxy = 296275C21DB37A360084EDC2 /* PBXContainerItemProxy */;
+			targetProxy = 2931725C1DBDE083004A4AC5 /* PBXContainerItemProxy */;
 		};
 		__Dependency_CUDARuntime /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_CUDARuntime" /* CUDARuntime */;
-			targetProxy = 296275C41DB37A360084EDC2 /* PBXContainerItemProxy */;
+			targetProxy = 2931725B1DBDE083004A4AC5 /* PBXContainerItemProxy */;
 		};
 		__Dependency_CuBLAS /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_CuBLAS" /* CuBLAS */;
-			targetProxy = 296275C31DB37A360084EDC2 /* PBXContainerItemProxy */;
+			targetProxy = 2931725D1DBDE083004A4AC5 /* PBXContainerItemProxy */;
 		};
 		__Dependency_NVRTC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "______Target_NVRTC" /* NVRTC */;
-			targetProxy = 296275C51DB37A360084EDC2 /* PBXContainerItemProxy */;
+			targetProxy = 2931725E1DBDE083004A4AC5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -661,7 +666,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "/Users/rxwei/Development/ML/CUDA/Packages/CCUDA-1.4.0";
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDARuntime_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx /usr/local/cuda/lib";
+				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = CUDARuntime;
@@ -678,7 +683,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "/Users/rxwei/Development/ML/CUDA/Packages/CCUDA-1.4.0";
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDARuntimeTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_VERSION = 3.0;
@@ -787,7 +792,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "/Users/rxwei/Development/ML/CUDA/Packages/CCUDA-1.4.0";
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDARuntime_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx /usr/local/cuda/lib";
+				LD_RUNPATH_SEARCH_PATHS = "$(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = CUDARuntime;
@@ -805,7 +810,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
 				HEADER_SEARCH_PATHS = "/Users/rxwei/Development/ML/CUDA/Packages/CCUDA-1.4.0";
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDARuntimeTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";

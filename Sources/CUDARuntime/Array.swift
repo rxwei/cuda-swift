@@ -8,7 +8,7 @@
 
 import CCUDARuntime
 
-fileprivate final class DeviceArrayBuffer<Element> : RandomAccessCollection {
+final class DeviceArrayBuffer<Element> : RandomAccessCollection {
 
     typealias Index = Int
     typealias IndexDistance = Int
@@ -100,7 +100,7 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         self = other
     }
 
-    public func makeHostArray() -> [Element] {
+    public func copyToHost() -> [Element] {
         var elements: [Element] = []
         elements.reserveCapacity(count)
         /// Temporary array copy solution
@@ -154,17 +154,17 @@ public extension DeviceArray {
 
     @inline(__always)
     public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
-        return try makeHostArray().reduce(initialResult, nextPartialResult)
+        return try copyToHost().reduce(initialResult, nextPartialResult)
     }
 
     @inline(__always)
     public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
-        return try makeHostArray().map(transform)
+        return try copyToHost().map(transform)
     }
 
     @inline(__always)
     public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
-        return try makeHostArray().flatMap(transform)
+        return try copyToHost().flatMap(transform)
     }
     
 }
@@ -172,7 +172,7 @@ public extension DeviceArray {
 public extension Array {
 
     public init(_ elementsOnDevice: DeviceArray<Element>) {
-        self = elementsOnDevice.makeHostArray()
+        self = elementsOnDevice.copyToHost()
     }
     
 }

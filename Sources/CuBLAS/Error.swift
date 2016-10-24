@@ -8,17 +8,16 @@
 
 import CCuBLAS
 
-
 public enum BLASError : UInt32, Error {
-    case notInitialized  = 1
-    case allocFailed     = 3
-    case invalidValue    = 7
-    case archMismatch    = 8
-    case mappingError    = 11
-    case executionFailed = 13
-    case internalError   = 14
-    case notSupported    = 15
-    case licenseError    = 16
+    case notInitialized       = 1
+    case allocationFailed     = 3
+    case invalidValue         = 7
+    case architectureMismatch = 8
+    case mappingError         = 11
+    case executionFailed      = 13
+    case internalError        = 14
+    case notSupported         = 15
+    case licenseError         = 16
 
     init(_ cudaError: cublasStatus_t) {
         self.init(rawValue: cudaError.rawValue)!
