@@ -1,0 +1,5 @@
+module CCuDNN [system] {
+  header "/usr/local/cuda/include/cudnn.h"
+  link "cudnn"
+}
+

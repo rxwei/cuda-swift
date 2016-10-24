@@ -38,7 +38,7 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
 
     public static func allocate(capacity: Int) throws -> UnsafeMutableDevicePointer<Pointee> {
         var address: CUdeviceptr = 0
-        try ensureSuccess(cuMemAlloc_v2(&address, capacity))
+        try ensureSuccess(cuMemAlloc_v2(&address, capacity * MemoryLayout<Pointee>.stride))
         return UnsafeMutableDevicePointer(assumingNonNil: address)
     }
 

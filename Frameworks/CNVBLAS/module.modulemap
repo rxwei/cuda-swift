@@ -1,0 +1,4 @@
+module CNVBLAS [system] {
+  header "/usr/local/cuda/include/nvblas.h"
+  link "nvblas"
+}

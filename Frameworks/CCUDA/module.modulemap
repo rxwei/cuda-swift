@@ -1,0 +1,4 @@
+module CCUDA [system] {
+  header "/usr/local/cuda/include/cuda.h"
+  link "cuda"
+}

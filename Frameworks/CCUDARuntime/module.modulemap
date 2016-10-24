@@ -1,0 +1,4 @@
+module CCUDARuntime [system] {
+  header "/usr/local/cuda/include/cuda_runtime.h"
+  link "cudart"
+}

@@ -1,0 +1,4 @@
+module CNVRTC [system] {
+  header "/usr/local/cuda/include/nvrtc.h"
+  link "nvrtc"
+}

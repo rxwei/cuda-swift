@@ -44,21 +44,34 @@ public struct Function : CHandleCarrier {
 
     /// Grid of blocks
     public struct GridSize {
-        let x: Int, y: Int, z: Int
+        public let x: Int, y: Int, z: Int
+
+        public init(x: Int, y: Int, z: Int) {
+            self.x = x
+            self.y = y
+            self.z = z
+        }
     }
 
     /// Block of threads
     public struct BlockSize {
-        let x: Int, y: Int, z: Int
+        public let x: Int, y: Int, z: Int
         /// Shared memory size per thread
-        let sharedMemorySize: Int
+        public let sharedMemorySize: Int
+        
+        public init(x: Int, y: Int, z: Int, sharedMemorySize: Int) {
+            self.x = x
+            self.y = y
+            self.z = z
+            self.sharedMemorySize = sharedMemorySize
+        }
     }
     
     public func withUnsafeHandle<Result>(_ body: (Handle) throws -> Result) rethrows -> Result {
         return try body(handle)
     }
 
-    public func launch(onArguments arguments: [Any], inGrid gridSize: GridSize,
+    public func launch(withArguments arguments: [Any], inGrid gridSize: GridSize,
                        ofBlocks blockSize: BlockSize, stream: Stream?) throws {
         try arguments.withUnsafeBufferPointer { ptr in
             let argPtr = unsafeBitCast(ptr.baseAddress, to: UnsafeMutablePointer<UnsafeMutableRawPointer?>.self)

@@ -34,6 +34,14 @@ class CuBLASTests: XCTestCase {
             /// Compare
             XCTAssertEqual(yy.makeHostArray(), expected)
             XCTAssertEqual(yy2.makeHostArray(), expected2)
+
+            /// Another test
+
+            /// We are going to add vector X onto Y using cuBLAS
+            let vectorX: DeviceArray<Float> = [1.1, 2.2, 0.3, -4.0]
+            var vectorY: DeviceArray<Float> = [0.0, -2.7, 0.009, -0.07]
+            BLAS.current.add(vectorX, multipliedBy: 1.0, onto: &vectorY)
+            print(vectorY.makeHostArray())
         }
     }
 
