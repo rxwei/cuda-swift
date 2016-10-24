@@ -13,7 +13,7 @@ class CUDADriverTests: XCTestCase {
     }
 
     func testDevice() {
-        let computability = Device.default.computeCapability
+        let computability = Device.main.computeCapability
         XCTAssertGreaterThanOrEqual(computability.major, 1)
         XCTAssertGreaterThanOrEqual(computability.minor, 0)
     }
@@ -35,7 +35,7 @@ class CUDADriverTests: XCTestCase {
           + "}";
 
         let ptx = try Compiler.compile(source)
-        let ctx = Device.default.makeContext()
+        let ctx = Device.main.makeContext()
         let module = try Module(ptx: ptx)
         let function = module.function(named: "gSum")
 
