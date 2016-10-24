@@ -414,3 +414,17 @@ func ensureSuccess(_ result: CUresult) throws {
         throw DriverError(result)
     }
 }
+
+
+func forceSuccess(_ result: CUresult) {
+    guard result == CUDA_SUCCESS else {
+        fatalError(String(describing: DriverError(result)))
+    }
+}
+
+prefix operator !!
+
+@inline(__always)
+prefix func !!(cudaError: CUresult) {
+    forceSuccess(cudaError)
+}

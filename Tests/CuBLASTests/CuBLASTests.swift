@@ -5,16 +5,16 @@ import CUDARuntime
 class CuBLASTests: XCTestCase {
 
     override func setUp() {
-        _ = BLAS.global
+        _ = BLAS.current
     }
 
     func testSum() {
         measure {
             let xx: DeviceArray<Float> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
-            let result = BLAS.global.absSum(xx)
+            let result = BLAS.current.absSum(xx)
             XCTAssertEqual(result, xx.reduce(0, {$0+abs($1)}))
             let xxDouble: DeviceArray<Double> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
-            let resultDouble = BLAS.global.absSum(xxDouble)
+            let resultDouble = BLAS.current.absSum(xxDouble)
             XCTAssertEqual(resultDouble, xxDouble.reduce(0, {$0+abs($1)}))
         }
     }
@@ -26,8 +26,8 @@ class CuBLASTests: XCTestCase {
             var yy2 = yy
             let yyOrig = yy
             /// Compute addition by BLAS
-            BLAS.global.add(xx, onto: &yy)
-            BLAS.global.add(xx, multipliedBy: 0.0002, onto: &yy2)
+            BLAS.current.add(xx, onto: &yy)
+            BLAS.current.add(xx, multipliedBy: 0.0002, onto: &yy2)
             /// Compute addition using CPU
             let expected = zip(xx, yyOrig).map { x, y in x * 1.0 + y }
             let expected2 = zip(xx, yyOrig).map { x, y in x * 0.0002 + y }

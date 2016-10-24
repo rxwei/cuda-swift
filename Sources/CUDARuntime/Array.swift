@@ -17,7 +17,7 @@ fileprivate final class DeviceArrayBuffer<Element> : RandomAccessCollection {
 
     private(set) var count: Int
 
-    required init(capacity: Int) {
+    init(capacity: Int) {
         baseAddress = UnsafeMutableDevicePointer.allocate(capacity: capacity)
         count = capacity
     }
@@ -27,7 +27,7 @@ fileprivate final class DeviceArrayBuffer<Element> : RandomAccessCollection {
         self.baseAddress.assign(from: other.baseAddress, count: count)
     }
 
-    convenience init<C: Collection>(_ elements: C) where
+    convenience init<C: Collection>(fromHost elements: C) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
         self.init(capacity: elements.count)
@@ -89,11 +89,11 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
     public init<C: Collection>(fromHost elements: C) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
-        buffer = DeviceArrayBuffer(elements)
+        buffer = DeviceArrayBuffer(fromHost: elements)
     }
 
     public init(arrayLiteral elements: Element...) {
-        buffer = DeviceArrayBuffer(elements)
+        buffer = DeviceArrayBuffer(fromHost: elements)
     }
 
     public init(_ other: DeviceArray<Element>) {

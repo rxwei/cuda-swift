@@ -28,7 +28,7 @@ open class Context : CHandleCarrier {
         return Int(lowerBound)..<Int(upperBound)
     }
 
-    public required init(device: Device) throws {
+    public init(device: Device) throws {
         var handle: CUcontext?
         try ensureSuccess(cuCtxCreate_v2(&handle, 0, device.handle))
         self.handle = handle!

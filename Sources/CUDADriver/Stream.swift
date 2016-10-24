@@ -16,20 +16,26 @@ open class Stream : CHandleCarrier {
 
     private static var instances: [CUstream : Stream] = [:]
 
-    private static func current(withHandle handle: CUstream) -> Stream {
+    open static func current(with handle: CUstream) -> Stream {
         return Stream.instances[handle]!
     }
 
-    public required init(priority: Int? = nil) throws {
+    public init() {
         var handle: CUstream?
-        if let priority = priority {
-            try ensureSuccess(cuStreamCreateWithPriority(
-                &handle, 0, Int32(priority)
-            ))
-        } else {
-            try ensureSuccess(cuStreamCreate(&handle, 0))
+        !!cuStreamCreate(&handle, 0)
+        self.handle = handle! // Safe
+        Stream.instances[self.handle] = self
+    }
+
+    public init?(priority: Int) {
+        var handle: CUstream?
+        do {
+            try ensureSuccess(cuStreamCreateWithPriority(&handle, 0, Int32(priority)))
+        } catch {
+            return nil
         }
         self.handle = handle! // Safe
+        Stream.instances[self.handle] = self
     }
 
     deinit {
@@ -50,7 +56,7 @@ open class Stream : CHandleCarrier {
     open func addCallback(_ callback: (Stream?, DriverError?) -> ()) {
         let cuCallback: CUstreamCallback = { handle, result, ptr in
             let callback = unsafeBitCast(ptr, to: ((Stream?, DriverError?) -> ()).self)
-            callback(Stream.current(withHandle: handle!),
+            callback(Stream.current(with: handle!),
                      result == CUDA_SUCCESS ? nil : DriverError(result))
         }
         cuStreamAddCallback(handle, cuCallback,
@@ -58,7 +64,7 @@ open class Stream : CHandleCarrier {
     }
 
     public func withUnsafeHandle<Result>
-        (_ body: (OpaquePointer) throws -> Result) rethrows -> Result {
+        (_ body: (Handle) throws -> Result) rethrows -> Result {
         return try body(handle)
     }
 
