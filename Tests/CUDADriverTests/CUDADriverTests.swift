@@ -1,6 +1,7 @@
 import XCTest
 @testable import CUDADriver
 @testable import class NVRTC.Compiler
+@testable import class NVRTC.Program
 
 class CUDADriverTests: XCTestCase {
 
@@ -41,7 +42,8 @@ class CUDADriverTests: XCTestCase {
           + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
           + "}";
 
-        let ptx = try Compiler.compile(source)
+        let program = try Program(source: source, name: "test")
+        let ptx = try Compiler.compile(program)
         try Device.main.withContext { context in
             let module = try Module(ptx: ptx)
             _ = module.function(named: "gIncr")

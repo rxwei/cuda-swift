@@ -8,7 +8,92 @@
 
 import CNVRTC
 @_exported import struct CUDADriver.PTX
+import protocol CUDADriver.CHandleCarrier
 import Foundation
+
+/// Source-level program
+open class Program {
+
+    let handle: nvrtcProgram
+
+    public var name: String?
+
+    /// Initialize with source program and headers
+    public init(data: Data, name: String? = nil,
+                headers: [(name: String, data: Data)]) throws {
+        self.name = name
+        var headerNames: [UnsafePointer<Int8>?] = headers.map { name, _ in
+            name.withCString{$0}
+        }
+        var headerCodes: [UnsafePointer<Int8>?] = headers.map { _, data in
+            data.withUnsafeBytes{$0}
+        }
+        var handle: nvrtcProgram?
+        try ensureSuccess(
+            data.withUnsafeBytes { bytes in
+                nvrtcCreateProgram(
+                    &handle,                          /// Handle
+                    bytes,                            /// Source
+                    name?.utf8CString.map{$0} ?? nil, /// Program name
+                    Int32(headerNames.count),         /// Header count
+                    &headerCodes,                     /// Headers
+                    &headerNames                      /// Header names
+                )
+            }
+        )
+        self.handle = handle! /// Safe
+    }
+
+    /// Initialize with source program
+    public init(data: Data, name: String? = nil) throws {
+        self.name = name
+        var handle: nvrtcProgram?
+        try ensureSuccess(
+            data.withUnsafeBytes { bytes in
+                nvrtcCreateProgram(
+                    &handle,                          /// Handle
+                    bytes,                            /// Source
+                    name?.utf8CString.map{$0} ?? nil, /// Program name
+                    0, nil, nil                       /// No headers
+                )
+            }
+        )
+        self.handle = handle! /// Safe
+    }
+
+    public convenience init(source: String, name: String? = nil) throws {
+        guard let data = source.data(using: .utf8, allowLossyConversion: true) else {
+            throw CompilerError.invalidEncoding
+        }
+        try self.init(data: data, name: name)
+    }
+
+    public convenience init(sourceFile: String) throws {
+        let url = URL(fileURLWithPath: sourceFile)
+        let name = url.deletingPathExtension().lastPathComponent
+        let data = try Data(contentsOf: url)
+        try self.init(data: data, name: name)
+    }
+
+    deinit {
+        var handle: nvrtcProgram? = self.handle
+        !!nvrtcDestroyProgram(&handle)
+    }
+
+    internal func retrievePTX() throws -> PTX {
+        var ptxSize = 0
+        /// Get PTX size
+        try ensureSuccess(nvrtcGetPTXSize(handle, &ptxSize))
+        var outData = Data(capacity: ptxSize)
+        outData.count = ptxSize
+        /// Get PTX data
+        try outData.withUnsafeMutableBytes { ptxBuf in
+            try ensureSuccess(nvrtcGetPTX(handle, ptxBuf))
+        }
+        return PTX(data: outData, name: name)
+    }
+
+}
 
 open class Compiler {
 
@@ -18,70 +103,20 @@ open class Compiler {
         nvrtcVersion(&major, &minor)
         return (major: Int(major), minor: Int(minor))
     }
-    
-    open class func compile(_ data: Data,
-                            named name: String? = nil,
-                            options: [String]? = nil) throws -> PTX {
-        /// Create program
-        var program: nvrtcProgram?
-        try ensureSuccess(
-            data.withUnsafeBytes { (bytes: UnsafePointer<Int8>) in
-                if var nameStr = name?.utf8CString.map({$0}) {
-                    return nvrtcCreateProgram(&program, bytes, &nameStr, 0, nil, nil)
-                }
-                return nvrtcCreateProgram(&program, bytes, "default", 0, nil, nil)
-            }
-        )
 
-        /// Compile with options
-        if let options = options {
-            try options.withUnsafeBufferPointer { (ptr: UnsafeBufferPointer<String>) in
-                var cStringPtr: [UnsafePointer<Int8>?] = ptr.map{$0.withCString{$0}}
-                try ensureSuccess(nvrtcCompileProgram(program, Int32(ptr.count), &cStringPtr))
-            }
-        }
-        /// Compile without options
-        else {
-            try ensureSuccess(nvrtcCompileProgram(program, 0, nil))
-        }
+    open class func compile(_ program: Program) throws -> PTX {
+        try ensureSuccess(nvrtcCompileProgram(program.handle, 0, nil))
+        return try program.retrievePTX()
+    }
 
-        /// Get PTX size
-        var ptxSize: Int = 0
-        nvrtcGetPTXSize(program, &ptxSize)
-
-        /// Get PTX
-        var outData = Data(capacity: ptxSize)
-        outData.count = ptxSize
-        outData.withUnsafeMutableBytes { ptxBuf -> () in
-            nvrtcGetPTX(program, ptxBuf)
+    open class func compile(_ program: Program, options: [String]) throws -> PTX {
+        return try options.withUnsafeBufferPointer { ptr in
+            var cStringPtr: [UnsafePointer<Int8>?] = ptr.map{$0.withCString{$0}}
+            try ensureSuccess(
+                nvrtcCompileProgram(program.handle, Int32(ptr.count), &cStringPtr)
+            )
+            return try program.retrievePTX()
         }
-        nvrtcDestroyProgram(&program)
-        return PTX(data: outData, name: name)
-    }
-    
-    open class func compile(from url: URL,
-                            options: [String]? = nil) throws -> PTX {
-        let handle = try FileHandle(forReadingFrom: url)
-        let data = handle.readDataToEndOfFile()
-        return try compile(
-            data,
-            named: url.deletingPathExtension().lastPathComponent,
-            options: options
-        )
-    }
-    
-    open class func compile(_ source: String,
-                            named name: String? = nil,
-                            options: [String]? = nil) throws -> PTX {
-        guard let data = source.data(using: .utf8, allowLossyConversion: true) else {
-            throw CompilerError.wrongSourceFormat
-        }
-        return try compile(data, named: name, options: options)
-    }
-    
-    open class func compileSourceFile(_ path: String,
-                                      options: [String]? = nil) throws -> PTX {
-        return try compile(from: URL(fileURLWithPath: path), options: options)
     }
 
 }

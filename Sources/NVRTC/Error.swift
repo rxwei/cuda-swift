@@ -21,7 +21,7 @@ public enum CompilerError : UInt32, Error {
     case noLoweredNamesBeforeCompilation = 9
     case nameExpressionNotValid = 10
     case internalError = 11
-    case wrongSourceFormat
+    case invalidEncoding
 
     init(_ nvrtcError: nvrtcResult) {
         self.init(rawValue: nvrtcError.rawValue)!

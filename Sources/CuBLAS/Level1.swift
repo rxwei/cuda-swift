@@ -15,8 +15,8 @@ public extension BLAS {
 
     public func sumOfAbsoluteValues(in vector: DeviceVector<Float>) -> DeviceValue<Float> {
         var result = DeviceValue<Float>()
-        result.withUnsafeMutableDevicePointer { resultPtr -> () in
-            vector.withUnsafeDevicePointer { dataPtr -> () in
+        result.withUnsafeMutableDevicePointer { resultPtr in
+            vector.withUnsafeDevicePointer { dataPtr in
                 !!cublasSasum_v2(
                     handle,
                     Int32(vector.count),
@@ -30,8 +30,8 @@ public extension BLAS {
 
     public func sumOfAbsoluteValues(in vector: DeviceVector<Double>) -> DeviceValue<Double> {
         var result = DeviceValue<Double>()
-        result.withUnsafeMutableDevicePointer { resultPtr -> () in
-            vector.withUnsafeDevicePointer { dataPtr -> () in
+        result.withUnsafeMutableDevicePointer { resultPtr in
+            vector.withUnsafeDevicePointer { dataPtr in
                 !!cublasDasum_v2(
                     handle,
                     Int32(vector.count),
@@ -47,9 +47,9 @@ public extension BLAS {
                     multipliedBy alpha: DeviceValue<Float>? = nil,
                     onto y: inout DeviceVector<Float>) {
         let alpha = alpha ?? floatOne
-        y.withUnsafeMutableDevicePointer { destPtr -> () in
-            x.withUnsafeDevicePointer { srcPtr -> () in
-                alpha.withUnsafeDevicePointer { alphaPtr -> () in
+        y.withUnsafeMutableDevicePointer { destPtr in
+            x.withUnsafeDevicePointer { srcPtr in
+                alpha.withUnsafeDevicePointer { alphaPtr in
                     !!cublasSaxpy_v2(
                         handle,
                         Int32(x.count), alphaPtr.deviceAddress,
