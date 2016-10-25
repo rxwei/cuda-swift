@@ -91,7 +91,9 @@ class CUDARuntimeTests: XCTestCase {
 
         let ptx = try Compiler.compile(source)
         let module = try Module(ptx: ptx)
-        let function = module.function(named: "gSum")
+        _ = module.function(named: "gIncr")
+        _ = module.function(named: "gSum")
+        _ = module.function(named: "saxpy")
     }
 
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {

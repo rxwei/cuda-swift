@@ -8,6 +8,13 @@ class CUDADriverTests: XCTestCase {
         Driver.initialize()
     }
 
+    /// Test initialize multiple times
+    func testInitialize() {
+        Driver.initialize()
+        Driver.initialize()
+        Driver.initialize()
+    }
+
     func testDeviceCount() {
         XCTAssertGreaterThanOrEqual(Device.count, 1)
     }
@@ -37,12 +44,15 @@ class CUDADriverTests: XCTestCase {
         let ptx = try Compiler.compile(source)
         try Device.main.withContext { context in
             let module = try Module(ptx: ptx)
-            let function = module.function(named: "gSum")
+            _ = module.function(named: "gIncr")
+            _ = module.function(named: "gSum")
+            _ = module.function(named: "saxpy")
         }
     }
 
     static var allTests : [(String, (CUDADriverTests) -> () throws -> Void)] {
         return [
+            ("testInitialize", testInitialize),
             ("testDeviceCount", testDeviceCount),
             ("testDevice", testDevice),
             ("testModule", testModule),
