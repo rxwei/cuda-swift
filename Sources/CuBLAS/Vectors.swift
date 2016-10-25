@@ -11,8 +11,8 @@ import CCuBLAS
 
 public extension BLAS {
 
-    public func absSum(_ data: DeviceArray<Float>) -> Float {
-        var data = data
+    public func sumOfAbsoluteValues(in elements: DeviceArray<Float>) -> Float {
+        var data = elements
         var result: Float = 0.0
         data.withUnsafeMutableDevicePointer { dataPtr -> () in
             !!cublasSasum_v2(
@@ -26,8 +26,8 @@ public extension BLAS {
         return result
     }
 
-    public func absSum(_ data: DeviceArray<Double>) -> Double {
-        var data = data
+    public func sumOfAbsoluteValues(in elements: DeviceArray<Double>) -> Double {
+        var data = elements
         var result: Double = 0.0
         data.withUnsafeMutableDevicePointer { dataPtr -> () in
             !!cublasDasum_v2(
