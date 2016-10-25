@@ -44,8 +44,9 @@ public extension BLAS {
     }
 
     public func add(_ x: DeviceVector<Float>,
-                    multipliedBy alpha: DeviceValue<Float> = DeviceValue(1.0),
+                    multipliedBy alpha: DeviceValue<Float>? = nil,
                     onto y: inout DeviceVector<Float>) {
+        let alpha = alpha ?? floatOne
         y.withUnsafeMutableDevicePointer { destPtr -> () in
             x.withUnsafeDevicePointer { srcPtr -> () in
                 alpha.withUnsafeDevicePointer { alphaPtr -> () in
@@ -60,16 +61,20 @@ public extension BLAS {
         }
     }
 
-    public func add(_ x: DeviceVector<Double>, multipliedBy alpha: Double = 1.0, onto y: inout DeviceVector<Double>) {
-        var alpha = alpha
+    public func add(_ x: DeviceVector<Double>,
+                    multipliedBy alpha: DeviceValue<Double>? = nil,
+                    onto y: inout DeviceVector<Double>) {
+        let alpha = alpha ?? doubleOne
         y.withUnsafeMutableDevicePointer { destPtr -> () in
             x.withUnsafeDevicePointer { srcPtr -> () in
-                !!cublasDaxpy_v2(
-                    handle,
-                    Int32(x.count), &alpha,
-                    srcPtr.deviceAddress, 1,
-                    destPtr.deviceAddress, 1
-                )
+                alpha.withUnsafeDevicePointer { alphaPtr -> () in
+                    !!cublasDaxpy_v2(
+                        handle,
+                        Int32(x.count), alphaPtr.deviceAddress,
+                        srcPtr.deviceAddress, 1,
+                        destPtr.deviceAddress, 1
+                    )
+                }
             }
         }
     }

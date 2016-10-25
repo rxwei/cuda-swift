@@ -21,6 +21,10 @@ open class BLAS {
 
     open static let current = BLAS()
 
+    /// Lazy instances of 1 on the device
+    lazy var floatOne = { DeviceValue<Float>(1) }()
+    lazy var doubleOne = { DeviceValue<Double>(1) }()
+
     public init() {
         var handle: cublasHandle_t?
         !!cublasCreate_v2(&handle)
