@@ -88,7 +88,7 @@ performance bottleneck for GPU-heavy applications. We can simply compile *.cu fi
 and *.ptx files at runtime using NVRTC. The following code compiles the CUDA kernel
 into PTX, and loads it to device memory.
 
-```
+```swift
 let source: String =
   + "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, size_t n) {"
   + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
