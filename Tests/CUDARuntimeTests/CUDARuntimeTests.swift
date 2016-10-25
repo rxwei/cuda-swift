@@ -39,9 +39,9 @@ class CUDARuntimeTests: XCTestCase {
         /// Test copy-on-write
         var devArray2 = devArray
         var devArray3 = devArray
-        devArray2[0] = 3
+        devArray2[0].value = 3
         XCTAssertNotEqual(Array(devArray), Array(devArray2))
-        devArray3[0] = 4
+        devArray3[0].value = 4
         XCTAssertNotEqual(Array(devArray2), Array(devArray3))
         XCTAssertEqual(Array(devArray), Array(devArray))
         XCTAssertEqual(Array(devArray), [1, 2, 3, 4, 5])

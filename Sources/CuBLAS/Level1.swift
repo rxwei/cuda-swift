@@ -218,28 +218,25 @@ public extension BLAS {
         return result
     }
     
-    /// TODO: These should return DeviceValue. In order to make that possible,
-    /// we need to add reference flags in DeviceValue to make it support non-owning
-    /// reference.
-    //    @inline(__always)
-    //    public func min(in vector: DeviceVector<Float>) -> Float {
-    //        return vector[indexOfMin(in: vector)]
-    //    }
-    //
-    //    @inline(__always)
-    //    public func min(in vector: DeviceVector<Double>) -> Double {
-    //        return vector[indexOfMin(in: vector)]
-    //    }
-    //
-    //    @inline(__always)
-    //    public func max(in vector: DeviceVector<Float>) -> Float {
-    //        return vector[indexOfMax(in: vector)]
-    //    }
-    //
-    //    @inline(__always)
-    //    public func max(in vector: DeviceVector<Double>) -> Double {
-    //        return vector[indexOfMax(in: vector)]
-    //    }
+    @inline(__always)
+    public func min(in vector: DeviceVector<Float>) -> DeviceValue<Float> {
+        return vector[Int(oneBasedIndexOfMin(in: vector).value) - 1]
+    }
+    
+    @inline(__always)
+    public func min(in vector: DeviceVector<Double>) -> DeviceValue<Double> {
+        return vector[Int(oneBasedIndexOfMin(in: vector).value) - 1]
+    }
+    
+    @inline(__always)
+    public func max(in vector: DeviceVector<Float>) -> DeviceValue<Float> {
+        return vector[Int(oneBasedIndexOfMax(in: vector).value) - 1]
+    }
+    
+    @inline(__always)
+    public func max(in vector: DeviceVector<Double>) -> DeviceValue<Double> {
+        return vector[Int(oneBasedIndexOfMax(in: vector).value) - 1]
+    }
     
     public func dotProduct(_ x: DeviceVector<Float>, _ y: DeviceVector<Float>) -> DeviceValue<Float> {
         var result = DeviceValue<Float>()

@@ -54,12 +54,14 @@ final class DeviceArrayBuffer<Element> : RandomAccessCollection {
         return count
     }
 
-    subscript(i: Int) -> Element {
+    subscript(i: Int) -> DeviceValue<Element> {
         get {
-            return baseAddress[i]
+            return DeviceValue(unownedReference: baseAddress.advanced(by: i))
         }
         set {
-            baseAddress[i] = newValue
+            newValue.withUnsafeDevicePointer { newValuePtr in
+                baseAddress.advanced(by: i).assign(from: newValuePtr)
+            }
         }
     }
     
@@ -131,7 +133,7 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         return count
     }
 
-    public subscript(i: Int) -> Element {
+    public subscript(i: Int) -> DeviceValue<Element> {
         get {
             return buffer[i]
         }
@@ -152,24 +154,24 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
 
 }
 
-public extension DeviceArray {
-
-    @inline(__always)
-    public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
-        return try copyToHost().reduce(initialResult, nextPartialResult)
-    }
-
-    @inline(__always)
-    public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
-        return try copyToHost().map(transform)
-    }
-
-    @inline(__always)
-    public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
-        return try copyToHost().flatMap(transform)
-    }
-    
-}
+//public extension DeviceArray {
+//
+//    @inline(__always)
+//    public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
+//        return try copyToHost().reduce(initialResult, nextPartialResult)
+//    }
+//
+//    @inline(__always)
+//    public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
+//        return try copyToHost().map(transform)
+//    }
+//
+//    @inline(__always)
+//    public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
+//        return try copyToHost().flatMap(transform)
+//    }
+//    
+//}
 
 public extension Array {
 

@@ -133,6 +133,16 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
                      count * MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
     }
 
+    public func assign(from pointer: UnsafeDevicePointer<Pointee>) {
+        !!cudaMemcpy(self.deviceAddress, pointer.deviceAddress,
+                     MemoryLayout<Pointee>.size, cudaMemcpyDeviceToDevice)
+    }
+
+    public func assign(from pointer: UnsafeDevicePointer<Pointee>, count: Int) {
+        !!cudaMemcpy(self.deviceAddress, pointer.deviceAddress,
+                     count * MemoryLayout<Pointee>.stride, cudaMemcpyDeviceToDevice)
+    }
+
     public func assign(from pointer: UnsafeMutableDevicePointer<Pointee>) {
         !!cudaMemcpy(self.deviceAddress, pointer.deviceAddress,
                      MemoryLayout<Pointee>.size, cudaMemcpyDeviceToDevice)

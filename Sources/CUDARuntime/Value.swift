@@ -10,20 +10,31 @@ final class DeviceValueBuffer<Wrapped> {
 
     let address: UnsafeMutableDevicePointer<Wrapped>
 
+    let owning: Bool
+
     init(_ initial: Wrapped? = nil) {
+        owning = true
         address = UnsafeMutableDevicePointer.allocate(capacity: 1)
         if let initial = initial {
             address.assign(initial)
         }
     }
 
+    init(unownedPointer: UnsafeMutableDevicePointer<Wrapped>) {
+        owning = false
+        address = unownedPointer
+    }
+
     init(_ other: DeviceValueBuffer<Wrapped>) {
+        owning = true
         address = UnsafeMutableDevicePointer.allocate(capacity: 1)
         address.assign(from: other.address)
     }
 
     deinit {
-        address.deallocate()
+        if owning {
+            address.deallocate()
+        }
     }
 
 }
@@ -34,7 +45,7 @@ public struct DeviceValue<Wrapped> {
 
     private var cowBuffer: DeviceValueBuffer<Wrapped> {
         mutating get {
-            if !isKnownUniquelyReferenced(&buffer) {
+            if !isKnownUniquelyReferenced(&buffer) || !buffer.owning {
                 buffer = DeviceValueBuffer(buffer)
             }
             return buffer
@@ -42,7 +53,7 @@ public struct DeviceValue<Wrapped> {
     }
 
     public var value: Wrapped {
-        get {
+        nonmutating get {
             return buffer.address.load()
         }
         mutating set {
@@ -52,6 +63,10 @@ public struct DeviceValue<Wrapped> {
 
     public init(_ initial: Wrapped? = nil) {
         buffer = DeviceValueBuffer(initial)
+    }
+
+    internal init(unownedReference address: UnsafeMutableDevicePointer<Wrapped>) {
+        buffer = DeviceValueBuffer(unownedPointer: address)
     }
 
     public init(_ other: DeviceValue<Wrapped>) {

@@ -12,10 +12,10 @@ class CuBLASTests: XCTestCase {
         measure {
             let xx: DeviceArray<Float> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
             let result = BLAS.current.sumOfAbsoluteValues(in: xx)
-            XCTAssertEqual(result.value, xx.reduce(0, {$0+abs($1)}))
+            XCTAssertEqual(result.value, xx.copyToHost().reduce(0, {$0+abs($1)}))
             let xxDouble: DeviceArray<Double> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
             let resultDouble = BLAS.current.sumOfAbsoluteValues(in: xxDouble)
-            XCTAssertEqual(resultDouble.value, xxDouble.reduce(0, {$0+abs($1)}))
+            XCTAssertEqual(resultDouble.value, xxDouble.copyToHost().reduce(0, {$0+abs($1)}))
         }
     }
 
@@ -29,8 +29,8 @@ class CuBLASTests: XCTestCase {
             BLAS.current.add(xx, onto: &yy)
             BLAS.current.add(xx, multipliedBy: DeviceValue(0.0002), onto: &yy2)
             /// Compute addition using CPU
-            let expected = zip(xx, yyOrig).map { x, y in x * 1.0 + y }
-            let expected2 = zip(xx, yyOrig).map { x, y in x * 0.0002 + y }
+            let expected = zip(xx, yyOrig).map { x, y in x.value * 1.0 + y.value }
+            let expected2 = zip(xx, yyOrig).map { x, y in x.value * 0.0002 + y.value }
             /// Compare
             XCTAssertEqual(yy.copyToHost(), expected)
             XCTAssertEqual(yy2.copyToHost(), expected2)
@@ -56,11 +56,17 @@ class CuBLASTests: XCTestCase {
         xx += yy
         XCTAssertEqual(xx.copyToHost(), [3, 6, 9, 12, 15])
 
-        /// Index of max
+        /// Index of min/max
+        XCTAssertEqual(BLAS.current.oneBasedIndexOfMin(in: xx).value, 1)
         XCTAssertEqual(BLAS.current.oneBasedIndexOfMax(in: xx).value, 5)
+
+        /// Min/max
+        XCTAssertEqual(BLAS.current.max(in: xx).value, 15)
+        XCTAssertEqual(BLAS.current.min(in: xx).value, 3)
 
         /// Dot product
         XCTAssertEqual((xx • yy).value, 165.0)
+        
     }
 
     static var allTests : [(String, (CuBLASTests) -> () throws -> Void)] {
