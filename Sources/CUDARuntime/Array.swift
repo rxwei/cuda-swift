@@ -145,6 +145,11 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         return try body(cowBuffer.baseAddress)
     }
 
+    public func withUnsafeDevicePointer<Result>
+        (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result {
+        return try body(UnsafeDevicePointer(buffer.baseAddress))
+    }
+
 }
 
 public extension DeviceArray {

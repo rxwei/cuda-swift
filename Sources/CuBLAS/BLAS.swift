@@ -6,15 +6,20 @@
 //
 //
 
-import CCUDARuntime
 import CCuBLAS
-@_exported import class CUDARuntime.Stream
+import typealias CCUDARuntime.cudaStream_t
 
-public class BLAS {
+@_exported import class CUDARuntime.Stream
+import struct CUDARuntime.DeviceArray
+
+public typealias DeviceVector<T> = DeviceArray<T>
+@_exported import struct CUDARuntime.DeviceValue
+
+open class BLAS {
 
     let handle: cublasHandle_t
 
-    public static let current = BLAS()
+    open static let current = BLAS()
 
     public init() {
         var handle: cublasHandle_t?
@@ -30,13 +35,13 @@ public class BLAS {
         cublasDestroy_v2(handle)
     }
 
-    public var version: Int {
+    open var version: Int {
         var version: Int32 = 0
         !!cublasGetVersion_v2(handle, &version)
         return Int(version)
     }
 
-    public var stream: Stream? {
+    open var stream: Stream? {
         get {
             var streamHandle: cudaStream_t?
             !!cublasGetStream_v2(handle, &streamHandle)
@@ -49,7 +54,7 @@ public class BLAS {
         }
     }
 
-    public var allowsAtomics: Bool {
+    open var allowsAtomics: Bool {
         get {
             var mode: cublasAtomicsMode_t = CUBLAS_ATOMICS_NOT_ALLOWED
             !!cublasGetAtomicsMode(handle, &mode)
@@ -63,12 +68,12 @@ public class BLAS {
         }
     }
 
-    enum PointerMode : UInt32 {
-        case deviceReference = 0
-        case hostReference = 1
+    public enum PointerMode : UInt32 {
+        case hostReference = 0
+        case deviceReference = 1
     }
 
-    var pointerMode: PointerMode {
+    open internal(set) var pointerMode: PointerMode {
         get {
             var mode: cublasPointerMode_t = CUBLAS_POINTER_MODE_HOST
             !!cublasGetPointerMode_v2(handle, &mode)
@@ -81,7 +86,5 @@ public class BLAS {
             )
         }
     }
-
-
 
 }

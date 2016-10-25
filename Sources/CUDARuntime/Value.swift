@@ -63,5 +63,9 @@ public struct DeviceValue<Wrapped> {
         return try body(cowBuffer.address)
     }
 
-}
+    public func withUnsafeDevicePointer<Result>
+        (_ body: (UnsafeDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
+        return try body(UnsafeDevicePointer(buffer.address))
+    }
 
+}

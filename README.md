@@ -29,7 +29,7 @@ Under active development, not yet ready to use.
     - [x] `RuntimeError` (all error codes from CUDA C API)
 - [ ] CuBLAS - GPU Basic Linear Algebra Subprograms (in-progress)
     - [x] Initialization
-    - [ ] Level 1 BLAS operations
+    - [x] Level 1 BLAS operations
     - [ ] Level 2 BLAS operations
     - [ ] Level 3 BLAS operations
 - [ ] NVBLAS - CPU Basic Linear Algebra Subprograms (We might not need this.)
@@ -57,11 +57,23 @@ enables us to casually perform the following GPU computation without dealing
 with manual device memory allocation:
 
 ```swift
-/// We are going to add vector X onto Y using cuBLAS
-let vectorX: DeviceArray<Float> = [1.1, 2.2, 0.3, -4.0]
-var vectorY: DeviceArray<Float> = [0.0, -2.7, 0.009, -0.07]
-BLAS.current.add(vectorX, multipliedBy: 1.0, onto: &vectorY)
-print(vectorY.copyToHost())
+import CuBLAS
+
+/// Vector addition using cuBLAS
+var x: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
+let y: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+/// Scalar multiplication
+x *= 2 // x => [2, 4, 6, 8, 10] stored on device
+
+/// Addition
+x += y // x => [3, 6, 9, 12, 15] stored on device
+
+/// Dot product
+x • y // => 165.0 : DeviceValue<Float> stored on device
+
+/// Absolute sum
+BLAS.sumOfAbsoluteValues(in: x) // => 15 : DeviceValue<Float> stored on device
 ```
 
 With value types, we can worry less about reference to device memory. The following
@@ -72,10 +84,8 @@ var vectorY: DeviceArray<Float> = [  1,   2,  3,   4,   5,   6,   7,            
 /// Make a value reference to vector Y. This does not copy anything!
 let originalVectorY = vectorY
 /// Mutate Y by adding  onto vectorY 
-BLAS.current.add(vectorX, onto: &vectorY)
-/// After vectorY's mutation, originalVectorY still has the original value we assigned 
-/// in line 2, and vectorY is no longer equal to originalVectorY. Because DeviceArray
-/// made a copy of vectorY's orignal buffer when mutated.
+vectorY += vectorX
+/// After vectorY's mutation, vectorY != vectorX. DeviceArray made a copy upon mutation!
 ```
 
 ### Real-time compilation
