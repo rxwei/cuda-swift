@@ -66,7 +66,10 @@ class CuBLASTests: XCTestCase {
 
         /// Dot product
         XCTAssertEqual((xx • yy).value, 165.0)
-        
+
+        /// Chain
+        xx *= xx • yy
+        XCTAssertEqual(xx.copyToHost(), [495.0, 990.0, 1485.0, 1980.0, 2475.0])
     }
 
     static var allTests : [(String, (CuBLASTests) -> () throws -> Void)] {
