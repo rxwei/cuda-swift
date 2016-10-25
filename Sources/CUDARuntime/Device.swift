@@ -21,9 +21,14 @@ public struct Device : Equatable {
     }
 
     public static var current: Device {
-        var index: Int32 = 0
-        !!cudaGetDevice(&index)
-        return Device(assumingIndex: index)
+        get {
+            var index: Int32 = 0
+            !!cudaGetDevice(&index)
+            return Device(assumingIndex: index)
+        }
+        set {
+            !!cudaSetDevice(newValue.index)
+        }
     }
 
     internal init(assumingIndex index: Int32) {
