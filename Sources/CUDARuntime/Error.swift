@@ -45,6 +45,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 3.1. Device emulation mode was
      * removed with the CUDA 3.1 release.
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case priorLaunchFailure           =      5
 
     /**
@@ -160,6 +161,7 @@ public enum RuntimeError : UInt32, Error {
      * memory may now have their address taken by the runtime via
      * ::cudaGetSymbolAddress().
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case addressOfConstant            =     22
 
     /**
@@ -169,6 +171,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 3.1. Device emulation mode was
      * removed with the CUDA 3.1 release.
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case textureFetchFailed           =     23
 
     /**
@@ -178,6 +181,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 3.1. Device emulation mode was
      * removed with the CUDA 3.1 release.
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case textureNotBound              =     24
 
     /**
@@ -187,6 +191,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 3.1. Device emulation mode was
      * removed with the CUDA 3.1 release.
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case synchronizationError         =     25
 
     /**
@@ -207,6 +212,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 3.1. Device emulation mode was
      * removed with the CUDA 3.1 release.
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case mixedDeviceExecution         =     28
 
     /**
@@ -227,6 +233,7 @@ public enum RuntimeError : UInt32, Error {
      * \deprecated
      * This error return is deprecated as of CUDA 4.1.
      */
+    @available(*, message: "Deprecated as of CUDA 4.1")
     case notYetImplemented            =     31
 
     /**
@@ -236,6 +243,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 3.1. Device emulation mode was
      * removed with the CUDA 3.1 release.
      */
+    @available(*, message: "Deprecated as of CUDA 3.1")
     case memoryValueTooLarge          =     32
 
     /**
@@ -394,6 +402,7 @@ public enum RuntimeError : UInt32, Error {
      * to attempt to enable/disable the profiling via ::cudaProfilerStart or
      * ::cudaProfilerStop without initialization.
      */
+    @available(*, message: "Deprecated as of CUDA 5.0")
     case profilerNotInitialized       =     56
 
     /**
@@ -401,6 +410,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 5.0. It is no longer an error
      * to call cudaProfilerStart() when profiling is already enabled.
      */
+    @available(*, message: "Deprecated as of CUDA 5.0")
     case profilerAlreadyStarted       =     57
 
     /**
@@ -408,6 +418,7 @@ public enum RuntimeError : UInt32, Error {
      * This error return is deprecated as of CUDA 5.0. It is no longer an error
      * to call cudaProfilerStop() when profiling is already disabled.
      */
+    @available(*, message: "Deprecated as of CUDA 5.0")
     case profilerAlreadyStopped       =    58
 
     /**
@@ -590,6 +601,7 @@ public enum RuntimeError : UInt32, Error {
      * \deprecated
      * This error return is deprecated as of CUDA 4.1.
      */
+    @available(*, message: "Deprecated as of CUDA 4.1")
     case apiFailureBase               =  10000
 
 
