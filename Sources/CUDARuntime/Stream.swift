@@ -6,10 +6,6 @@
 //
 //
 
-/// - Richard's thoughts:
-/// Is the following really needed? Perhaps we can directly use the Stream from driver.
-/// |- No. Driver requires `cuInit(0)`, i.e. `Driver.initialize()`. What a shame!
-
 import CCUDARuntime
 import protocol CUDADriver.CHandleCarrier
 
@@ -35,7 +31,9 @@ open class Stream : CHandleCarrier {
     public init?(priority: Int) {
         var handle: Handle?
         do {
-            try ensureSuccess(cudaStreamCreateWithPriority(&handle, 0, Int32(priority)))
+            try ensureSuccess(
+                cudaStreamCreateWithPriority(&handle, 0, Int32(priority))
+            )
         } catch {
             return nil
         }
@@ -48,7 +46,7 @@ open class Stream : CHandleCarrier {
         !!cudaStreamDestroy(handle)
     }
 
-    open func synchronize() throws {
+    open func synchronize() {
         !!cudaStreamSynchronize(handle)
     }
 
@@ -68,7 +66,8 @@ open class Stream : CHandleCarrier {
                               unsafeBitCast(callback, to: UnsafeMutableRawPointer.self), 0)
     }
 
-    public func withUnsafeHandle<Result>(_ body: (Handle) throws -> Result) rethrows -> Result {
+    public func withUnsafeHandle<Result>
+        (_ body: (Handle) throws -> Result) rethrows -> Result {
         return try body(handle)
     }
     

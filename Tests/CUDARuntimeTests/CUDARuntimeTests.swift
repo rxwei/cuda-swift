@@ -1,5 +1,6 @@
 import XCTest
 @testable import CUDARuntime
+import NVRTC
 
 class CUDARuntimeTests: XCTestCase {
 
@@ -72,12 +73,34 @@ class CUDARuntimeTests: XCTestCase {
         XCTAssertNotEqual(val3.value, val.value)
     }
 
+    func testModule() throws {
+        let source: String =
+            "extern \"C\" __global__ void gIncr(float *d, size_t ind, float delta) {"
+                + "    d[ind] += delta;"
+                + "}"
+                + "extern \"C\" __global__ void gSum(float *d, size_t size, float *total) {"
+                + "    total = 0;"
+                + "    for (size_t i = 0; i < size; ++i) {"
+                + "        *total += d[i];"
+                + "    }"
+                + "}"
+                + "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, size_t n) {"
+                + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
+                + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
+                + "}";
+
+        let ptx = try Compiler.compile(source)
+        let module = try Module(ptx: ptx)
+        let function = module.function(named: "gSum")
+    }
+
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {
         return [
             ("testDevice", testDevice),
             ("testPointer", testPointer),
             ("testArray", testArray),
-            ("testValue", testValue)
+            ("testValue", testValue),
+            ("testModule", testModule)
         ]
     }
 }

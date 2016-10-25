@@ -35,16 +35,10 @@ class CUDADriverTests: XCTestCase {
           + "}";
 
         let ptx = try Compiler.compile(source)
-        let ctx = Device.main.makeContext()
-        let module = try Module(ptx: ptx)
-        let function = module.function(named: "gSum")
-
-        let numbers: [Float] = [1, 2, 3, 4, 5]
-        var result: Float = 0
-
-        /// TODO: launch kernel
-
-        Context.synchronize()
+        try Device.main.withContext { context in
+            let module = try Module(ptx: ptx)
+            let function = module.function(named: "gSum")
+        }
     }
 
     static var allTests : [(String, (CUDADriverTests) -> () throws -> Void)] {

@@ -20,6 +20,10 @@ public struct Device : Equatable, CHandleCarrier {
         self.handle = handle
     }
 
+    public static func ==(lhs: Device, rhs: Device) -> Bool {
+        return lhs.handle == rhs.handle
+    }
+
     public var name: String {
         var name: [CChar] = Array(repeating: 0, count: 32)
         cuDeviceGetName(&name, 32, handle)
@@ -44,14 +48,30 @@ public struct Device : Equatable, CHandleCarrier {
         return String(cString: id)
     }
 
+    /// Create a context with a lifetime of the reference scope.
+    /// - note: Not sure if we should make the lifetime explicit, i.e.
+    /// make `Context` a struct that has `begin()` and `end()`. Alternatively,
+    /// we can just hide `makeContext()` and provide only `withContext(_:)`
+    /// which gurantees the destruction of context when body returns.
+    /// - returns: new context
+    @discardableResult
     public func makeContext() -> Context {
         var ctxHandle: CUcontext?
         !!cuCtxCreate_v2(&ctxHandle, 0, handle)
         return Context(binding: ctxHandle!)
     }
 
-    public static func ==(lhs: Device, rhs: Device) -> Bool {
-        return lhs.handle == rhs.handle
+    /// Create a context and execute the body.
+    /// The lifetime of the context = the lifetype of the body
+    /// - parameter body: closure with the new context
+    /// - returns: result of the body
+    @discardableResult
+    public func withContext<Result>
+        (_ body: (Context) throws -> Result) rethrows -> Result {
+        let context = makeContext()
+        let result = try body(context)
+        Context.synchronize()
+        return result
     }
 
     public init?(atIndex index: Int) {

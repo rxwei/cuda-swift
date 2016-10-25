@@ -278,12 +278,12 @@
 		"_______Group_CUDARuntime" /* CUDARuntime */ = {
 			isa = PBXGroup;
 			children = (
-				__PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Device.swift /* Device.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Error.swift /* Error.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Memory.swift /* Memory.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Module.swift /* Module.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Stream.swift /* Stream.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Value.swift /* Value.swift */,
 			);
 			name = CUDARuntime;

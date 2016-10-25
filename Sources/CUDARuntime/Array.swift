@@ -140,9 +140,6 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         }
     }
 
-    /// - note: This should be @inline(__always). But it crashes Swift SIL
-    /// verfication as of Swift 3.0.1-PREVIEW-3
-    /// [SR-3030](https://bugs.swift.org/browse/SR-3030)
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
         return try body(cowBuffer.baseAddress)
