@@ -39,14 +39,22 @@ class CUDARuntimeTests: XCTestCase {
         /// Test copy-on-write
         var devArray2 = devArray
         var devArray3 = devArray
+        let devArray4 = devArray3
         devArray2[0].value = 3
         XCTAssertNotEqual(Array(devArray), Array(devArray2))
         devArray3[0].value = 4
+        var val3_0 = devArray3[0]
+        var origVal3_0 = val3_0
+        XCTAssertEqual(val3_0.value, 4)
+        val3_0.value = 10
+        XCTAssertEqual(val3_0.value, 10)
+        XCTAssertEqual(origVal3_0.value, 4)
         XCTAssertNotEqual(Array(devArray2), Array(devArray3))
-        XCTAssertEqual(Array(devArray), Array(devArray))
-        XCTAssertEqual(Array(devArray), [1, 2, 3, 4, 5])
-        XCTAssertEqual(Array(devArray2), [3, 2, 3, 4, 5])
-        XCTAssertEqual(Array(devArray3), [4, 2, 3, 4, 5])
+        XCTAssertEqual(devArray.copyToHost(), Array(devArray))
+        XCTAssertEqual(devArray.copyToHost(), [1, 2, 3, 4, 5])
+        XCTAssertEqual(devArray2.copyToHost(), [3, 2, 3, 4, 5])
+        XCTAssertEqual(devArray3.copyToHost(), [4, 2, 3, 4, 5])
+        XCTAssertEqual(devArray4.copyToHost(), [1, 2, 3, 4, 5])
     }
 
     func testValue() {
