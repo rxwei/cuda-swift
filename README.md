@@ -1,6 +1,14 @@
 # CUDA for Swift
 
-This project provides a *native* Swift interface to CUDA.
+This project provides a native Swift interface to CUDA with the following
+features/goals:
+
+* Value types
+* Type safety
+* Cross-platform
+* Real-time compilation
+* Operator overloading
+* Xcode Playground support
 
 ## Components
 
@@ -12,7 +20,7 @@ This project provides a *native* Swift interface to CUDA.
     - [x] `Context`
     - [x] `Device`
     - [x] `Function` (kernel)
-    - [x] `PTX`    
+    - [x] `PTX`
     - [x] `Module`
     - [x] `Stream`
     - [x] `UnsafeDevicePointer<T>` and `UnsafeMutableDevicePointer<T>`
@@ -150,3 +158,9 @@ swift build -Xcc -I/usr/lib/cuda/include -Xlinker -L/usr/lib/cuda/lib
 ```
 
 You may use the Makefile in this project.
+
+## License
+
+MIT License
+
+CUDA is a registered trademark of NVIDIA Corporation.
