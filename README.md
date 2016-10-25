@@ -73,7 +73,7 @@ x += y // x => [3, 6, 9, 12, 15] stored on device
 x • y // => 165.0 : DeviceValue<Float> stored on device
 
 /// Absolute sum
-BLAS.sumOfAbsoluteValues(in: x) // => 15 : DeviceValue<Float> stored on device
+BLAS.current.sumOfAbsoluteValues(in: x) // => 15 : DeviceValue<Float> stored on device
 ```
 
 With value types, we can worry less about reference to device memory. The following
