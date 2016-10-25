@@ -38,8 +38,16 @@ public struct Function : CHandleCarrier {
         }
     }
 
-    public init(_ handle: CUfunction) {
+    init(_ handle: CUfunction) {
         self.handle = handle
+    }
+
+    public init(assumingDeviceAddress function: UnsafeRawPointer) {
+        handle = OpaquePointer(function)
+    }
+
+    public init(assumingDeviceAddress function: UnsafeMutableRawPointer) {
+        handle = OpaquePointer(function)
     }
 
     /// Grid of blocks
