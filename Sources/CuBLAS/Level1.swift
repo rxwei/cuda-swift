@@ -285,40 +285,40 @@ infix operator • : MultiplicationPrecedence
 
 @inline(__always)
 public func •(lhs: DeviceVector<Float>, rhs: DeviceVector<Float>) -> DeviceValue<Float> {
-    return BLAS.current.dotProduct(lhs, rhs)
+    return BLAS.main.dotProduct(lhs, rhs)
 }
 
 @inline(__always)
 public func •(lhs: DeviceVector<Double>, rhs: DeviceVector<Double>) -> DeviceValue<Double> {
-    return BLAS.current.dotProduct(lhs, rhs)
+    return BLAS.main.dotProduct(lhs, rhs)
 }
 
 @inline(__always)
 public func *=(lhs: inout DeviceVector<Float>, rhs: Float) {
-    BLAS.current.multiply(&lhs, by: DeviceValue(rhs))
+    BLAS.main.multiply(&lhs, by: DeviceValue(rhs))
 }
 
 @inline(__always)
 public func *=(lhs: inout DeviceVector<Double>, rhs: Double) {
-    BLAS.current.multiply(&lhs, by: DeviceValue(rhs))
+    BLAS.main.multiply(&lhs, by: DeviceValue(rhs))
 }
 
 @inline(__always)
 public func +=(lhs: inout DeviceVector<Float>, rhs: DeviceVector<Float>) {
-    BLAS.current.add(rhs, onto: &lhs)
+    BLAS.main.add(rhs, onto: &lhs)
 }
 
 @inline(__always)
 public func +=(lhs: inout DeviceVector<Double>, rhs: DeviceVector<Double>) {
-    BLAS.current.add(rhs, onto: &lhs)
+    BLAS.main.add(rhs, onto: &lhs)
 }
 
 @inline(__always)
 public func *=(lhs: inout DeviceVector<Float>, rhs: DeviceValue<Float>) {
-    BLAS.current.multiply(&lhs, by: rhs)
+    BLAS.main.multiply(&lhs, by: rhs)
 }
 
 @inline(__always)
 public func *=(lhs: inout DeviceVector<Double>, rhs: DeviceValue<Double>) {
-    BLAS.current.multiply(&lhs, by: rhs)
+    BLAS.main.multiply(&lhs, by: rhs)
 }
