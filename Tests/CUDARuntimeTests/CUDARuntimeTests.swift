@@ -42,6 +42,8 @@ class CUDARuntimeTests: XCTestCase {
         let devArray4 = devArray3
         devArray2[0].value = 3
         XCTAssertNotEqual(Array(devArray), Array(devArray2))
+        devArray2[0] = DeviceValue(1)
+        XCTAssertEqual(Array(devArray), Array(devArray2))
         devArray3[0].value = 4
         var val3_0 = devArray3[0]
         var origVal3_0 = val3_0
@@ -49,12 +51,36 @@ class CUDARuntimeTests: XCTestCase {
         val3_0.value = 10
         XCTAssertEqual(val3_0.value, 10)
         XCTAssertEqual(origVal3_0.value, 4)
+        var devArray5 = devArray
+        let val5_0 = devArray5[0]
+        devArray5[0].value = 100
+        XCTAssertEqual(val5_0.value, 1)
+        devArray5[0] = DeviceValue(100)
+        XCTAssertEqual(val5_0.value, 1)
+        XCTAssertEqual(devArray5[0].value, 100)
         XCTAssertNotEqual(Array(devArray2), Array(devArray3))
         XCTAssertEqual(devArray.copyToHost(), Array(devArray))
         XCTAssertEqual(devArray.copyToHost(), [1, 2, 3, 4, 5])
-        XCTAssertEqual(devArray2.copyToHost(), [3, 2, 3, 4, 5])
+        XCTAssertEqual(devArray2.copyToHost(), [1, 2, 3, 4, 5])
         XCTAssertEqual(devArray3.copyToHost(), [4, 2, 3, 4, 5])
         XCTAssertEqual(devArray4.copyToHost(), [1, 2, 3, 4, 5])
+
+        /// Test array slices
+        var devArray6 = devArray // 1...5
+        let devArray6_13 = devArray6[1...3]
+        XCTAssertEqual(devArray6_13.copyToHost(), [2, 3, 4])
+        devArray6[1].value = 20
+        XCTAssertEqual(devArray6_13.copyToHost(), [2, 3, 4])
+        XCTAssertEqual(devArray6.copyToHost(), [1, 20, 3, 4, 5])
+
+        /// Test array value reference
+        var V: DeviceArray<Float> = [1, 2, 3]
+        let x = V[2]
+        XCTAssertEqual(x.value, 3)
+        V[2] = DeviceValue(0)
+        XCTAssertEqual(x.value, 3)
+        V[2].value = 100
+        XCTAssertEqual(x.value, 3)
     }
 
     func testValue() {

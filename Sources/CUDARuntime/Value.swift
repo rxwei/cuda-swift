@@ -6,67 +6,37 @@
 //
 //
 
-final class DeviceValueBuffer<Wrapped> {
-
-    let address: UnsafeMutableDevicePointer<Wrapped>
-
-    let owning: Bool
-
-    init(_ initial: Wrapped? = nil) {
-        owning = true
-        address = UnsafeMutableDevicePointer.allocate(capacity: 1)
-        if let initial = initial {
-            address.assign(initial)
-        }
-    }
-
-    init(unownedPointer: UnsafeMutableDevicePointer<Wrapped>) {
-        owning = false
-        address = unownedPointer
-    }
-
-    init(_ other: DeviceValueBuffer<Wrapped>) {
-        owning = true
-        address = UnsafeMutableDevicePointer.allocate(capacity: 1)
-        address.assign(from: other.address)
-    }
-
-    deinit {
-        if owning {
-            address.deallocate()
-        }
-    }
-
-}
-
 public struct DeviceValue<Wrapped> {
 
-    private var buffer: DeviceValueBuffer<Wrapped>
+    private var buffer: ManagedDeviceBuffer<Wrapped>
+    private var owning = true
 
-    private var cowBuffer: DeviceValueBuffer<Wrapped> {
+    private var mutatingBuffer: ManagedDeviceBuffer<Wrapped> {
         mutating get {
-            if !isKnownUniquelyReferenced(&buffer) || !buffer.owning {
-                buffer = DeviceValueBuffer(buffer)
+            if !isKnownUniquelyReferenced(&buffer) || !owning {
+                buffer = ManagedDeviceBuffer(buffer)
             }
             return buffer
         }
     }
 
+    init(buffer: ManagedDeviceBuffer<Wrapped>) {
+        self.buffer = buffer
+        self.owning = false
+    }
+
     public var value: Wrapped {
-        nonmutating get {
-            return buffer.address.load()
+        get {
+            return buffer.baseAddress.load()
         }
-        mutating set {
-            cowBuffer.address.assign(newValue)
+        set {
+            mutatingBuffer.baseAddress.assign(newValue)
         }
     }
 
     public init(_ initial: Wrapped? = nil) {
-        buffer = DeviceValueBuffer(initial)
-    }
-
-    internal init(unownedReference address: UnsafeMutableDevicePointer<Wrapped>) {
-        buffer = DeviceValueBuffer(unownedPointer: address)
+        buffer = ManagedDeviceBuffer(capacity: 1)
+        initial.flatMap(buffer.baseAddress.assign)
     }
 
     public init(_ other: DeviceValue<Wrapped>) {
@@ -75,12 +45,12 @@ public struct DeviceValue<Wrapped> {
 
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (UnsafeMutableDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
-        return try body(cowBuffer.address)
+        return try body(mutatingBuffer.baseAddress)
     }
 
     public func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
-        return try body(UnsafeDevicePointer(buffer.address))
+        return try body(UnsafeDevicePointer(buffer.baseAddress))
     }
 
 }

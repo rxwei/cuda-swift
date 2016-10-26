@@ -259,12 +259,12 @@
 				__PBXFileRef_Sources/CUDADriver/Context.swift /* Context.swift */,
 				__PBXFileRef_Sources/CUDADriver/Device.swift /* Device.swift */,
 				__PBXFileRef_Sources/CUDADriver/Driver.swift /* Driver.swift */,
-				__PBXFileRef_Sources/CUDADriver/Error.swift /* Error.swift */,
 				__PBXFileRef_Sources/CUDADriver/Function.swift /* Function.swift */,
 				__PBXFileRef_Sources/CUDADriver/Memory.swift /* Memory.swift */,
 				__PBXFileRef_Sources/CUDADriver/Module.swift /* Module.swift */,
 				__PBXFileRef_Sources/CUDADriver/PTX.swift /* PTX.swift */,
 				__PBXFileRef_Sources/CUDADriver/Stream.swift /* Stream.swift */,
+				__PBXFileRef_Sources/CUDADriver/Error.swift /* Error.swift */,
 			);
 			name = CUDADriver;
 			path = Sources/CUDADriver;
@@ -283,13 +283,13 @@
 			isa = PBXGroup;
 			children = (
 				__PBXFileRef_Sources/CUDARuntime/Device.swift /* Device.swift */,
-				__PBXFileRef_Sources/CUDARuntime/Error.swift /* Error.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Memory.swift /* Memory.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Module.swift /* Module.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Stream.swift /* Stream.swift */,
 				29D37BA21DC0789900500FD3 /* Buffer.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Value.swift /* Value.swift */,
+				__PBXFileRef_Sources/CUDARuntime/Error.swift /* Error.swift */,
 			);
 			name = CUDARuntime;
 			path = Sources/CUDARuntime;
@@ -309,8 +309,8 @@
 			children = (
 				__PBXFileRef_Sources/CuBLAS/BLAS.swift /* BLAS.swift */,
 				29D37BA01DC025F200500FD3 /* MatrixType.swift */,
-				__PBXFileRef_Sources/CuBLAS/Error.swift /* Error.swift */,
 				__PBXFileRef_Sources/CuBLAS/Vectors.swift /* Level1.swift */,
+				__PBXFileRef_Sources/CuBLAS/Error.swift /* Error.swift */,
 			);
 			name = CuBLAS;
 			path = Sources/CuBLAS;

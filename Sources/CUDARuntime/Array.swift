@@ -8,74 +8,16 @@
 
 import CCUDARuntime
 
-final class DeviceArrayBuffer<Element> : RandomAccessCollection {
-
-    typealias Index = Int
-    typealias IndexDistance = Int
-
-    let baseAddress: UnsafeMutableDevicePointer<Element>
-
-    private(set) var count: Int
-
-    init(capacity: Int) {
-        baseAddress = UnsafeMutableDevicePointer.allocate(capacity: capacity)
-        count = capacity
-    }
-
-    convenience init(_ other: DeviceArrayBuffer<Element>) {
-        self.init(capacity: other.count)
-        self.baseAddress.assign(from: other.baseAddress, count: count)
-    }
-
-    convenience init<C: Collection>(fromHost elements: C) where
-        C.Iterator.Element == Element, C.IndexDistance == Int
-    {
-        self.init(capacity: elements.count)
-        self.baseAddress.assign(fromHost: elements)
-    }
-
-    deinit {
-        baseAddress.deallocate()
-    }
-
-    func index(after i: Int) -> Int {
-        return i + 1
-    }
-
-    func index(before i: Int) -> Int {
-        return i - 1
-    }
-
-    var startIndex: Int {
-        return 0
-    }
-
-    var endIndex: Int {
-        return count
-    }
-
-    subscript(i: Int) -> DeviceValue<Element> {
-        get {
-            return DeviceValue(unownedReference: baseAddress.advanced(by: i))
-        }
-        set {
-            newValue.withUnsafeDevicePointer { newValuePtr in
-                baseAddress.advanced(by: i).assign(from: newValuePtr)
-            }
-        }
-    }
-    
-}
-
 public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayLiteral {
 
     public typealias Index = Int
     public typealias IndexDistance = Int
+    public typealias SubSequence = DeviceArray<Element>
 
     private var buffer: DeviceArrayBuffer<Element>
 
     /// Copy on write
-    private var cowBuffer: DeviceArrayBuffer<Element> {
+    private var mutatingBuffer: DeviceArrayBuffer<Element> {
         mutating get {
             if !isKnownUniquelyReferenced(&buffer) {
                 buffer = DeviceArrayBuffer(buffer)
@@ -91,11 +33,12 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
     public init<C: Collection>(fromHost elements: C) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
-        buffer = DeviceArrayBuffer(fromHost: elements)
+        buffer = DeviceArrayBuffer(capacity: elements.count)
+        buffer.baseAddress.assign(fromHost: elements)
     }
 
     public init(arrayLiteral elements: Element...) {
-        buffer = DeviceArrayBuffer(fromHost: elements)
+        self.init(fromHost: elements)
     }
 
     public init(_ other: DeviceArray<Element>) {
@@ -133,18 +76,42 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
         return count
     }
 
+    public var indices: CountableRange<Int> {
+        return 0..<count
+    }
+
     public subscript(i: Int) -> DeviceValue<Element> {
         get {
-            return buffer[i]
+            return DeviceValue(buffer: ManagedDeviceBuffer(viewing: buffer, offset: i))
+        }
+        set {
+            newValue.withUnsafeDevicePointer { newValuePtr in
+                mutatingBuffer.baseAddress.advanced(by: i).assign(from: newValuePtr)
+            }
+        }
+    }
+
+    private init(viewing buffer: DeviceArrayBuffer<Element>, range: Range<Int>) {
+        self.buffer = DeviceArrayBuffer(viewing: buffer, range: range)
+    }
+
+    public subscript(range: Range<Int>) -> DeviceArray<Element> {
+        get {
+            return DeviceArray(viewing: buffer, range: range)
         }
         mutating set {
-            cowBuffer[i] = newValue
+            mutatingBuffer.baseAddress.assign(
+                from: newValue.buffer.baseAddress,
+                count: Swift.min(range.count, newValue.count)
+            ///        ^ adding qualifier to disambiguate from `min(by:)`
+            /// Compiler bug: SR-3051
+            )
         }
     }
 
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
-        return try body(cowBuffer.baseAddress)
+        return try body(mutatingBuffer.baseAddress)
     }
 
     public func withUnsafeDevicePointer<Result>
@@ -153,25 +120,6 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
     }
 
 }
-
-//public extension DeviceArray {
-//
-//    @inline(__always)
-//    public func reduce<Result>(_ initialResult: Result, _ nextPartialResult: (Result, Element) throws -> Result) rethrows -> Result {
-//        return try copyToHost().reduce(initialResult, nextPartialResult)
-//    }
-//
-//    @inline(__always)
-//    public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T] {
-//        return try copyToHost().map(transform)
-//    }
-//
-//    @inline(__always)
-//    public func flatMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
-//        return try copyToHost().flatMap(transform)
-//    }
-//    
-//}
 
 public extension Array {
 
