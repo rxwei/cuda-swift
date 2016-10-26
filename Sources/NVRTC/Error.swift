@@ -15,7 +15,7 @@ public enum CompilerError : UInt32, Error {
     case invalidInput = 3
     case invalidProgram = 4
     case invalidOption = 5
-    case compilation = 6
+    case compilationError = 6
     case builtinOperationFailure = 7
     case noNameExpressionsAfterCompilation = 8
     case noLoweredNamesBeforeCompilation = 9

@@ -19,9 +19,14 @@ open class Program {
     public var name: String?
 
     /// Initialize with source program and headers
-    public init(data: Data, name: String? = nil,
+    public init(data: Data, name: String? = nil, externC: Bool = true,
                 headers: [(name: String, data: Data)]) throws {
         self.name = name
+        var data = data
+        if externC { /// Disable mangling
+            data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
+            data.append(contentsOf: "}".utf8)
+        }
         var headerNames: [UnsafePointer<Int8>?] = headers.map { name, _ in
             name.withCString{$0}
         }
