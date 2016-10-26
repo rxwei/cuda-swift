@@ -154,7 +154,7 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
 
 #### Linux
 ```
-swift build -Xcc -I/usr/lib/cuda/include -Xlinker -L/usr/lib/cuda/lib
+swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
 ```
 
 You may use the Makefile in this project.
