@@ -96,10 +96,11 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     /// Avoid doing this often because it's expensive
     /// - complexity: O(size)
     public func load() -> Pointee {
-        var pointee: Pointee?
-        !!cudaMemcpy(&pointee, deviceAddress,
+        var ptr = UnsafeMutablePointer<Pointee>.allocate(capacity: 1)
+        !!cudaMemcpy(ptr, deviceAddress,
                      MemoryLayout<Pointee>.size, cudaMemcpyDeviceToHost)
-        return pointee!
+        defer { ptr.deallocate(capacity: 1) }
+        return ptr.pointee
     }
 
     public func assign(_ value: Pointee) {
@@ -219,14 +220,14 @@ public struct UnsafeDevicePointer<Pointee> : Equatable, Hashable, Strideable {
     /// Convert from mutable device pointer
     /// - parameter other: address on graphic device
     public init(_ other: UnsafeMutableDevicePointer<Pointee>) {
-        self.deviceAddress = UnsafePointer(other.deviceAddress)
+        deviceAddress = UnsafePointer(other.deviceAddress)
     }
 
     /// Convert from mutable device pointer
     /// - parameter other: address on graphic device
     public init?(_ other: UnsafeMutableDevicePointer<Pointee>?) {
         guard let other = other else { return nil }
-        self.deviceAddress = UnsafePointer(other.deviceAddress)
+        deviceAddress = UnsafePointer(other.deviceAddress)
     }
 
     /// Convert from other device pointer
@@ -256,7 +257,7 @@ public struct UnsafeDevicePointer<Pointee> : Equatable, Hashable, Strideable {
     }
 
     public func distance(to other: UnsafeDevicePointer<Pointee>) -> Int {
-        return self.deviceAddress.distance(to: other.deviceAddress)
+        return deviceAddress.distance(to: other.deviceAddress)
     }
 
     public func predecessor() -> UnsafeDevicePointer {
@@ -269,12 +270,12 @@ public struct UnsafeDevicePointer<Pointee> : Equatable, Hashable, Strideable {
 
     /// Pointee **copied** from device
     /// Avoid doing this often because it's expensive
-    /// - complexity: O(size)
     public func load() -> Pointee {
-        var pointee: Pointee?
-        !!cudaMemcpy(&pointee, deviceAddress,
+        var ptr = UnsafeMutablePointer<Pointee>.allocate(capacity: 1)
+        !!cudaMemcpy(ptr, deviceAddress,
                      MemoryLayout<Pointee>.size, cudaMemcpyDeviceToHost)
-        return pointee!
+        defer { ptr.deallocate(capacity: 1) }
+        return ptr.pointee
     }
 
     public func copyBytes(toHost pointer: UnsafeMutablePointer<Pointee>, count: Int) {
@@ -283,7 +284,7 @@ public struct UnsafeDevicePointer<Pointee> : Equatable, Hashable, Strideable {
     }
 
     public subscript(i: Int) -> Pointee {
-        return self.advanced(by: i).load()
+        return advanced(by: i).load()
     }
     
 }
