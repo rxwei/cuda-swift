@@ -8,8 +8,7 @@
 
 import CCUDARuntime
 
-public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayLiteral {
-
+public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCollection, ExpressibleByArrayLiteral {
     public typealias Index = Int
     public typealias IndexDistance = Int
     public typealias SubSequence = DeviceArray<Element>
@@ -24,6 +23,11 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
             }
             return buffer
         }
+    }
+
+    /// Creates an empty instance.
+    public init() {
+        buffer = DeviceArrayBuffer(capacity: 0)
     }
 
     public init(capacity: Int) {
@@ -78,6 +82,14 @@ public struct DeviceArray<Element> : RandomAccessCollection, ExpressibleByArrayL
 
     public var indices: CountableRange<Int> {
         return 0..<count
+    }
+    /// Replaces the specified subrange of elements with the given collection.
+    public mutating func replaceSubrange<C : Collection>
+        (_ subrange: Range<Int>, with newElements: C) where C.Iterator.Element == DeviceValue<Element> {
+        let subrange = CountableRange(subrange)
+        for (index, element) in zip(subrange, newElements) {
+            self[index] = element
+        }
     }
 
     public subscript(i: Int) -> DeviceValue<Element> {

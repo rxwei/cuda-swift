@@ -65,7 +65,7 @@ class CUDARuntimeTests: XCTestCase {
         XCTAssertEqual(devArray3.copyToHost(), [4, 2, 3, 4, 5])
         XCTAssertEqual(devArray4.copyToHost(), [1, 2, 3, 4, 5])
 
-        /// Test array slices
+        /// Array slices
         var devArray6 = devArray // 1...5
         let devArray6_13 = devArray6[1...3]
         XCTAssertEqual(devArray6_13.copyToHost(), [2, 3, 4])
@@ -73,7 +73,7 @@ class CUDARuntimeTests: XCTestCase {
         XCTAssertEqual(devArray6_13.copyToHost(), [2, 3, 4])
         XCTAssertEqual(devArray6.copyToHost(), [1, 20, 3, 4, 5])
 
-        /// Test array value reference
+        /// Array value reference
         var V: DeviceArray<Float> = [1, 2, 3]
         let x = V[2]
         XCTAssertEqual(x.value, 3)
