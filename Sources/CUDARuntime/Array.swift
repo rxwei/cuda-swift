@@ -8,12 +8,54 @@
 
 import CCUDARuntime
 
-public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCollection, ExpressibleByArrayLiteral {
+public protocol DeviceCollection : RandomAccessCollection {
+    typealias Index = Int
+    typealias IndexDistance = Int
+    associatedtype Element
+    associatedtype SubSequence : RandomAccessCollection
+    func copyToHost() -> [Element]
+    subscript(index: Int) -> Iterator.Element { get }
+}
+
+public protocol MutableDeviceCollection : DeviceCollection {
+    subscript(index: Int) -> Iterator.Element { get set }
+}
+
+protocol DeviceArrayProtocol : DeviceCollection, RangeReplaceableCollection, ExpressibleByArrayLiteral
+{
+    /// The number of elements the Array can store without reallocation.
+    var capacity: Int { get }
+
+    /// An object that guarantees the lifetime of this array's elements.
+    var owner: AnyObject? { get }
+
+    subscript(index: Int) -> Iterator.Element { get set }
+
+    associatedtype Buffer : AnyObject
+    init(_ buffer: Buffer)
+}
+
+extension DeviceArrayProtocol {
+    public typealias Index = Int
+    public typealias IndexDistance = Int
+
+    var capacity: Int {
+        return count
+    }
+}
+
+public struct DeviceArray<Element> :
+    RandomAccessCollection,
+    MutableDeviceCollection,
+    RangeReplaceableCollection,
+    ExpressibleByArrayLiteral
+{
     public typealias Index = Int
     public typealias IndexDistance = Int
     public typealias SubSequence = DeviceArray<Element>
 
     private var buffer: DeviceArrayBuffer<Element>
+    private var retainedReference: Any?
 
     /// Copy on write
     private var mutatingBuffer: DeviceArrayBuffer<Element> {
@@ -23,6 +65,10 @@ public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCol
             }
             return buffer
         }
+    }
+
+    init(_ buffer: DeviceArrayBuffer<Element>) {
+        self.buffer = buffer
     }
 
     /// Creates an empty instance.
@@ -38,6 +84,7 @@ public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCol
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
         buffer = DeviceArrayBuffer(capacity: elements.count)
+        buffer.retainee = elements
         buffer.baseAddress.assign(fromHost: elements)
     }
 
@@ -54,7 +101,7 @@ public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCol
         elements.reserveCapacity(count)
         /// Temporary array copy solution
         var temp = UnsafeMutablePointer<Element>.allocate(capacity: count)
-        temp.assign(fromDevice: buffer.baseAddress, count: count)
+        temp.assign(fromDevice: buffer.baseAddress.advanced(by: buffer.startIndex), count: count)
         elements.append(contentsOf: UnsafeBufferPointer(start: temp, count: count))
         temp.deallocate(capacity: count)
         return elements
@@ -77,7 +124,7 @@ public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCol
     }
 
     public var endIndex: Int {
-        return count
+        return buffer.count
     }
 
     public var indices: CountableRange<Int> {
@@ -94,41 +141,47 @@ public struct DeviceArray<Element> : RandomAccessCollection, RangeReplaceableCol
 
     public subscript(i: Int) -> DeviceValue<Element> {
         get {
-            return DeviceValue(buffer: ManagedDeviceBuffer(viewing: buffer, offset: i))
+            return DeviceValue(buffer:
+                DeviceValueBuffer(viewing: buffer, offsetBy: i)
+            )
         }
         set {
-            newValue.withUnsafeDevicePointer { newValuePtr in
-                mutatingBuffer.baseAddress.advanced(by: i).assign(from: newValuePtr)
-            }
+            mutatingBuffer[bufferIndex(fromLocal: i)] = newValue.buffer
         }
     }
 
     private init(viewing buffer: DeviceArrayBuffer<Element>, range: Range<Int>) {
-        self.buffer = DeviceArrayBuffer(viewing: buffer, range: range)
+        self.buffer = DeviceArrayBuffer(viewing: buffer, in: range)
+    }
+
+    @inline(__always)
+    private func bufferRange(fromLocal localRange: Range<Int>) -> Range<Int> {
+        return (buffer.startIndex + localRange.lowerBound)..<(buffer.startIndex + localRange.upperBound)
+    }
+
+    @inline(__always)
+    private func bufferIndex(fromLocal localIndex: Int) -> Int {
+        return localIndex + buffer.startIndex
     }
 
     public subscript(range: Range<Int>) -> DeviceArray<Element> {
         get {
-            return DeviceArray(viewing: buffer, range: range)
+            return DeviceArray(viewing: buffer, range: bufferRange(fromLocal: range))
         }
         mutating set {
-            mutatingBuffer.baseAddress.assign(
-                from: newValue.buffer.baseAddress,
-                count: Swift.min(range.count, newValue.count)
-            ///        ^ adding qualifier to disambiguate from `min(by:)`
-            /// Compiler bug: SR-3051
-            )
+            mutatingBuffer[bufferRange(fromLocal: range)] = newValue.buffer
         }
     }
 
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
-        return try body(mutatingBuffer.baseAddress)
+        let buffer = mutatingBuffer
+        return try body(buffer.baseAddress.advanced(by: buffer.startIndex))
     }
 
     public func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result {
-        return try body(UnsafeDevicePointer(buffer.baseAddress))
+        return try body(UnsafeDevicePointer(buffer.baseAddress.advanced(by: buffer.startIndex)))
     }
 
 }
@@ -138,5 +191,5 @@ public extension Array {
     public init(_ elementsOnDevice: DeviceArray<Element>) {
         self = elementsOnDevice.copyToHost()
     }
-    
+
 }

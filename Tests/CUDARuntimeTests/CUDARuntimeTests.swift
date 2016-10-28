@@ -81,6 +81,27 @@ class CUDARuntimeTests: XCTestCase {
         XCTAssertEqual(x.value, 3)
         V[2].value = 100
         XCTAssertEqual(x.value, 3)
+
+        /// Nested device array literal
+        var VV: DeviceArray<DeviceArray<DeviceArray<Float>>> = [
+            [[1, 0], [1, 2], [1, 3], [1, 4], [1, 5]],
+            [[1, 2], [1, 2], [1, 3], [1, 4], [1, 5]],
+        ]
+        XCTAssertEqual(VV[0][1].copyToHost(), [1, 2])
+        XCTAssertEqual(VV[1][4].copyToHost(), [1, 5])
+        let row1: [[Float]] = VV[1].copyToHost()
+        let row1ShouldBe: [[Float]] = [[1, 2], [1, 2], [1, 3], [1, 4], [1, 5]]
+        XCTAssertTrue(row1.elementsEqual(row1ShouldBe, by: { (xx, yy) in
+            xx.elementsEqual(yy)
+        }))
+
+        /// Nested array reference literal, currently FAILS
+        var VV1: DeviceArray<DeviceArray<Float>> = {
+            let vv1_0: DeviceArray<Float> = [1, 2, 3]
+            let vv1_1: DeviceArray<Float> = [4, 5, 6]
+            return [ vv1_0, vv1_1 ]
+        }()
+        XCTAssertEqual(VV1[0].copyToHost(), [1, 2, 3])
     }
 
     func testValue() {

@@ -8,73 +8,166 @@
 
 import Foundation
 
-open class ManagedDeviceBuffer<Element> {
+protocol DeviceBufferProtocol : class {
+    associatedtype Element
+    var owner: AnyObject? { get }
+    var baseAddress: UnsafeMutableDevicePointer<Element> { get }
+    init()
+    init(viewing other: Self)
+}
 
-    public let baseAddress: UnsafeMutableDevicePointer<Element>
+protocol ArrayViewingBufferProtocol : DeviceBufferProtocol {
+    init<ArrayBuffer: DeviceArrayBufferProtocol>(viewing other: ArrayBuffer, offsetBy offset: Int)
+        where ArrayBuffer.Element == Element
+}
 
-    public let capacity: Int
+protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, RandomAccessCollection {
+    typealias Index = Int
+    typealias Indices = CountableRange<Int>
+    associatedtype Element
 
-    /// Optional strong reference to other buffer. Used when array produces a
-    /// slice. It needs to hold on to the original buffer so that the original
-    /// array makes a copy when it mutates.
-    public let retainedReference: ManagedDeviceBuffer<Element>?
+    var baseAddress: UnsafeMutableDevicePointer<Element> { get }
+    var capacity: Int { get }
+    var retainee: Any? { get set }
 
-    public convenience init(_ other: ManagedDeviceBuffer<Element>) {
-        self.init(capacity: other.capacity)
+    init(capacity: Int)
+    init(viewing other: Self, in range: Range<Int>)
+
+    subscript(i: Int) -> DeviceValueBuffer<Element> { get set }
+}
+
+extension DeviceArrayBufferProtocol {
+    init() {
+        self.init(capacity: 0)
+    }
+}
+
+final class DeviceValueBuffer<Element> : ArrayViewingBufferProtocol {
+
+    let baseAddress: UnsafeMutableDevicePointer<Element>
+    let owner: AnyObject?
+
+    required init() {
+        baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: 1)
+        owner = nil
+    }
+
+    convenience init(_ other: DeviceValueBuffer<Element>) {
+        self.init()
         baseAddress.assign(from: other.baseAddress)
     }
 
-    public init(capacity: Int) {
-        self.capacity = capacity
-        baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: capacity)
-        retainedReference = nil
-    }
-
-    public init(viewing other: ManagedDeviceBuffer<Element>) {
-        capacity = other.capacity
+    required init(viewing other: DeviceValueBuffer<Element>) {
         baseAddress = other.baseAddress
-        retainedReference = other
+        owner = other
     }
 
-    public init(viewing other: ManagedDeviceBuffer<Element>, offset: Int) {
-        capacity = other.capacity
-        baseAddress = other.baseAddress + offset
-        retainedReference = other
+    required init<Buffer: DeviceArrayBufferProtocol>
+        (viewing arrayBuffer: Buffer, offsetBy offset: Int) where Buffer.Element == Element
+    {
+        baseAddress = arrayBuffer.baseAddress.advanced(by: arrayBuffer.startIndex + offset)
+        owner = arrayBuffer
     }
 
     deinit {
-        /// Deallocate if and only if `self` is owning the memory
-        if retainedReference == nil {
+        if owner == nil {
             baseAddress.deallocate()
         }
     }
 
 }
 
-final class DeviceArrayBuffer<Element> : ManagedDeviceBuffer<Element> {
+final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
+    typealias SubSequence = DeviceArrayBuffer<Element>
 
-    let count: Int
+    let baseAddress: UnsafeMutableDevicePointer<Element>
+    let capacity: Int
+    let startIndex: Int, endIndex: Int
+    var owner: AnyObject?
+    var retainee: Any?
 
-    /// Copy elements from the other buffer
-    public init(_ other: DeviceArrayBuffer<Element>) {
-        count = other.count
-        super.init(capacity: other.count)
-        baseAddress.assign(from: other.baseAddress, count: count)
-    }
-
-    override init(capacity: Int) {
-        count = capacity
-        super.init(capacity: capacity)
+    init(capacity: Int) {
+        self.capacity = capacity
+        baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: capacity)
+        startIndex = 0
+        endIndex = capacity
+        owner = nil
     }
 
     init(viewing other: DeviceArrayBuffer<Element>) {
-        count = other.capacity
-        super.init(viewing: other)
+        capacity = other.capacity
+        baseAddress = other.baseAddress
+        startIndex = other.startIndex
+        endIndex = other.endIndex
+        owner = other
     }
 
-    init(viewing other: DeviceArrayBuffer<Element>, range: Range<Int>) {
-        count = range.count
-        super.init(viewing: other, offset: range.lowerBound)
+    /// Copy elements from the other buffer
+    convenience init(_ other: DeviceArrayBuffer<Element>) {
+        self.init(capacity: other.count)
+        baseAddress.assign(from: other.baseAddress.advanced(by: other.startIndex), count: count)
+    }
+
+    init(viewing other: DeviceArrayBuffer<Element>, in range: Range<Int>) {
+        baseAddress = other.baseAddress
+        guard other.startIndex <= range.lowerBound &&
+            other.endIndex >= range.upperBound else {
+            fatalError("Array index out of bounds")
+        }
+        capacity = other.capacity
+        startIndex = range.lowerBound
+        endIndex = range.upperBound
+        owner = other
+    }
+    
+    deinit {
+        if owner == nil {
+            baseAddress.deallocate()
+        }
+    }
+
+    var count: Int {
+        return endIndex - startIndex
+    }
+
+    func index(after i: Int) -> Int {
+        return i + 1
+    }
+
+    func index(before i: Int) -> Int {
+        return i - 1
+    }
+
+    var indices: CountableRange<Int> {
+        return startIndex..<endIndex
+    }
+
+    /// Accesses the subsequence bounded by the given range.
+    ///
+    /// - Parameter bounds: A range of the collection's indices. The upper and
+    ///   lower bounds of the `bounds` range must be valid indices of the
+    ///   collection.
+    subscript(bounds: Range<Int>) -> DeviceArrayBuffer<Element> {
+        get {
+            return DeviceArrayBuffer(viewing: self, in: bounds)
+        }
+        set {
+            guard bounds.lowerBound >= startIndex && bounds.upperBound <= endIndex else {
+                fatalError("Array index out of bounds")
+            }
+            baseAddress.advanced(by: bounds.lowerBound)
+                       .assign(from: newValue.baseAddress.advanced(by: newValue.startIndex),
+                               count: Swift.min(bounds.count, count))
+        }
+    }
+
+    subscript(i: Int) -> DeviceValueBuffer<Element> {
+        get {
+            return DeviceValueBuffer(viewing: self, offsetBy: i)
+        }
+        set {
+            baseAddress.advanced(by: i).assign(from: newValue.baseAddress)
+        }
     }
 
 }

@@ -8,21 +8,19 @@
 
 public struct DeviceValue<Wrapped> {
 
-    private var buffer: ManagedDeviceBuffer<Wrapped>
-    private var owning = true
+    var buffer: DeviceValueBuffer<Wrapped>
 
-    private var mutatingBuffer: ManagedDeviceBuffer<Wrapped> {
+    private var mutatingBuffer: DeviceValueBuffer<Wrapped> {
         mutating get {
-            if !isKnownUniquelyReferenced(&buffer) || !owning {
-                buffer = ManagedDeviceBuffer(buffer)
+            if !isKnownUniquelyReferenced(&buffer) || buffer.owner != nil {
+                buffer = DeviceValueBuffer(buffer)
             }
             return buffer
         }
     }
 
-    init(buffer: ManagedDeviceBuffer<Wrapped>) {
+    init(buffer: DeviceValueBuffer<Wrapped>) {
         self.buffer = buffer
-        self.owning = false
     }
 
     public var value: Wrapped {
@@ -35,7 +33,7 @@ public struct DeviceValue<Wrapped> {
     }
 
     public init(_ initial: Wrapped? = nil) {
-        buffer = ManagedDeviceBuffer(capacity: 1)
+        buffer = DeviceValueBuffer()
         initial.flatMap(buffer.baseAddress.assign)
     }
 
@@ -53,4 +51,26 @@ public struct DeviceValue<Wrapped> {
         return try body(UnsafeDevicePointer(buffer.baseAddress))
     }
 
+}
+
+extension DeviceValue where Wrapped : DeviceCollection {
+
+    public subscript(i: Int) -> Wrapped.Iterator.Element {
+        get {
+            return value[i]
+        }
+    }
+
+    public func copyToHost() -> [Wrapped.Element] {
+        return value.copyToHost()
+    }
+    
+}
+
+extension DeviceValue where Wrapped : DeviceCollection, Wrapped.Element : DeviceCollection {
+
+    public func copyToHost() -> [[Wrapped.Element.Element]] {
+        return value.copyToHost().map{$0.copyToHost()}
+    }
+    
 }
