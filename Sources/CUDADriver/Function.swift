@@ -101,9 +101,6 @@ public struct Function : CHandleCarrier {
         }
     }
     
-    /// - note:
-    /// Needs rewriting
-    /// Does not work
     public func launch(withArguments arguments: inout ArgumentList, inGrid gridSize: GridSize,
                        ofBlocks blockSize: BlockSize, stream: Stream?) throws {
         try ensureSuccess(
