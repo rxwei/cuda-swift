@@ -17,25 +17,28 @@ open class Program {
     let handle: nvrtcProgram
 
     public var name: String?
+    public var data: Data
+    public var headers: [(name: String, data: Data)]?
 
     /// Initialize with source program and headers
     public init(data: Data, name: String? = nil, externC: Bool = true,
                 headers: [(name: String, data: Data)]) throws {
         self.name = name
-        var data = data
+        self.data = data
+        self.headers = headers
         if externC { /// Disable mangling
-            data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
-            data.append(UInt8("}")!)
+            self.data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
+            self.data.append(UInt8("}")!)
         }
-        var headerNames: [UnsafePointer<Int8>?] = headers.map { name, _ in
+        var headerNames: [UnsafePointer<Int8>?] = self.headers!.map { name, _ in
             name.withCString{$0}
         }
-        var headerCodes: [UnsafePointer<Int8>?] = headers.map { _, data in
+        var headerCodes: [UnsafePointer<Int8>?] = self.headers!.map { _, data in
             data.withUnsafeBytes{$0}
         }
         var handle: nvrtcProgram?
         try ensureSuccess(
-            data.withUnsafeBytes { bytes in
+            self.data.withUnsafeBytes { bytes in
                 nvrtcCreateProgram(
                     &handle,                          /// Handle
                     bytes,                            /// Source
@@ -52,14 +55,14 @@ open class Program {
     /// Initialize with source program
     public init(data: Data, name: String? = nil, externC: Bool = true) throws {
         self.name = name
-        var data = data
+        self.data = data
         if externC { /// Disable mangling
-            data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
-            data.append(contentsOf: "}".utf8)
+            self.data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
+            self.data.append(contentsOf: "}".utf8)
         }
         var handle: nvrtcProgram?
         try ensureSuccess(
-            data.withUnsafeBytes { bytes in
+            self.data.withUnsafeBytes { bytes in
                 nvrtcCreateProgram(
                     &handle,                          /// Handle
                     bytes,                            /// Source
@@ -121,7 +124,6 @@ open class Compiler {
 
     open class func compile(_ program: Program, options: [Option]) throws -> PTX {
         return try options.map{$0.rawArgument}.withUnsafeBufferPointer { ptr in
-            ///var cStringPtr: [UnsafePointer<Int8>?] = ptr.map{$0.rawArgument.withCString{$0}}
             var cArgs: [ContiguousArray<Int8>] = ptr.map{$0.utf8CString}
             var cArgPtrs: [UnsafePointer<Int8>?] = []
             for i in cArgs.indices {
