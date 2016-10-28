@@ -26,6 +26,11 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         self.deviceAddressHandle = deviceAddressHandle
     }
 
+    public init?(_ deviceAddress: UnsafeMutablePointer<Pointee>?) {
+        guard let deviceAddress = deviceAddress else { return nil }
+        deviceAddressHandle = CUdeviceptr(UInt(bitPattern: deviceAddress))
+    }
+
     private init(assumingNonNil deviceAddress: CUdeviceptr) {
         self.deviceAddressHandle = deviceAddress
     }

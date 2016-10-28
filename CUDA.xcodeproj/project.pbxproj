@@ -10,6 +10,7 @@
 		29D37BA11DC025F200500FD3 /* MatrixType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D37BA01DC025F200500FD3 /* MatrixType.swift */; };
 		29D37BA31DC0789900500FD3 /* Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D37BA21DC0789900500FD3 /* Buffer.swift */; };
 		29E0EEC61DC0A94B00CFE0E0 /* Level2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E0EEC51DC0A94B00CFE0E0 /* Level2.swift */; };
+		29F097C91DC4037300DC14FC /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F097C81DC4037300DC14FC /* Option.swift */; };
 		_LinkFileRef_CUDADriver_via_CUDADriverTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_CUDARuntime /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_CUDARuntimeTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
@@ -85,6 +86,7 @@
 		29D37BA01DC025F200500FD3 /* MatrixType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MatrixType.swift; sourceTree = "<group>"; };
 		29D37BA21DC0789900500FD3 /* Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Buffer.swift; path = Sources/CUDARuntime/Buffer.swift; sourceTree = SOURCE_ROOT; };
 		29E0EEC51DC0A94B00CFE0E0 /* Level2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level2.swift; sourceTree = "<group>"; };
+		29F097C81DC4037300DC14FC /* Option.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Option.swift; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcodeproj/Configs/Project.xcconfig /* CUDA.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CUDA.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcworkspace /* CUDA.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CUDA.xcworkspace; sourceTree = "<group>"; };
 		__PBXFileRef_Frameworks /* Frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Frameworks; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 			isa = PBXGroup;
 			children = (
 				__PBXFileRef_Sources/NVRTC/Compiler.swift /* Compiler.swift */,
+				29F097C81DC4037300DC14FC /* Option.swift */,
 				__PBXFileRef_Sources/NVRTC/Error.swift /* Error.swift */,
 			);
 			name = NVRTC;
@@ -602,6 +605,7 @@
 			buildActionMask = 0;
 			files = (
 				__src_cc_ref_Sources/NVRTC/Compiler.swift /* Compiler.swift in Sources */,
+				29F097C91DC4037300DC14FC /* Option.swift in Sources */,
 				__src_cc_ref_Sources/NVRTC/Error.swift /* Error.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -85,14 +85,14 @@ public struct Function : CHandleCarrier {
         return try body(handle)
     }
 
-    public struct Arguments {
+    public struct ArgumentList {
         var references: [Any] = []
         var addresses: [UnsafeMutableRawPointer?] = []
 
         public init() {}
 
-        public mutating func append<T>(_ argument: T) {
-            references.append(argument)
+        public mutating func append<T>(_ pointer: UnsafeMutableDevicePointer<T>?) {
+            references.append(pointer?.deviceAddressHandle ?? 0)
             addresses.append(&references[references.endIndex-1])
         }
 
@@ -104,7 +104,7 @@ public struct Function : CHandleCarrier {
     /// - note:
     /// Needs rewriting
     /// Does not work
-    public func launch(withArguments arguments: inout Arguments, inGrid gridSize: GridSize,
+    public func launch(withArguments arguments: inout ArgumentList, inGrid gridSize: GridSize,
                        ofBlocks blockSize: BlockSize, stream: Stream?) throws {
         try ensureSuccess(
             cuLaunchKernel(handle, UInt32(gridSize.x), UInt32(gridSize.y), UInt32(gridSize.z),

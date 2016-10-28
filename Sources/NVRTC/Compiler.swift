@@ -119,11 +119,18 @@ open class Compiler {
         return try program.retrievePTX()
     }
 
-    open class func compile(_ program: Program, options: [String]) throws -> PTX {
-        return try options.withUnsafeBufferPointer { ptr in
-            var cStringPtr: [UnsafePointer<Int8>?] = ptr.map{$0.withCString{$0}}
+    open class func compile(_ program: Program, options: [Option]) throws -> PTX {
+        return try options.map{$0.rawArgument}.withUnsafeBufferPointer { ptr in
+            ///var cStringPtr: [UnsafePointer<Int8>?] = ptr.map{$0.rawArgument.withCString{$0}}
+            var cArgs: [ContiguousArray<Int8>] = ptr.map{$0.utf8CString}
+            var cArgPtrs: [UnsafePointer<Int8>?] = []
+            for i in cArgs.indices {
+                cArgs[i].withUnsafeBufferPointer { buf in
+                    cArgPtrs.append(buf.baseAddress)
+                }
+            }
             try ensureSuccess(
-                nvrtcCompileProgram(program.handle, Int32(ptr.count), &cStringPtr)
+                nvrtcCompileProgram(program.handle, Int32(ptr.count), &cArgPtrs)
             )
             return try program.retrievePTX()
         }

@@ -140,17 +140,23 @@ class CUDARuntimeTests: XCTestCase {
     func testModule() throws {
         let source: String =
             "__global__ void mult(float a, float *x, size_t n) {"
-                + "    size_t i = blockIdx.x * blockDim.x + threadIdx.x;"
-                + "    if (i < n) x[i] = a * x[i];"
-                + "}";
-        let ptx = try Compiler.compile(Program(source: source))
+          + "    size_t i = blockIdx.x * blockDim.x + threadIdx.x;"
+          + "    if (i < n) x[i] = a * x[i];"
+          + "}";
+        let ptx = try Compiler.compile(
+            Program(source: source),
+            options: [
+                .gpu(withComputeCapability: Device.current.computeCapability),
+                .contractIntoFMAD(true),
+            ]
+        )
         let module = try Module(ptx: ptx)
         let mult = module.function(named: "mult")!
         var n: Int32 = 256
-        var x = DeviceArray<Float>(fromHost: sequence(first: Float(0.0), next: {$0+1.0}).prefix(Int(n)).map{$0})
+        var x = DeviceArray<Float>(fromHost: Array(sequence(first: 0.0, next: {$0+1}).prefix(256)))
         var a: Float = 5.0
         
-        var args = Function.Arguments()
+        var args = Function.ArgumentList()
         args.append(&a)
         args.append(&x)
         args.append(&n)

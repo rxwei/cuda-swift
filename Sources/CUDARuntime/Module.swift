@@ -11,6 +11,7 @@
 @_exported import struct CUDADriver.Function
 import enum CUDADriver.Driver
 import struct CUDADriver.Device
+import struct CUDADriver.UnsafeMutableDevicePointer
 import class CUDADriver.Context
 import class CUDADriver.Module
 
@@ -28,12 +29,12 @@ open class Module : CUDADriver.Module {
 
 }
 
-public extension CUDADriver.Function.Arguments {
+public extension CUDADriver.Function.ArgumentList {
 
     public mutating func append<DeviceType: DeviceAddressible>(_ argument: inout DeviceType) {
         argument.withUnsafeMutableDevicePointer { devPtr -> () in
             devPtr.withMutableDeviceAddress { addr -> () in
-                self.append(addr)
+                self.append(CUDADriver.UnsafeMutableDevicePointer(addr))
                 return () /// Compiler bug
             }
         }
