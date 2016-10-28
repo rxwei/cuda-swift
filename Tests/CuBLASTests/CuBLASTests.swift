@@ -11,10 +11,10 @@ class CuBLASTests: XCTestCase {
     func testSum() {
         measure {
             let xx: DeviceArray<Float> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
-            let result = BLAS.main.sumOfAbsoluteValues(in: xx)
+            let result = ∑+(xx)
             XCTAssertEqual(result.value, xx.copyToHost().reduce(0, {$0+abs($1)}))
             let xxDouble: DeviceArray<Double> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
-            let resultDouble = BLAS.main.sumOfAbsoluteValues(in: xxDouble)
+            let resultDouble = ∑+(xxDouble)
             XCTAssertEqual(resultDouble.value, xxDouble.copyToHost().reduce(0, {$0+abs($1)}))
         }
     }

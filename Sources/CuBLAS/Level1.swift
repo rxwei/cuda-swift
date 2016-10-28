@@ -282,6 +282,7 @@ public extension BLAS {
 }
 
 infix operator • : MultiplicationPrecedence
+prefix operator ∑+
 
 @inline(__always)
 public func •(lhs: DeviceVector<Float>, rhs: DeviceVector<Float>) -> DeviceValue<Float> {
@@ -321,4 +322,14 @@ public func *=(lhs: inout DeviceVector<Float>, rhs: DeviceValue<Float>) {
 @inline(__always)
 public func *=(lhs: inout DeviceVector<Double>, rhs: DeviceValue<Double>) {
     BLAS.main.multiply(&lhs, by: rhs)
+}
+
+@inline(__always)
+public prefix func ∑+(vector: DeviceVector<Double>) -> DeviceValue<Double> {
+    return BLAS.main.sumOfAbsoluteValues(in: vector)
+}
+
+@inline(__always)
+public prefix func ∑+(vector: DeviceVector<Float>) -> DeviceValue<Float> {
+    return BLAS.main.sumOfAbsoluteValues(in: vector)
 }
