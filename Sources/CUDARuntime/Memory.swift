@@ -25,8 +25,8 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     /// UnsafeMutableRawPointer, e.g.
     /// `init(assumingMemoryBoundFrom: UnsafeMutableRawPointer)`
     /// For now, let's leave it as is
-    public init(_ deviceAddress: UnsafeMutableRawPointer) {
-        self.deviceAddress = deviceAddress.assumingMemoryBound(to: Pointee.self)
+    public init(_ deviceAddress: UnsafeMutablePointer<Pointee>) {
+        self.deviceAddress = deviceAddress
     }
 
     /// Convert from other mutable device pointer
@@ -58,7 +58,7 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     public static func allocate(capacity: Int) -> UnsafeMutableDevicePointer<Pointee> {
         var pointer: UnsafeMutableRawPointer?
         !!cudaMalloc(&pointer, capacity * MemoryLayout<Pointee>.stride)
-        return UnsafeMutableDevicePointer(pointer!)
+        return UnsafeMutableDevicePointer(pointer!.assumingMemoryBound(to: Pointee.self))
     }
 
     public func deallocate() {
@@ -212,14 +212,14 @@ public struct UnsafeDevicePointer<Pointee> : Equatable, Hashable, Strideable {
 
     /// Convert from raw memory address on graphic device
     /// - parameter deviceAddress: address on graphic device
-    public init(_ deviceAddress: UnsafeMutableRawPointer) {
-        self.deviceAddress = UnsafePointer(deviceAddress.assumingMemoryBound(to: Pointee.self))
+    public init(_ deviceAddress: UnsafeMutablePointer<Pointee>) {
+        self.deviceAddress = UnsafePointer(deviceAddress)
     }
 
     /// Convert from raw memory address on graphic device
     /// - parameter deviceAddress: address on graphic device
-    public init(_ deviceAddress: UnsafeRawPointer) {
-        self.deviceAddress = deviceAddress.assumingMemoryBound(to: Pointee.self)
+    public init(_ deviceAddress: UnsafePointer<Pointee>) {
+        self.deviceAddress = deviceAddress
     }
 
     /// Convert from mutable device pointer
