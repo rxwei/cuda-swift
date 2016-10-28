@@ -186,7 +186,7 @@ public extension UnsafeMutableDevicePointer {
 
     public func withMemoryRebound<T, Result>
         (to type: T.Type, capacity: Int,
-         _ body: (UnsafeMutableDevicePointer<T>) throws -> Result) rethrows -> Result {
+         _ body: @escaping (UnsafeMutableDevicePointer<T>) throws -> Result) rethrows -> Result {
         return try deviceAddress.withMemoryRebound(to: T.self, capacity: capacity) { ptr -> Result in
             try body(UnsafeMutableDevicePointer<T>(ptr))
         }
@@ -303,7 +303,7 @@ public extension UnsafeDevicePointer {
 
     public func withMemoryRebound<T, Result>
         (to type: T.Type, capacity: Int,
-         _ body: (UnsafeDevicePointer<T>) throws -> Result) rethrows -> Result {
+         _ body: @escaping (UnsafeDevicePointer<T>) throws -> Result) rethrows -> Result {
         return try deviceAddress.withMemoryRebound(to: T.self, capacity: capacity) { ptr -> Result in
             try body(UnsafeDevicePointer<T>(ptr))
         }
