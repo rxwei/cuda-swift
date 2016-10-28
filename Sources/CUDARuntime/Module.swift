@@ -26,8 +26,17 @@ open class Module : CUDADriver.Module {
         try super.init(ptx: ptx)
     }
 
-    deinit {
-        Context.synchronize()
+}
+
+public extension CUDADriver.Function.Arguments {
+
+    public mutating func append<DeviceType: DeviceAddressible>(_ argument: inout DeviceType) {
+        argument.withUnsafeMutableDevicePointer { devPtr -> () in
+            devPtr.withMutableDeviceAddress { addr -> () in
+                self.append(addr)
+                return () /// Compiler bug
+            }
+        }
     }
-    
+
 }

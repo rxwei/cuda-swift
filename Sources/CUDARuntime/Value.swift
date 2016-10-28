@@ -6,11 +6,11 @@
 //
 //
 
-public struct DeviceValue<Wrapped> {
+public struct DeviceValue<Element> : DeviceAddressible {
 
-    var buffer: DeviceValueBuffer<Wrapped>
+    var buffer: DeviceValueBuffer<Element>
 
-    private var mutatingBuffer: DeviceValueBuffer<Wrapped> {
+    private var mutatingBuffer: DeviceValueBuffer<Element> {
         mutating get {
             if !isKnownUniquelyReferenced(&buffer) || buffer.owner != nil {
                 buffer = DeviceValueBuffer(buffer)
@@ -19,11 +19,11 @@ public struct DeviceValue<Wrapped> {
         }
     }
 
-    init(buffer: DeviceValueBuffer<Wrapped>) {
+    init(buffer: DeviceValueBuffer<Element>) {
         self.buffer = buffer
     }
 
-    public var value: Wrapped {
+    public var value: Element {
         get {
             return buffer.baseAddress.load()
         }
@@ -32,44 +32,49 @@ public struct DeviceValue<Wrapped> {
         }
     }
 
-    public init(_ initial: Wrapped? = nil) {
+    public init(_ initial: Element? = nil) {
         buffer = DeviceValueBuffer()
         initial.flatMap(buffer.baseAddress.assign)
     }
 
-    public init(_ other: DeviceValue<Wrapped>) {
+    public init(_ other: DeviceValue<Element>) {
         self = other
     }
 
-    public mutating func withUnsafeMutableDevicePointer<Result>
-        (_ body: (UnsafeMutableDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
-        return try body(mutatingBuffer.baseAddress)
+    public var unsafePointer: UnsafeDevicePointer<Element> {
+        return UnsafeDevicePointer(buffer.baseAddress)
     }
 
     public func withUnsafeDevicePointer<Result>
-        (_ body: (UnsafeDevicePointer<Wrapped>) throws -> Result) rethrows -> Result {
+        (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result {
         return try body(UnsafeDevicePointer(buffer.baseAddress))
+    }
+
+    public mutating func withUnsafeMutableDevicePointer<Result>
+        (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
+        var baseAddress = mutatingBuffer.baseAddress
+        return try body(&baseAddress)
     }
 
 }
 
-extension DeviceValue where Wrapped : DeviceCollection {
+extension DeviceValue where Element : DeviceCollection {
 
-    public subscript(i: Int) -> Wrapped.Iterator.Element {
+    public subscript(i: Int) -> Element.Iterator.Element {
         get {
             return value[i]
         }
     }
 
-    public func copyToHost() -> [Wrapped.Element] {
+    public func copyToHost() -> [Element.Element] {
         return value.copyToHost()
     }
     
 }
 
-extension DeviceValue where Wrapped : DeviceCollection, Wrapped.Element : DeviceCollection {
+extension DeviceValue where Element : DeviceCollection, Element.Element : DeviceCollection {
 
-    public func copyToHost() -> [[Wrapped.Element.Element]] {
+    public func copyToHost() -> [[Element.Element.Element]] {
         return value.copyToHost().map{$0.copyToHost()}
     }
     

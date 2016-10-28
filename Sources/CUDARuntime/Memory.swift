@@ -14,7 +14,7 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     public typealias Stride = Int
 
     /// Raw address on CUDA device
-    public let deviceAddress: UnsafeMutablePointer<Pointee>
+    public var deviceAddress: UnsafeMutablePointer<Pointee>
 
     /// Convert from raw memory address on graphic device
     /// - parameter deviceAddress: address on graphic device
@@ -177,6 +177,11 @@ public extension UnsafeMutableDevicePointer {
     public func withDeviceAddress<Result>
         (body: (UnsafePointer<Pointee>) throws -> Result) rethrows -> Result {
         return try body(deviceAddress)
+    }
+
+    public mutating func withMutableDeviceAddress<Result>
+        (body: (inout UnsafeMutablePointer<Pointee>) throws -> Result) rethrows -> Result {
+        return try body(&deviceAddress)
     }
 
     public func withMemoryRebound<T, Result>

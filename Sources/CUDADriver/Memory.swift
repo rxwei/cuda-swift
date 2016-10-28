@@ -8,12 +8,6 @@
 
 import CCUDA
 
-public enum SharedMemoryBankSize: UInt32 {
-    case `default` = 0x00
-    case fourBytes = 0x01
-    case eightBytes = 0x02
-}
-
 public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Strideable {
 
     public typealias Stride = Int

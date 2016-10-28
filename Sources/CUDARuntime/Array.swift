@@ -21,40 +21,30 @@ public protocol MutableDeviceCollection : DeviceCollection {
     subscript(index: Int) -> Iterator.Element { get set }
 }
 
-protocol DeviceArrayProtocol : DeviceCollection, RangeReplaceableCollection, ExpressibleByArrayLiteral
+protocol DeviceArrayProtocol :
+    DeviceAddressible, MutableDeviceCollection,
+    RangeReplaceableCollection, ExpressibleByArrayLiteral
 {
-    /// The number of elements the Array can store without reallocation.
-    var capacity: Int { get }
-
-    /// An object that guarantees the lifetime of this array's elements.
-    var owner: AnyObject? { get }
-
-    subscript(index: Int) -> Iterator.Element { get set }
-
     associatedtype Buffer : AnyObject
+    var capacity: Int { get }
+    subscript(i: Int) -> Iterator.Element { get set }
+    var buffer: Buffer { get set }
     init(_ buffer: Buffer)
 }
 
-extension DeviceArrayProtocol {
-    public typealias Index = Int
-    public typealias IndexDistance = Int
-
+extension DeviceArrayProtocol where Buffer : DeviceArrayBufferProtocol {
     var capacity: Int {
-        return count
+        return buffer.capacity
     }
 }
 
-public struct DeviceArray<Element> :
-    RandomAccessCollection,
-    MutableDeviceCollection,
-    RangeReplaceableCollection,
-    ExpressibleByArrayLiteral
+public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
 {
     public typealias Index = Int
     public typealias IndexDistance = Int
     public typealias SubSequence = DeviceArray<Element>
 
-    private var buffer: DeviceArrayBuffer<Element>
+    var buffer: DeviceArrayBuffer<Element>
     private var retainedReference: Any?
 
     /// Copy on write
@@ -65,6 +55,10 @@ public struct DeviceArray<Element> :
             }
             return buffer
         }
+    }
+
+    public var unsafePointer: UnsafeDevicePointer<Element> {
+        return UnsafeDevicePointer(buffer.baseAddress.advanced(by: buffer.startIndex))
     }
 
     init(_ buffer: DeviceArrayBuffer<Element>) {
@@ -78,6 +72,11 @@ public struct DeviceArray<Element> :
 
     public init(capacity: Int) {
         buffer = DeviceArrayBuffer(capacity: capacity)
+    }
+
+    public init(repeating element: Element, count: Int) {
+        buffer = DeviceArrayBuffer(capacity: count)
+        buffer.baseAddress.assign(element, count: count)
     }
 
     public init<C: Collection>(fromHost elements: C) where
@@ -174,9 +173,10 @@ public struct DeviceArray<Element> :
     }
 
     public mutating func withUnsafeMutableDevicePointer<Result>
-        (_ body: (UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
+        (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
         let buffer = mutatingBuffer
-        return try body(buffer.baseAddress.advanced(by: buffer.startIndex))
+        var baseAddress = buffer.baseAddress.advanced(by: buffer.startIndex)
+        return try body(&baseAddress)
     }
 
     public func withUnsafeDevicePointer<Result>

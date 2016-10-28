@@ -63,8 +63,8 @@ open class Context : CHandleCarrier {
         return handle == nil ? nil : instances[handle!]!
     }
 
-    open class func synchronize() {
-        !!cuCtxSynchronize()
+    open class func synchronize() throws {
+        try ensureSuccess(cuCtxSynchronize())
     }
     
     public func withUnsafeHandle<Result>

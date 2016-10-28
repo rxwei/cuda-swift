@@ -25,7 +25,7 @@ open class Program {
         var data = data
         if externC { /// Disable mangling
             data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
-            data.append(contentsOf: "}".utf8)
+            data.append(UInt8("}")!)
         }
         var headerNames: [UnsafePointer<Int8>?] = headers.map { name, _ in
             name.withCString{$0}
@@ -50,8 +50,13 @@ open class Program {
     }
 
     /// Initialize with source program
-    public init(data: Data, name: String? = nil) throws {
+    public init(data: Data, name: String? = nil, externC: Bool = true) throws {
         self.name = name
+        var data = data
+        if externC { /// Disable mangling
+            data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
+            data.append(contentsOf: "}".utf8)
+        }
         var handle: nvrtcProgram?
         try ensureSuccess(
             data.withUnsafeBytes { bytes in

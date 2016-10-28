@@ -8,6 +8,12 @@
 
 import CCUDA
 
+public enum SharedMemoryBankSize: UInt32 {
+    case `default` = 0x00
+    case fourBytes = 0x01
+    case eightBytes = 0x02
+}
+
 public struct Function : CHandleCarrier {
 
     public typealias Handle = CUfunction
@@ -66,12 +72,12 @@ public struct Function : CHandleCarrier {
         public let x: Int, y: Int, z: Int
         /// Shared memory size per thread
         public let sharedMemory: Int
-        
-        public init(x: Int, y: Int, z: Int, sharedMemorySize: Int) {
+
+        public init(x: Int, y: Int, z: Int, sharedMemory: Int = 0) {
             self.x = x
             self.y = y
             self.z = z
-            self.sharedMemory = sharedMemorySize
+            self.sharedMemory = sharedMemory
         }
     }
     
@@ -79,19 +85,33 @@ public struct Function : CHandleCarrier {
         return try body(handle)
     }
 
+    public struct Arguments {
+        var references: [Any] = []
+        var addresses: [UnsafeMutableRawPointer?] = []
+
+        public init() {}
+
+        public mutating func append<T>(_ argument: T) {
+            references.append(argument)
+            addresses.append(&references[references.endIndex-1])
+        }
+
+        public mutating func append<T>(_ argument: inout T) {
+            addresses.append(&argument)
+        }
+    }
+    
     /// - note:
     /// Needs rewriting
     /// Does not work
-    public func launch(withArguments arguments: [Any], inGrid gridSize: GridSize,
+    public func launch(withArguments arguments: inout Arguments, inGrid gridSize: GridSize,
                        ofBlocks blockSize: BlockSize, stream: Stream?) throws {
-        try arguments.withUnsafeBufferPointer { ptr in
-            let argPtr = unsafeBitCast(ptr.baseAddress, to: UnsafeMutablePointer<UnsafeMutableRawPointer?>.self)
-            try ensureSuccess(
-                cuLaunchKernel(handle, UInt32(gridSize.x), UInt32(gridSize.y), UInt32(gridSize.z),
-                               UInt32(blockSize.x), UInt32(blockSize.y), UInt32(blockSize.z),
-                               UInt32(blockSize.sharedMemory), stream?.handle ?? nil, argPtr, nil)
-            )
-        }
+        try ensureSuccess(
+            cuLaunchKernel(handle, UInt32(gridSize.x), UInt32(gridSize.y), UInt32(gridSize.z),
+                           UInt32(blockSize.x), UInt32(blockSize.y), UInt32(blockSize.z),
+                           UInt32(blockSize.sharedMemory), stream?.handle, &arguments.addresses, nil)
+        )
+        try Context.synchronize()
     }
 
 }

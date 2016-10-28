@@ -28,6 +28,10 @@ public struct PTX {
         name = url.deletingPathExtension().lastPathComponent
     }
 
+    public var text: String {
+        return String(data: data, encoding: .utf8)!
+    }
+
     public func write(to url: URL) throws {
         try data.write(to: url)
     }

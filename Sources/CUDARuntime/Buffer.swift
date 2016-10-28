@@ -6,7 +6,14 @@
 //
 //
 
-import Foundation
+public protocol DeviceAddressible {
+    associatedtype Element
+    var unsafePointer: UnsafeDevicePointer<Element> { get }
+    func withUnsafeDevicePointer<Result>
+        (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
+    mutating func withUnsafeMutableDevicePointer<Result>
+        (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result
+}
 
 protocol DeviceBufferProtocol : class {
     associatedtype Element
@@ -24,7 +31,6 @@ protocol ArrayViewingBufferProtocol : DeviceBufferProtocol {
 protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, RandomAccessCollection {
     typealias Index = Int
     typealias Indices = CountableRange<Int>
-    associatedtype Element
 
     var baseAddress: UnsafeMutableDevicePointer<Element> { get }
     var capacity: Int { get }
@@ -43,7 +49,6 @@ extension DeviceArrayBufferProtocol {
 }
 
 final class DeviceValueBuffer<Element> : ArrayViewingBufferProtocol {
-
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let owner: AnyObject?
 
