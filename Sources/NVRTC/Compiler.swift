@@ -21,15 +21,11 @@ open class Program {
     public var headers: [(name: String, data: Data)]?
 
     /// Initialize with source program and headers
-    public init(data: Data, name: String? = nil, externC: Bool = true,
+    public init(data: Data, name: String? = nil,
                 headers: [(name: String, data: Data)]) throws {
         self.name = name
         self.data = data
         self.headers = headers
-        if externC { /// Disable mangling
-            self.data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
-            self.data.append(UInt8("}")!)
-        }
         var headerNames: [UnsafePointer<Int8>?] = self.headers!.map { name, _ in
             name.withCString{$0}
         }
@@ -53,13 +49,9 @@ open class Program {
     }
 
     /// Initialize with source program
-    public init(data: Data, name: String? = nil, externC: Bool = true) throws {
+    public init(data: Data, name: String? = nil) throws {
         self.name = name
         self.data = data
-        if externC { /// Disable mangling
-            self.data.insert(contentsOf: "extern \"C\"{".utf8, at: 0)
-            self.data.append(contentsOf: "}".utf8)
-        }
         var handle: nvrtcProgram?
         try ensureSuccess(
             self.data.withUnsafeBytes { bytes in

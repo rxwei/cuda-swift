@@ -139,7 +139,7 @@ class CUDARuntimeTests: XCTestCase {
     
     func testModule() throws {
         let source: String =
-            "__global__ void mult(float a, float *x, size_t n) {"
+            "extern \"C\" __global__ void mult(float a, float *x, size_t n) {"
           + "    size_t i = blockIdx.x * blockDim.x + threadIdx.x;"
           + "    if (i < n) x[i] = a * x[i];"
           + "}";
