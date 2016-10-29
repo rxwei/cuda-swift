@@ -109,6 +109,17 @@ open class Compiler {
         return (major: Int(major), minor: Int(minor))
     }
 
+    open class func compile(_ source: String, named name: String? = nil) throws -> PTX {
+        let program = try Program(source: source, name: name)
+        return try compile(program)
+    }
+
+    open class func compile(_ source: String, named name: String? = nil,
+                            options: [Option]) throws -> PTX {
+        let program = try Program(source: source, name: name)
+        return try compile(program, options: options)
+    }
+
     open class func compile(_ program: Program) throws -> PTX {
         try ensureSuccess(nvrtcCompileProgram(program.handle, 0, nil))
         return try program.retrievePTX()

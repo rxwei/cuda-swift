@@ -6,8 +6,10 @@
 //
 //
 
+@_exported import struct CUDADriver.ComputeCapability
+
 public enum Option {
-    case gpu(withComputeCapability: (Int, Int))
+    case computeCapability(ComputeCapability)
     case relocatableDeviceCode(Bool)
     case debugInfo
     case lineInfo
@@ -30,8 +32,8 @@ public enum Option {
 
     var rawArgument: String {
         switch self {
-        case let .gpu(withComputeCapability: (major, minor)):
-            return "--gpu-architecture=compute_\(major)\(minor)"
+        case let .computeCapability(cc):
+            return "--gpu-architecture=compute_\(cc.major)\(cc.minor)"
         case let .relocatableDeviceCode(r):
             return "--relocatable-device-code=\(r)"
         case .debugInfo:

@@ -13,14 +13,16 @@ open class Stream : CHandleCarrier {
     public typealias Handle = CUstream
 
     let handle: CUstream
+    let owning: Bool
 
     private static var instances: [CUstream : Stream] = [:]
-
+    
     open static func current(with handle: CUstream) -> Stream {
         return Stream.instances[handle]!
     }
 
     public init() {
+        owning = true
         var handle: CUstream?
         !!cuStreamCreate(&handle, 0)
         self.handle = handle! // Safe
@@ -34,13 +36,22 @@ open class Stream : CHandleCarrier {
         } catch {
             return nil
         }
+        owning = true
         self.handle = handle! // Safe
         Stream.instances[self.handle] = self
     }
 
+    public init(unsafelyReferencing handle: Handle) {
+        owning = false
+        self.handle = handle
+        Stream.instances[self.handle] = self
+    }
+
     deinit {
-        Stream.instances.removeValue(forKey: handle)
-        cuStreamDestroy_v2(handle)
+        if owning {
+            Stream.instances.removeValue(forKey: handle)
+            cuStreamDestroy_v2(handle)
+        }
     }
 
     open func synchronize() {
@@ -53,14 +64,21 @@ open class Stream : CHandleCarrier {
         return Int(priority)
     }
 
-    open func addCallback(_ callback: (Stream?, DriverError?) -> ()) {
-        let cuCallback: CUstreamCallback = { handle, result, ptr in
-            let callback = unsafeBitCast(ptr, to: ((Stream?, DriverError?) -> ()).self)
-            callback(Stream.current(with: handle!),
-                     result == CUDA_SUCCESS ? nil : DriverError(result))
+    /// Buffer that keeps track of all callbacks. This is needed because we need
+    /// to follow the C-convention, i.e. no local capture, in CUDA's callback
+    /// function.
+    private var callbacks: [(Stream?, DriverError?) -> ()] = []
+
+    open func addCallback(_ callback: @escaping (Stream?, DriverError?) -> ()) {
+        let cuCallback: CUstreamCallback = { handle, result, userDataPtr in
+            let callback = userDataPtr?.assumingMemoryBound(
+                to: ((Stream?, DriverError?) -> ()).self).pointee
+            callback?(Stream.current(with: handle!),
+                      result == CUDA_SUCCESS ? nil : DriverError(result))
         }
+        callbacks.append(callback)
         cuStreamAddCallback(handle, cuCallback,
-                            unsafeBitCast(callback, to: UnsafeMutableRawPointer.self), 0)
+                            &callbacks[callbacks.endIndex-1], 0)
     }
 
     public func withUnsafeHandle<Result>

@@ -7,6 +7,7 @@
 //
 
 import CCUDARuntime
+@_exported import struct CUDADriver.ComputeCapability
 
 public struct Device : Equatable {
 
@@ -60,12 +61,12 @@ public struct Device : Equatable {
         return prop
     }
 
-    public var computeCapability: (major: Int, minor: Int) {
+    public var computeCapability: ComputeCapability {
         var major: Int32 = 0
         !!cudaDeviceGetAttribute(&major, cudaDevAttrComputeCapabilityMajor, Int32(index))
         var minor: Int32 = 0
         !!cudaDeviceGetAttribute(&minor, cudaDevAttrComputeCapabilityMinor, Int32(index))
-        return (major: Int(major), minor: Int(minor))
+        return ComputeCapability(major: Int(major), minor: Int(minor))
     }
 
     public static func ==(lhs: Device, rhs: Device) -> Bool {

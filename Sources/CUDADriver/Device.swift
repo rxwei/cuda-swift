@@ -30,10 +30,10 @@ public struct Device : Equatable, CHandleCarrier {
         return String(cString: name)
     }
 
-    public var computeCapability: (major: Int, minor: Int) {
+    public var computeCapability: ComputeCapability {
         var major: Int32 = 0, minor: Int32 = 0
         cuDeviceComputeCapability(&major, &minor, handle)
-        return (major: Int(major), minor: Int(minor))
+        return ComputeCapability(major: Int(major), minor: Int(minor))
     }
 
     public var properties: Properties {
@@ -97,4 +97,15 @@ public struct Device : Equatable, CHandleCarrier {
 
     public static var main: Device = Device(atIndex: 0)!
 
+}
+
+public struct ComputeCapability {
+
+    public let major, minor: Int
+
+    public init(major: Int, minor: Int) {
+        self.major = major
+        self.minor = minor
+    }
+    
 }

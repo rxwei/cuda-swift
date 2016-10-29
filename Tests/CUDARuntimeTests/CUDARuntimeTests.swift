@@ -1,7 +1,6 @@
 import XCTest
 @testable import CUDARuntime
 import NVRTC
-import class CUDADriver.Stream
 
 class CUDARuntimeTests: XCTestCase {
 
@@ -137,7 +136,7 @@ class CUDARuntimeTests: XCTestCase {
         XCTAssertNotEqual(val3.value, val.value)
     }
     
-    func testModule() throws {
+    func testModuleMult() throws {
         let source: String =
             "extern \"C\" __global__ void mult(float a, float *x, size_t n) {"
           + "    size_t i = blockIdx.x * blockDim.x + threadIdx.x;"
@@ -146,7 +145,9 @@ class CUDARuntimeTests: XCTestCase {
         let ptx = try Compiler.compile(
             Program(source: source),
             options: [
-                .gpu(withComputeCapability: Device.current.computeCapability),
+                .computeCapability(Device.current.computeCapability),
+                .cpp11,
+                .lineInfo,
                 .contractIntoFMAD(true),
             ]
         )
@@ -156,19 +157,55 @@ class CUDARuntimeTests: XCTestCase {
         var x = DeviceArray<Float>(fromHost: Array(sequence(first: 0.0, next: {$0+1}).prefix(256)))
         var a: Float = 5.0
         
-        var args = Function.ArgumentList()
+        var args = ArgumentList()
         args.append(&a)
         args.append(&x)
         args.append(&n)
-        
-        try mult.launch(
-            withArguments: &args,
-            inGrid: Function.GridSize(x: 8, y: 1, z: 1),
-            ofBlocks: Function.BlockSize(x: 32, y: 1, z: 1),
-            stream: nil
-        )
-        
+
+        let stream = CUDARuntime.Stream()
+        stream.addCallback { stream, error in
+            debugPrint("Callback called!")
+            XCTAssertNil(error)
+            XCTAssertNotNil(stream)
+        }
+
+        try mult<<<(8, 32, 0, stream)>>>(args)
+
         XCTAssertEqual(x.copyToHost(), [0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 105.0, 110.0, 115.0, 120.0, 125.0, 130.0, 135.0, 140.0, 145.0, 150.0, 155.0, 160.0, 165.0, 170.0, 175.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0, 225.0, 230.0, 235.0, 240.0, 245.0, 250.0, 255.0, 260.0, 265.0, 270.0, 275.0, 280.0, 285.0, 290.0, 295.0, 300.0, 305.0, 310.0, 315.0, 320.0, 325.0, 330.0, 335.0, 340.0, 345.0, 350.0, 355.0, 360.0, 365.0, 370.0, 375.0, 380.0, 385.0, 390.0, 395.0, 400.0, 405.0, 410.0, 415.0, 420.0, 425.0, 430.0, 435.0, 440.0, 445.0, 450.0, 455.0, 460.0, 465.0, 470.0, 475.0, 480.0, 485.0, 490.0, 495.0, 500.0, 505.0, 510.0, 515.0, 520.0, 525.0, 530.0, 535.0, 540.0, 545.0, 550.0, 555.0, 560.0, 565.0, 570.0, 575.0, 580.0, 585.0, 590.0, 595.0, 600.0, 605.0, 610.0, 615.0, 620.0, 625.0, 630.0, 635.0, 640.0, 645.0, 650.0, 655.0, 660.0, 665.0, 670.0, 675.0, 680.0, 685.0, 690.0, 695.0, 700.0, 705.0, 710.0, 715.0, 720.0, 725.0, 730.0, 735.0, 740.0, 745.0, 750.0, 755.0, 760.0, 765.0, 770.0, 775.0, 780.0, 785.0, 790.0, 795.0, 800.0, 805.0, 810.0, 815.0, 820.0, 825.0, 830.0, 835.0, 840.0, 845.0, 850.0, 855.0, 860.0, 865.0, 870.0, 875.0, 880.0, 885.0, 890.0, 895.0, 900.0, 905.0, 910.0, 915.0, 920.0, 925.0, 930.0, 935.0, 940.0, 945.0, 950.0, 955.0, 960.0, 965.0, 970.0, 975.0, 980.0, 985.0, 990.0, 995.0, 1000.0, 1005.0, 1010.0, 1015.0, 1020.0, 1025.0, 1030.0, 1035.0, 1040.0, 1045.0, 1050.0, 1055.0, 1060.0, 1065.0, 1070.0, 1075.0, 1080.0, 1085.0, 1090.0, 1095.0, 1100.0, 1105.0, 1110.0, 1115.0, 1120.0, 1125.0, 1130.0, 1135.0, 1140.0, 1145.0, 1150.0, 1155.0, 1160.0, 1165.0, 1170.0, 1175.0, 1180.0, 1185.0, 1190.0, 1195.0, 1200.0, 1205.0, 1210.0, 1215.0, 1220.0, 1225.0, 1230.0, 1235.0, 1240.0, 1245.0, 1250.0, 1255.0, 1260.0, 1265.0, 1270.0, 1275.0])
+    }
+
+    func testModuleSaxpy() {
+        do {
+            let source =
+                "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, size_t n) {"
+              + "    size_t tid = threadIdx.x;"
+              + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
+              + "}"
+
+            let ptx = try Compiler.compile(source, options: [
+                .computeCapability(Device.current.computeCapability),
+            ])
+            let module = try Module(ptx: ptx)
+            let reduce = module.function(named: "saxpy")!
+            
+            /// Arguments
+            var a: Float = 5.1
+            var x = DeviceArray<Float>(fromHost: Array(sequence(first: 0, next: {$0+1}).prefix(512)))
+            var y = DeviceArray<Float>(fromHost: Array(sequence(first: 512, next: {$0-1}).prefix(512)))
+            var out = DeviceArray<Float>(capacity: 512)
+            var args = ArgumentList()
+            var n: Int32 = 512
+            args.append(&a)
+            args.append(&x)
+            args.append(&y)
+            args.append(&out)
+            args.append(&n)
+            
+            try reduce<<<(1, 1)>>>(args)
+            XCTAssertEqual(out.copyToHost(), [])
+        } catch {
+            XCTFail(error.localizedDescription)
+        }
     }
 
     static var allTests : [(String, (CUDARuntimeTests) -> () throws -> Void)] {
@@ -177,7 +214,8 @@ class CUDARuntimeTests: XCTestCase {
             ("testPointer", testPointer),
             ("testArray", testArray),
             ("testValue", testValue),
-            ("testModule", testModule)
+            ("testModuleMult", testModuleMult),
+            ("testModuleSaxpy", testModuleSaxpy)
         ]
     }
 }

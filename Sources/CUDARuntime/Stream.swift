@@ -56,14 +56,20 @@ open class Stream : CHandleCarrier {
         return Int(priority)
     }
 
-    open func addCallback(_ callback: (Stream?, RuntimeError?) -> ()) {
-        let cuCallback: cudaStreamCallback_t = { handle, result, ptr in
-            let callback = unsafeBitCast(ptr, to: ((Stream?, RuntimeError?) -> ()).self)
-            callback(Stream.current(with: handle!),
-                     result == cudaSuccess ? nil : RuntimeError(result))
+    /// Buffer that keeps track of all callbacks. This is needed because we need
+    /// to follow the C-convention, i.e. no local capture, in CUDA's callback
+    /// function.
+    private var callbacks: [(Stream?, RuntimeError?) -> ()] = []
+
+    open func addCallback(_ callback: @escaping (Stream?, RuntimeError?) -> ()) {
+        let cuCallback: cudaStreamCallback_t = { handle, result, userDataPtr in
+            let callback = userDataPtr?.assumingMemoryBound(
+                to: ((Stream?, RuntimeError?) -> ()).self).pointee
+            callback?(Stream.current(with: handle!),
+                      result == cudaSuccess ? nil : RuntimeError(result))
         }
-        cudaStreamAddCallback(handle, cuCallback,
-                              unsafeBitCast(callback, to: UnsafeMutableRawPointer.self), 0)
+        callbacks.append(callback)
+        cudaStreamAddCallback(handle, cuCallback, &callbacks[callbacks.endIndex-1], 0)
     }
 
     public func withUnsafeHandle<Result>
