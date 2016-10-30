@@ -8,18 +8,18 @@ guard let device = Device.current else {
 }
 
 /// This program performs Z = a * X + Y, where a is a scalar and X and Y are vectors.
-let source =
+let saxpySource =
     "extern \"C\" __global__ void saxpy(size_t n, double a, double *x, double *y, double *z) {"
   + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
   + "    if (tid < n) z[tid] = a * x[tid] + y[tid];"
   + "}"
 
-let ptx = try Compiler.compile(source, options: [
+let module = try Module(source: saxpySource, compileOptions: [
     .computeCapability(device.computeCapability),
     .contractIntoFMAD(false),
     .useFastMath
 ])
-let module = try Module(ptx: ptx)
+
 let saxpy = module.function(named: "saxpy")!
 
 /// Data
@@ -30,11 +30,11 @@ var result = DeviceArray<Double>(capacity: n)
 
 /// Add arguments to a list
 var args = ArgumentList()
-args.append(Int32(n))   /// count
+args.append(Int32(n))    /// count
 args.append(Double(5.1)) /// a
-args.append(&x)         /// X
-args.append(&y)         /// Y
-args.append(&result)    /// Z
+args.append(&x)          /// X
+args.append(&y)          /// Y
+args.append(&result)     /// Z
 
 /// Launch kernel
 try saxpy<<<(n/128, 128)>>>(args)

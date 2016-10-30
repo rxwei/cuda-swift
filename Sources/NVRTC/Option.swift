@@ -8,7 +8,7 @@
 
 @_exported import struct CUDADriver.ComputeCapability
 
-public enum Option {
+public enum CompileOption {
     case computeCapability(ComputeCapability)
     case relocatableDeviceCode(Bool)
     case debugInfo

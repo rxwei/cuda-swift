@@ -13,7 +13,6 @@ let package = Package(
     ]
 )
 
-//#if os(macOS)
 let dylib = Product(
     name: "CUDA",
     type: .Library(.Dynamic),
@@ -26,4 +25,3 @@ let staticLib = Product(
     modules: [ "CUDADriver", "CUDARuntime", "NVRTC", "CuBLAS" ]
 )
 products.append(staticLib)
-//#endif

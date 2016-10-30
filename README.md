@@ -1,14 +1,161 @@
 # CUDA for Swift
 
 This project provides a native Swift interface to CUDA with the following
-features/goals:
+modules:
 
-* Value types
-* Type safety
-* Cross-platform
-* Real-time compilation
-* Operator overloading
-* Xcode Playground support
+- [x] CUDA Driver API `import CUDADriver`
+- [x] CUDA Runtime API `import CUDADriver`
+- [x] CUDA Runtime Compiler `import NVRTC`
+- [x] CUDA Basic Linear Algebra Subprograms `import CuBLAS`
+
+Any machine with CUDA 7.0+ and a CUDA-capable GPU is supported. Xcode Playground
+is supported as well. Please refer to [Usage](#Usage)
+and [Components](#Components).
+
+## Quick look
+
+### Value types
+
+CUDA Driver, Runtime, cuBLAS, and NVRTC (real-time compiler) are wrapped in
+native Swift types. Additionally, higher level modules such as Runtime and
+CuBLAS provide *value types* with copy-on-write semantics. This enables us to
+casually perform the following GPU computation without dealing with manual
+device memory allocation:
+
+```swift
+import CuBLAS
+
+/// Initialize two arrays on device
+/// These are the only lines of code that invokes memory copying!
+var x: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
+let y: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+/// Scalar multiplication
+x *= 2 // x => [2.0, 4.0, 6.0, 8.0, 10.0] stored on device
+
+/// Addition
+x += y // x => [3.0, 6.0, 9.0, 12.0, 15.0] stored on device
+
+/// Dot product
+x • y // => 165.0 : DeviceValue<Float> stored on device
+
+/// A chain of operations
+x *= x • y // x => [495.0, 990.0, 1485.0, 1980.0, 2475.0] stored on device
+
+/// Absolute sum
+BLAS.current.sumOfAbsoluteValues(in: x) // => 15 : DeviceValue<Float> stored on device
+```
+
+The following example demonstrates copy-on-write arrays in device memory.
+```swift
+let vectorX: DeviceArray<Float> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
+var vectorY: DeviceArray<Float> = [  1,   2,  3,   4,   5,   6,   7,            8,  9]
+/// Make a value reference to vector Y. Right now, this does not copy anything.
+let originalVectorY = vectorY
+/// Mutate Y by adding vectorX onto vectorY 
+vectorY += vectorX
+/// Now, vectorY != originalVectorY. Because DeviceArray made a copy upon mutation!
+```
+
+### Real-time compilation
+
+Swift Package Manager does not support invoking external build systems, but this is
+not a limitation at all! Real-time compilation is convenient and should not be a
+performance bottleneck for GPU-heavy applications. We can simply compile *.cu files 
+and *.ptx files at runtime using NVRTC. The following code compiles the CUDA kernel
+into PTX, and loads it to device memory.
+
+#### Compile source string to PTX
+```swift
+let source: String =
+  + "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, size_t n) {"
+  + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
+  + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
+  + "}";
+let ptx = try Compiler.compile(Program(source: source))
+
+```
+#### Load a module from PTX using Driver API within a context
+```swift
+Device.main.withContext { context in
+    let module = try Module(ptx: ptx)
+    let function = module.function(named: "saxpy")
+    function.launch(with: ..., gridSize: ..., blockSize: ..., stream: ...) 
+}
+```
+#### Alternatively, use Runtime API without dealing with context
+```swift
+let module = try Module(ptx: ptx)
+let function = module.function(named: "saxpy")
+function.launch(with: ..., gridSize: ..., blockSize: ..., stream: ...) 
+```
+
+### A complete program
+You can find this example as a script
+at
+[Scripts/kernel_example.swift](https://github.com/rxwei/cuda-swift/blob/master/Scripts/kernel_example.swift).
+```swift
+/// main.swift
+import NVRTC
+import CUDARuntime
+
+guard let device = Device.current else {
+    fatalError("No CUDA device available")
+}
+
+/// This program performs Z = a * X + Y, where a is a scalar and X and Y are vectors.
+let saxpySource =
+    "extern \"C\" __global__ void saxpy(size_t n, double a, double *x, double *y, double *z) {"
+  + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
+  + "    if (tid < n) z[tid] = a * x[tid] + y[tid];"
+  + "}"
+
+let module = try Module(source: saxpySource, compileOptions: [
+    .computeCapability(device.computeCapability),
+    .contractIntoFMAD(false),
+    .useFastMath
+])
+
+let saxpy = module.function(named: "saxpy")!
+
+/// Data
+let n = 1024
+var x = DeviceArray<Double>(repeating: 1.0, count: n)
+var y = DeviceArray<Double>(fromHost: Array(sequence(first: 0, next: {$0+1}).prefix(n)))
+var result = DeviceArray<Double>(capacity: n)
+
+/// Add arguments to a list
+var args = ArgumentList()
+args.append(Int32(n))    /// count
+args.append(Double(5.1)) /// a
+args.append(&x)          /// X
+args.append(&y)          /// Y
+args.append(&result)     /// Z
+
+/// Launch kernel using the operator you might be familiar with.
+/// This is equivalent to `try saxpy.launch(with: ...)`
+try saxpy<<<(n/128, 128)>>>(args)
+
+print(result.copyToHost())
+```
+
+## Usage
+
+```swift
+.Package(url: "https://github.com/rxwei/cuda-swift", majorVersion: 1)
+```
+
+You'll need to specify the path to your CUDA headers and library at `swift build`.
+
+#### macOS
+```
+swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
+```
+
+#### Linux
+```
+swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
+```
 
 ## Components
 
@@ -51,113 +198,11 @@ features/goals:
 
 - [ ] [CuDNN](https://github.com/rxwei/cudnn-swift)
 
-## Quick look
-
-### Value types
-
-CUDA Driver, Runtime, cuBLAS, and NVRTC (real-time compiler) are wrapped in
-native Swift types. For higher level APIs such as Runtime and cuBLAS, we wrap
-the types that traditionally required unsafe memory allocation into **value
-types** with copy-on-write semantics. This enables us to casually perform the
-following GPU computation without dealing with manual device memory allocation:
-
-```swift
-import CuBLAS
-
-/// Initialize two arrays on device
-/// These are the only lines of code that invokes memory copying!
-var x: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
-let y: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
-
-/// Scalar multiplication
-x *= 2 // x => [2.0, 4.0, 6.0, 8.0, 10.0] stored on device
-
-/// Addition
-x += y // x => [3.0, 6.0, 9.0, 12.0, 15.0] stored on device
-
-/// Dot product
-x • y // => 165.0 : DeviceValue<Float> stored on device
-
-/// A chain of operations
-x *= x • y // x => [495.0, 990.0, 1485.0, 1980.0, 2475.0] stored on device
-
-/// Absolute sum
-BLAS.current.sumOfAbsoluteValues(in: x) // => 15 : DeviceValue<Float> stored on device
-```
-
-With value types, we can worry less about reference to device memory. The following
-example demonstrates copy-on-write.
-```swift
-let vectorX: DeviceArray<Float> = [1.2, 3.3, -3, 4.0, 5.6, 7.5, -10, -100.2012432, 20]
-var vectorY: DeviceArray<Float> = [  1,   2,  3,   4,   5,   6,   7,            8,  9]
-/// Make a value reference to vector Y. Right now, this does not copy anything.
-let originalVectorY = vectorY
-/// Mutate Y by adding vectorX onto vectorY 
-vectorY += vectorX
-/// Now, vectorY != originalVectorY. Because DeviceArray made a copy upon mutation!
-```
-
-### Real-time compilation
-
-In C/C++, we can write all the logic in a *.cu file. How do we do that in Swift? 
-
-Swift Package Manager does not support invoking external build systems, but this is
-not a limitation at all! Real-time compilation is convenient and should not be a
-performance bottleneck for GPU-heavy applications. We can simply compile *.cu files 
-and *.ptx files at runtime using NVRTC. The following code compiles the CUDA kernel
-into PTX, and loads it to device memory.
-
-#### Compile source string to PTX
-```swift
-let source: String =
-  + "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, size_t n) {"
-  + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
-  + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
-  + "}";
-let ptx = try Compiler.compile(Program(source: source))
-
-```
-#### Load a module from PTX using Driver API within a context
-```swift
-Device.main.withContext { context in
-    let module = try Module(ptx: ptx)
-    let function = module.function(named: "saxpy")
-    function.launch(withArguments: ..., inGrid: ..., ofBlocks: ..., stream: ...) 
-}
-```
-#### Alternatively, use Runtime API without dealing with context
-```swift
-let module = try Module(ptx: ptx)
-let function = module.function(named: "saxpy")
-function.launch(withArguments: ..., inGrid: ..., ofBlocks: ..., stream: ...) 
-```
+You may use the Makefile in this project.
 
 ## Dependencies
 
-- [CCUDA](https://github.com/rxwei/CCUDA)
-
-## Usage
-
-After its initial release, you'll be able to use cuda-swift by adding the
-following dependency: 
-
-```swift
-.Package(url: "https://github.com/rxwei/cuda-swift", majorVersion: 1)
-```
-
-You'll need to specify the path to your CUDA headers and library at `swift build`.
-
-#### macOS
-```
-swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
-```
-
-#### Linux
-```
-swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
-```
-
-You may use the Makefile in this project.
+- [CCUDA (CUDA C System Module)](https://github.com/rxwei/CCUDA)
 
 ## License
 

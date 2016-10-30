@@ -8,6 +8,7 @@
 
 import CNVRTC
 @_exported import struct CUDADriver.PTX
+import class CUDADriver.Module
 import protocol CUDADriver.CHandleCarrier
 import Foundation
 
@@ -115,7 +116,7 @@ open class Compiler {
     }
 
     open class func compile(_ source: String, named name: String? = nil,
-                            options: [Option]) throws -> PTX {
+                            options: [CompileOption]) throws -> PTX {
         let program = try Program(source: source, name: name)
         return try compile(program, options: options)
     }
@@ -125,7 +126,7 @@ open class Compiler {
         return try program.retrievePTX()
     }
 
-    open class func compile(_ program: Program, options: [Option]) throws -> PTX {
+    open class func compile(_ program: Program, options: [CompileOption]) throws -> PTX {
         return try options.map{$0.rawArgument}.withUnsafeBufferPointer { ptr in
             var cArgs: [ContiguousArray<Int8>] = ptr.map{$0.utf8CString}
             var cArgPtrs: [UnsafePointer<Int8>?] = []
@@ -141,4 +142,12 @@ open class Compiler {
         }
     }
 
+}
+
+public extension Module {
+
+    public convenience init(source: String, compileOptions options: [CompileOption]) throws {
+        try self.init(ptx: Compiler.compile(source, options: options))
+    }
+    
 }
