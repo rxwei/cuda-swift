@@ -42,23 +42,10 @@ public struct Device : Equatable, CHandleCarrier {
         return props
     }
 
-    public var pciBusID: String {
+    public var pciBusIdentifier: String {
         var id: [CChar] = Array(repeating: 0, count: 32)
         cuDeviceGetPCIBusId(&id, 32, handle)
         return String(cString: id)
-    }
-
-    /// Create a context with a lifetime of the reference scope.
-    /// - note: Not sure if we should make the lifetime explicit, i.e.
-    /// make `Context` a struct that has `begin()` and `end()`. Alternatively,
-    /// we can just hide `makeContext()` and provide only `withContext(_:)`
-    /// which gurantees the destruction of context when body returns.
-    /// - returns: new context
-    @discardableResult
-    public func makeContext() -> Context {
-        var ctxHandle: CUcontext?
-        !!cuCtxCreate_v2(&ctxHandle, 0, handle)
-        return Context(binding: ctxHandle!)
     }
 
     /// Create a context and execute the body.
@@ -68,9 +55,10 @@ public struct Device : Equatable, CHandleCarrier {
     @discardableResult
     public func withContext<Result>
         (_ body: (Context) throws -> Result) throws -> Result {
-        let context = makeContext()
+        let context = Context.begin(onDevice: self)
         let result = try body(context)
         try Context.synchronize()
+        context.end()
         return result
     }
 

@@ -32,8 +32,12 @@ open class Module : CUDADriver.Module {
         }) else {
             throw RuntimeError.noDevice
         }
-        context = driverDevice.makeContext()
+        context = Context.begin(onDevice: driverDevice)
         try super.init(ptx: ptx)
+    }
+
+    deinit {
+        context.end()
     }
 
 }

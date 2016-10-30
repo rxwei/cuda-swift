@@ -16,8 +16,13 @@ open class Context : CHandleCarrier {
 
     private static var instances: [CUcontext : Context] = [:]
 
-    deinit {
-        Context.instances.removeValue(forKey: handle)
+    open class func begin(onDevice device: Device) -> Context {
+        var ctxHandle: CUcontext?
+        !!cuCtxCreate_v2(&ctxHandle, 0, device.handle)
+        return Context(handle: ctxHandle!)
+    }
+
+    open func end() {
         !!cuCtxDestroy_v2(handle)
     }
 
@@ -36,15 +41,22 @@ open class Context : CHandleCarrier {
 
     /// Creates a context object and bind it to the handle.
     /// Will destroy the handle when object's lifetime ends.
-    internal init(binding handle: CUcontext) {
+    init(handle: CUcontext) {
         self.handle = handle
     }
 
     /// Binds the specified CUDA context to the calling CPU thread.
     /// If there exists a CUDA context stack on the calling CPU thread,
     /// this will replace the top of that stack with self.
-    open func bindToThread() {
-        !!cuCtxPushCurrent_v2(handle)
+    open class var current: Context? {
+        set {
+            !!cuCtxSetCurrent(newValue?.handle)
+        }
+        get {
+            var handle: CUcontext?
+            !!cuCtxGetCurrent(&handle)
+            return handle.flatMap(Context.init(handle:))
+        }
     }
 
     /// Pushes the given context ctx onto the CPU thread's stack of current
@@ -59,7 +71,7 @@ open class Context : CHandleCarrier {
     /// - returns: the popped context, if any
     open class func pop() -> Context? {
         var handle: CUcontext?
-        cuCtxPopCurrent_v2(&handle)
+        !!cuCtxPopCurrent_v2(&handle)
         return handle.flatMap { instances[$0] }
     }
 
