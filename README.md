@@ -5,8 +5,8 @@ modules:
 
 - [x] CUDA Driver API `import CUDADriver`
 - [x] CUDA Runtime API `import CUDADriver`
-- [x] CUDA Runtime Compiler `import NVRTC`
-- [x] CUDA Basic Linear Algebra Subprograms `import CuBLAS`
+- [x] NVRTC - CUDA Runtime Compiler `import NVRTC`
+- [x] cuBLAS - CUDA Basic Linear Algebra Subprograms `import CuBLAS`
 
 Any machine with CUDA 7.0+ and a CUDA-capable GPU is supported. Xcode Playground
 is supported as well. Please refer to [Usage](#Usage)
@@ -54,7 +54,7 @@ var vectorY: DeviceArray<Float> = [  1,   2,  3,   4,   5,   6,   7,            
 let originalVectorY = vectorY
 /// Mutate Y by adding vectorX onto vectorY 
 vectorY += vectorX
-/// Now, vectorY != originalVectorY. Because DeviceArray made a copy upon mutation!
+/// Now, vectorY != originalVectorY. Because DeviceArray made a copy upon mutation.
 ```
 
 ### Real-time compilation
@@ -77,7 +77,7 @@ let ptx = try Compiler.compile(Program(source: source))
 ```
 #### Load a module from PTX using Driver API within a context
 ```swift
-Device.main.withContext { context in
+Device.main?.withContext { context in
     let module = try Module(ptx: ptx)
     let function = module.function(named: "saxpy")
     function.launch(with: ..., gridSize: ..., blockSize: ..., stream: ...) 
@@ -141,11 +141,16 @@ print(result.copyToHost())
 
 ## Usage
 
+Add a dependency:
+
 ```swift
 .Package(url: "https://github.com/rxwei/cuda-swift", majorVersion: 1)
 ```
 
-You'll need to specify the path to your CUDA headers and library at `swift build`.
+You may use the `Makefile` in this repository for you own project. No extra path
+configuration is needed.
+
+Otherwise, specify the path to your CUDA headers and library at `swift build`.
 
 #### macOS
 ```
@@ -154,7 +159,7 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
 
 #### Linux
 ```
-swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
+swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib64
 ```
 
 ## Components
@@ -197,8 +202,6 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib
 ### Next steps
 
 - [ ] [CuDNN](https://github.com/rxwei/cudnn-swift)
-
-You may use the Makefile in this project.
 
 ## Dependencies
 
