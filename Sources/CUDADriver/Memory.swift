@@ -98,9 +98,11 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     }
 
     public func assign(_ value: Pointee, count: Int) throws {
-        var value = value
+        /// Ideally we want to use `cudaMemset`, but `cudaMemset` only supports a
+        /// limited number of data types, and thus is not suitable for our generic case.
+        var array = Array(repeating: value, count: count)
         try ensureSuccess(
-            cuMemcpyHtoD_v2(deviceAddressHandle, &value, count * MemoryLayout<Pointee>.stride)
+            cuMemcpyHtoD_v2(deviceAddressHandle, &array, count * MemoryLayout<Pointee>.stride)
         )
     }
 
