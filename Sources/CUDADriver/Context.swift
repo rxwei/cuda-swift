@@ -60,7 +60,7 @@ open class Context : CHandleCarrier {
     open class func pop() -> Context? {
         var handle: CUcontext?
         cuCtxPopCurrent_v2(&handle)
-        return handle == nil ? nil : instances[handle!]!
+        return handle.flatMap { instances[$0] }
     }
 
     open class func synchronize() throws {

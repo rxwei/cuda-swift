@@ -172,6 +172,18 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     
 }
 
+extension UnsafeMutableDevicePointer {
+
+    typealias Attributes = cudaPointerAttributes
+
+    var attributes: Attributes {
+        var attributes = cudaPointerAttributes()
+        !!cudaPointerGetAttributes(&attributes, deviceAddress)
+        return attributes
+    }
+    
+}
+
 public extension UnsafeMutableDevicePointer {
 
     public func withDeviceAddress<Result>

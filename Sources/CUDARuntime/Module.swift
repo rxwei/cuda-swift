@@ -27,7 +27,11 @@ open class Module : CUDADriver.Module {
     public override init(ptx: PTX) throws {
         Driver.initialize()
         /// Create and hold on to the context
-        let driverDevice = CUDADriver.Device(atIndex: CUDARuntime.Device.current.index)!
+        guard let driverDevice = CUDARuntime.Device.current.flatMap ({ device in
+            CUDADriver.Device(atIndex: device.index)
+        }) else {
+            throw RuntimeError.noDevice
+        }
         context = driverDevice.makeContext()
         try super.init(ptx: ptx)
     }
@@ -39,7 +43,7 @@ public extension CUDADriver.ArgumentList {
     public mutating func append<DeviceType: DeviceAddressible>(_ argument: inout DeviceType) {
         argument.withUnsafeMutableDevicePointer { devPtr -> () in
             devPtr.withMutableDeviceAddress { addr -> () in
-                self.append(CUDADriver.UnsafeMutableDevicePointer(addr))
+                self.append(addr)
                 return () /// Compiler bug
             }
         }

@@ -6,15 +6,6 @@
 //
 //
 
-public protocol DeviceAddressible {
-    associatedtype Element
-    var unsafePointer: UnsafeDevicePointer<Element> { get }
-    func withUnsafeDevicePointer<Result>
-        (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
-    mutating func withUnsafeMutableDevicePointer<Result>
-        (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result
-}
-
 protocol DeviceBufferProtocol : class {
     associatedtype Element
     var owner: AnyObject? { get }
@@ -105,6 +96,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         startIndex = other.startIndex
         endIndex = other.endIndex
         owner = other
+        retainee = other.retainee
     }
 
     /// Copy elements from the other buffer

@@ -38,14 +38,13 @@ extension DeviceArrayProtocol where Buffer : DeviceArrayBufferProtocol {
     }
 }
 
-public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
-{
+public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol {
+
     public typealias Index = Int
     public typealias IndexDistance = Int
     public typealias SubSequence = DeviceArray<Element>
 
     var buffer: DeviceArrayBuffer<Element>
-    private var retainedReference: Any?
 
     /// Copy on write
     private var mutatingBuffer: DeviceArrayBuffer<Element> {

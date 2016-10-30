@@ -53,21 +53,27 @@ public struct BlockSize {
 }
 
 public struct ArgumentList {
-    private var references: [CUdeviceptr] = []
-    private var values: [Any] = []
+    
+    private var references: [Any] = []
     var addresses: [UnsafeMutableRawPointer?] = []
+
+    /// Capacity is assumed to be 16. We need a better solution.
+    public init() {
+        references.reserveCapacity(16)
+    }
     
-    public init() {}
-    
-    public mutating func append<T>(_ address: UnsafeMutableDevicePointer<T>) {
-        references.append(address.deviceAddressHandle)
+    public init(capacity: Int) {
+        references.reserveCapacity(capacity)
+    }
+
+    public mutating func append<T>(_ argument: T) {
+        guard references.count < references.capacity else {
+            fatalError("Exceeded capacity of the argument list")
+        }
+        references.append(argument)
         addresses.append(&references[references.count-1])
     }
     
-    public mutating func append<T>(_ argument: inout T) {
-        values.append(argument)
-        addresses.append(&argument)
-    }
 }
 
 public enum CachePreference : UInt32 {

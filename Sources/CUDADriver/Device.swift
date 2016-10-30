@@ -95,7 +95,7 @@ public struct Device : Equatable, CHandleCarrier {
         return Int(deviceCount)
     }
 
-    public static var main: Device = Device(atIndex: 0)!
+    public static var main: Device? = Device(atIndex: 0)
 
 }
 

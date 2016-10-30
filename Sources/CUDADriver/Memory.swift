@@ -20,15 +20,14 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         return UnsafePointer(bitPattern: UInt(deviceAddressHandle))!
     }
 
-    /// Initializer for other CUDA Runtime API calls within the module
-    public init?(_ deviceAddressHandle: CUdeviceptr) {
+    init?(_ deviceAddressHandle: CUdeviceptr) {
         guard deviceAddressHandle != 0 else { return nil }
         self.deviceAddressHandle = deviceAddressHandle
     }
 
     public init?(_ deviceAddress: UnsafeMutablePointer<Pointee>?) {
-        guard let deviceAddress = deviceAddress else { return nil }
-        deviceAddressHandle = CUdeviceptr(UInt(bitPattern: deviceAddress))
+        guard let nonNilAddress = deviceAddress else { return nil }
+        deviceAddressHandle = CUdeviceptr(UInt(bitPattern: nonNilAddress))
     }
 
     public init(_ deviceAddress: UnsafeMutablePointer<Pointee>) {

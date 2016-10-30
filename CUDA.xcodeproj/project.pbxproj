@@ -11,6 +11,7 @@
 		29D37BA31DC0789900500FD3 /* Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D37BA21DC0789900500FD3 /* Buffer.swift */; };
 		29E0EEC61DC0A94B00CFE0E0 /* Level2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E0EEC51DC0A94B00CFE0E0 /* Level2.swift */; };
 		29F097C91DC4037300DC14FC /* Option.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F097C81DC4037300DC14FC /* Option.swift */; };
+		29F5F5CE1DC55DDB003B5C8B /* DeviceAddressible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F5F5CD1DC55DDB003B5C8B /* DeviceAddressible.swift */; };
 		_LinkFileRef_CUDADriver_via_CUDADriverTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_CUDARuntime /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
 		_LinkFileRef_CUDADriver_via_CUDARuntimeTests /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_CUDADriver" /* CUDADriver.framework */; };
@@ -87,6 +88,7 @@
 		29D37BA21DC0789900500FD3 /* Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Buffer.swift; path = Sources/CUDARuntime/Buffer.swift; sourceTree = SOURCE_ROOT; };
 		29E0EEC51DC0A94B00CFE0E0 /* Level2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level2.swift; sourceTree = "<group>"; };
 		29F097C81DC4037300DC14FC /* Option.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Option.swift; sourceTree = "<group>"; };
+		29F5F5CD1DC55DDB003B5C8B /* DeviceAddressible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAddressible.swift; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcodeproj/Configs/Project.xcconfig /* CUDA.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CUDA.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
 		__PBXFileRef_CUDA.xcworkspace /* CUDA.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CUDA.xcworkspace; sourceTree = "<group>"; };
 		__PBXFileRef_Frameworks /* Frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Frameworks; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				__PBXFileRef_Sources/CUDARuntime/Device.swift /* Device.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Memory.swift /* Memory.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Module.swift /* Module.swift */,
+				29F5F5CD1DC55DDB003B5C8B /* DeviceAddressible.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Stream.swift /* Stream.swift */,
 				29D37BA21DC0789900500FD3 /* Buffer.swift */,
 				__PBXFileRef_Sources/CUDARuntime/Array.swift /* Array.swift */,
@@ -566,6 +569,7 @@
 				__src_cc_ref_Sources/CUDARuntime/Device.swift /* Device.swift in Sources */,
 				__src_cc_ref_Sources/CUDARuntime/Error.swift /* Error.swift in Sources */,
 				__src_cc_ref_Sources/CUDARuntime/Memory.swift /* Memory.swift in Sources */,
+				29F5F5CE1DC55DDB003B5C8B /* DeviceAddressible.swift in Sources */,
 				__src_cc_ref_Sources/CUDARuntime/Module.swift /* Module.swift in Sources */,
 				__src_cc_ref_Sources/CUDARuntime/Stream.swift /* Stream.swift in Sources */,
 				__src_cc_ref_Sources/CUDARuntime/Value.swift /* Value.swift in Sources */,

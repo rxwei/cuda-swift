@@ -16,7 +16,8 @@ class NVRTCTests: XCTestCase {
           + "}"
         /// If we use measure block here, Linux tests will fail under Swift 3.0.1-preview2
         do {
-            let ptx = try Compiler.compile(Program(source: source, name: "test"))
+            let program = try Program(source: source, name: "test")
+            let ptx = try Compiler.compile(program)
             XCTAssertEqual(ptx.name, "test")
             /// TODO: Compare PTX
         }
