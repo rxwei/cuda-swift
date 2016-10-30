@@ -3,35 +3,40 @@
 import NVRTC
 import CUDARuntime
 
-let source: String =
-    "extern \"C\" __global__ void mult(double *x, double a, size_t n) {"
-  + "    size_t i = blockIdx.x * blockDim.x + threadIdx.x;"
-  + "    if (i < n) x[i] = a * x[i];"
-  + "}";
-let ptx = try Compiler.compile(
-    Program(source: source),
-    options: [
-        .computeCapability(Device.current.computeCapability),
-        .cpp11,
-        .lineInfo,
-        .contractIntoFMAD(true),
-    ]
-)
+guard let device = Device.current else {
+    fatalError("No CUDA device available")
+}
+
+/// This program performs Z = a * X + Y, where a is a scalar and X and Y are vectors.
+let source =
+    "extern \"C\" __global__ void saxpy(size_t n, double a, double *x, double *y, double *z) {"
+  + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
+  + "    if (tid < n) z[tid] = a * x[tid] + y[tid];"
+  + "}"
+
+let ptx = try Compiler.compile(source, options: [
+    .computeCapability(device.computeCapability),
+    .contractIntoFMAD(false),
+    .useFastMath
+])
 let module = try Module(ptx: ptx)
-let mult = module.function(named: "mult")!
-var x = DeviceArray<Double>(fromHost: Array(sequence(first: 0.0, next: {$0+1}).prefix(256)))
-var a: Double = 5.0
-var n: Int32 = 256
+let saxpy = module.function(named: "saxpy")!
 
+/// Data
+let n = 1024
+var x = DeviceArray<Double>(repeating: 1.0, count: n)
+var y = DeviceArray<Double>(fromHost: Array(sequence(first: 0, next: {$0+1}).prefix(n)))
+var result = DeviceArray<Double>(capacity: n)
+
+/// Add arguments to a list
 var args = ArgumentList()
-args.append(&x)
-args.append(&a)
-args.append(&n)
+args.append(Int32(n))   /// count
+args.append(Double(5.1)) /// a
+args.append(&x)         /// X
+args.append(&y)         /// Y
+args.append(&result)    /// Z
 
-print(x.copyToHost())
+/// Launch kernel
+try saxpy<<<(n/128, 128)>>>(args)
 
-try mult<<<(8, 32)>>>(args)
-
-print(x.copyToHost())
-
-
+print(result.copyToHost())
