@@ -16,6 +16,7 @@ public enum SharedMemoryBankSize: UInt32 {
 
 /// Grid of blocks
 public struct GridSize {
+    /// Dimensions
     public let x: Int, y: Int, z: Int
     
     public init(x: Int, y: Int, z: Int) {
@@ -23,7 +24,7 @@ public struct GridSize {
         self.y = y
         self.z = z
     }
-    
+
     public init(_ count: Int) {
         self.x = count
         self.y = 1
@@ -33,15 +34,16 @@ public struct GridSize {
 
 /// Block of threads
 public struct BlockSize {
+    /// Dimensions
     public let x: Int, y: Int, z: Int
     /// Shared memory size per thread
     public let memory: Int
     
-    public init(x: Int, y: Int, z: Int, sharedMemory: Int = 0) {
+    public init(x: Int, y: Int, z: Int, memory: Int = 0) {
         self.x = x
         self.y = y
         self.z = z
-        self.memory = sharedMemory
+        self.memory = memory
     }
     
     public init(threadCount: Int, memory: Int = 0) {

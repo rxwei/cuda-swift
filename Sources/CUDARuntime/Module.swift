@@ -16,13 +16,13 @@ import CCUDARuntime
 import enum CUDADriver.Driver
 import struct CUDADriver.Device
 import struct CUDADriver.UnsafeMutableDevicePointer
-import class CUDADriver.Context
+import struct CUDADriver.Context
 import class CUDADriver.Module
 import class CUDADriver.Stream
 
 open class Module : CUDADriver.Module {
 
-    private let context: Context
+    private var context: Context
 
     public override init(ptx: PTX) throws {
         Driver.initialize()

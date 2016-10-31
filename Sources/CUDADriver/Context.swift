@@ -8,31 +8,30 @@
 
 import CCUDA
 
-open class Context : CHandleCarrier {
+public struct Context : CHandleCarrier {
 
-    public typealias Handle = CUcontext
+    public typealias Handle = CUcontext?
 
-    let handle: CUcontext
+    var handle: CUcontext?
 
-    private static var instances: [CUcontext : Context] = [:]
-
-    open class func begin(onDevice device: Device) -> Context {
+    public static func begin(onDevice device: Device) -> Context {
         var ctxHandle: CUcontext?
         !!cuCtxCreate_v2(&ctxHandle, 0, device.handle)
         return Context(handle: ctxHandle!)
     }
 
-    open func end() {
+    public mutating func end() {
         !!cuCtxDestroy_v2(handle)
+        handle = nil
     }
 
-    open class var device: Device {
+    public static var device: Device {
         var deviceHandle: CUdevice = 0
         !!cuCtxGetDevice(&deviceHandle)
         return Device(deviceHandle)
     }
 
-    open class var priorityRange: Range<Int> {
+    public static var priorityRange: Range<Int> {
         var lowerBound: Int32 = 0
         var upperBound: Int32 = 0
         !!cuCtxGetStreamPriorityRange(&lowerBound, &upperBound)
@@ -48,7 +47,7 @@ open class Context : CHandleCarrier {
     /// Binds the specified CUDA context to the calling CPU thread.
     /// If there exists a CUDA context stack on the calling CPU thread,
     /// this will replace the top of that stack with self.
-    open class var current: Context? {
+    public static var current: Context? {
         set {
             !!cuCtxSetCurrent(newValue?.handle)
         }
@@ -59,23 +58,23 @@ open class Context : CHandleCarrier {
         }
     }
 
-    /// Pushes the given context ctx onto the CPU thread's stack of current
-    /// contexts. The specified context becomes the CPU thread's current
-    /// context, so all CUDA functions that operate on the current context 
-    /// are affected.
-    open func push() {
+    /// Pushes self onto the CPU thread's stack of current contexts.
+    /// The specified context becomes the CPU thread's current context,
+    /// so all CUDA functions that operate on the current context are 
+    /// affected.
+    public func pushToThread() {
         !!cuCtxPushCurrent_v2(handle)
     }
 
     /// Pops the current CUDA context from the CPU thread and returns it
     /// - returns: the popped context, if any
-    open class func pop() -> Context? {
+    public static func popFromThread() -> Context? {
         var handle: CUcontext?
         !!cuCtxPopCurrent_v2(&handle)
-        return handle.flatMap { instances[$0] }
+        return handle.flatMap(Context.init(handle:))
     }
 
-    open class func synchronize() throws {
+    public static func synchronize() throws {
         try ensureSuccess(cuCtxSynchronize())
     }
     
@@ -84,4 +83,33 @@ open class Context : CHandleCarrier {
         return try body(handle)
     }
 
+}
+
+/// Context scheduling options
+public extension Context {
+
+    public struct Options : OptionSet {
+
+        public let rawValue: UInt32
+
+        public static let autoScheduling = 0x00
+        public static let spinScheduling = 0x01
+        public static let blockingSyncScheduling = 0x02
+        
+        @available(*, deprecated, message: "Deprecated as of CUDA 4.0. Use .blockingSyncScheduling instead.")
+        public static let blockingSync = 0x04
+        
+        static let schedulingMask = 0x07
+
+        public static let mappedPinnedAllocations = 0x08
+        public static let keepingLocalMemory = 0x10
+
+        static let flagsMask = 0x1f
+
+        public init(rawValue: UInt32) {
+            self.rawValue = rawValue
+        }
+        
+    }
+    
 }
