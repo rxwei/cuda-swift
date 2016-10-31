@@ -1,4 +1,4 @@
-# CUDA for Swift
+# cuda-swift
 
 This project provides a native Swift interface to CUDA with the following
 modules:
