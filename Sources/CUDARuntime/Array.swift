@@ -56,10 +56,6 @@ public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
         }
     }
 
-    public var unsafePointer: UnsafeDevicePointer<Element> {
-        return UnsafeDevicePointer(buffer.baseAddress.advanced(by: buffer.startIndex))
-    }
-
     init(_ buffer: DeviceArrayBuffer<Element>) {
         self.buffer = buffer
     }
@@ -169,6 +165,10 @@ public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
         mutating set {
             mutatingBuffer[bufferRange(fromLocal: range)] = newValue.buffer
         }
+    }
+
+    var unsafePointer: UnsafeDevicePointer<Element> {
+        return UnsafeDevicePointer(buffer.baseAddress.advanced(by: buffer.startIndex))
     }
 
     public mutating func withUnsafeMutableDevicePointer<Result>

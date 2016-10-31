@@ -15,7 +15,7 @@ open class Stream : CHandleCarrier {
 
     private static var instances: [Handle : Stream] = [:]
 
-    open class func current(with handle: Handle) -> Stream? {
+    class func current(with handle: Handle) -> Stream? {
         return instances[handle]
     }
 

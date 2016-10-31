@@ -45,15 +45,14 @@ open class BLAS {
         return Int(version)
     }
 
-    open var stream: Stream? {
-        get {
-            var streamHandle: cudaStream_t?
-            !!cublasGetStream_v2(handle, &streamHandle)
-            return streamHandle.flatMap(Stream.current(with:))
-        }
-        set {
-            newValue?.withUnsafeHandle { streamHandle -> () in
-                !!cublasSetStream_v2(handle, streamHandle)
+    open var stream: Stream? = nil {
+        didSet {
+            if let stream = stream {
+                stream.withUnsafeHandle { streamHandle in
+                    !!cublasSetStream_v2(handle, streamHandle)
+                }
+            } else {
+                !!cublasSetStream_v2(handle, nil)
             }
         }
     }

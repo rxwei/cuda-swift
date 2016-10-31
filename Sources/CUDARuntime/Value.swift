@@ -41,7 +41,7 @@ public struct DeviceValue<Element> : DeviceAddressible {
         self = other
     }
 
-    public var unsafePointer: UnsafeDevicePointer<Element> {
+    var unsafePointer: UnsafeDevicePointer<Element> {
         return UnsafeDevicePointer(buffer.baseAddress)
     }
 

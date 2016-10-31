@@ -8,7 +8,6 @@
 
 public protocol DeviceAddressible {
     associatedtype Element
-    var unsafePointer: UnsafeDevicePointer<Element> { get }
     func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
     mutating func withUnsafeMutableDevicePointer<Result>

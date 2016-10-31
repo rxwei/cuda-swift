@@ -17,7 +17,7 @@ open class Stream : CHandleCarrier {
 
     private static var instances: [CUstream : Stream] = [:]
     
-    open static func current(with handle: CUstream) -> Stream {
+    class func current(with handle: CUstream) -> Stream {
         return Stream.instances[handle]!
     }
 
@@ -41,7 +41,13 @@ open class Stream : CHandleCarrier {
         Stream.instances[self.handle] = self
     }
 
-    public init(unsafelyReferencing handle: Handle) {
+    /// Unsafely reference a stream handle.
+    /// This is *not* intended for public use. Currently it acts as a bridge
+    /// between Runtime API and Driver API, specifically for `Function.launch`
+    /// to take a runtime stream argument.
+    /// - note: This will be removed once runtmie has its own `Function` logic
+    /// implemented.
+    public init!(unsafelyReferencing handle: Handle) {
         owning = false
         self.handle = handle
         Stream.instances[self.handle] = self
