@@ -14,10 +14,37 @@ public struct Context : CHandleCarrier {
 
     var handle: CUcontext?
 
-    public static func begin(onDevice device: Device) -> Context {
+    public struct Options : OptionSet {
+        public static let autoScheduling = 0x00
+        public static let spinScheduling = 0x01
+        public static let blockingSyncScheduling = 0x02
+        
+        @available(*, deprecated, message: "Deprecated as of CUDA 4.0. Use .blockingSyncScheduling instead.")
+        public static let blockingSync = 0x04
+        
+        /// Mask for scheduling bits, not for external use
+        static let schedulingMask = 0x07
+
+        public static let mappedPinnedAllocations = 0x08
+        public static let keepLocalMemory = 0x10
+
+        /// Mask for all flag bits, not for external use
+        private static let flagsMask = 0x1f
+
+        public let rawValue: UInt32
+
+        public init(rawValue: UInt32) {
+            self.rawValue = rawValue
+        }
+    }
+
+    public static func begin(onDevice device: Device, options: Options? = nil) -> Context {
         var ctxHandle: CUcontext?
         !!cuCtxCreate_v2(&ctxHandle, 0, device.handle)
-        return Context(handle: ctxHandle!)
+        if let options = options {
+            !!cuDevicePrimaryCtxSetFlags(device.handle, options.rawValue)
+        }
+        return Context(ctxHandle!)
     }
 
     public mutating func end() {
@@ -25,7 +52,7 @@ public struct Context : CHandleCarrier {
         handle = nil
     }
 
-    public static var device: Device {
+    public static var currentDevice: Device {
         var deviceHandle: CUdevice = 0
         !!cuCtxGetDevice(&deviceHandle)
         return Device(deviceHandle)
@@ -38,9 +65,7 @@ public struct Context : CHandleCarrier {
         return Int(lowerBound)..<Int(upperBound)
     }
 
-    /// Creates a context object and bind it to the handle.
-    /// Will destroy the handle when object's lifetime ends.
-    init(handle: CUcontext) {
+    init(_ handle: CUcontext) {
         self.handle = handle
     }
 
@@ -54,7 +79,7 @@ public struct Context : CHandleCarrier {
         get {
             var handle: CUcontext?
             !!cuCtxGetCurrent(&handle)
-            return handle.flatMap(Context.init(handle:))
+            return handle.flatMap { Context($0) }
         }
     }
 
@@ -71,7 +96,7 @@ public struct Context : CHandleCarrier {
     public static func popFromThread() -> Context? {
         var handle: CUcontext?
         !!cuCtxPopCurrent_v2(&handle)
-        return handle.flatMap(Context.init(handle:))
+        return handle.flatMap { Context($0) }
     }
 
     public static func synchronize() throws {
@@ -83,33 +108,4 @@ public struct Context : CHandleCarrier {
         return try body(handle)
     }
 
-}
-
-/// Context scheduling options
-public extension Context {
-
-    public struct Options : OptionSet {
-
-        public let rawValue: UInt32
-
-        public static let autoScheduling = 0x00
-        public static let spinScheduling = 0x01
-        public static let blockingSyncScheduling = 0x02
-        
-        @available(*, deprecated, message: "Deprecated as of CUDA 4.0. Use .blockingSyncScheduling instead.")
-        public static let blockingSync = 0x04
-        
-        static let schedulingMask = 0x07
-
-        public static let mappedPinnedAllocations = 0x08
-        public static let keepingLocalMemory = 0x10
-
-        static let flagsMask = 0x1f
-
-        public init(rawValue: UInt32) {
-            self.rawValue = rawValue
-        }
-        
-    }
-    
 }
