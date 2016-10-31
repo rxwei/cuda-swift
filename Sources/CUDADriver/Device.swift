@@ -55,7 +55,7 @@ public struct Device : Equatable, CHandleCarrier {
     @discardableResult
     public func withContext<Result>
         (_ execute: (Context) throws -> Result) throws -> Result {
-        var context = Context.begin(onDevice: self)
+        var context = Context.begin(on: self)
         let result = try execute(context)
         try Context.synchronize()
         context.end()

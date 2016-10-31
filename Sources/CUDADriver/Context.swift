@@ -38,7 +38,7 @@ public struct Context : CHandleCarrier {
         }
     }
 
-    public static func begin(onDevice device: Device, options: Options? = nil) -> Context {
+    public static func begin(on device: Device, options: Options? = nil) -> Context {
         var ctxHandle: CUcontext?
         !!cuCtxCreate_v2(&ctxHandle, 0, device.handle)
         if let options = options {
