@@ -224,7 +224,7 @@ public extension Function {
         return Int(maxThreads)
     }
     
-    public var PTXVersion: Int {
+    public var ptxVersion: Int {
         var maxThreads: Int32 = 0
         cuFuncGetAttribute(&maxThreads,
                            CU_FUNC_ATTRIBUTE_PTX_VERSION,
