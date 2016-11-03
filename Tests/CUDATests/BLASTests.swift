@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Warp
+@testable import CUDA
 
 class BLASTests: XCTestCase {
 

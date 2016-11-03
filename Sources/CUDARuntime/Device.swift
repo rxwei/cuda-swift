@@ -21,6 +21,10 @@ public struct Device : Equatable {
         return Int(deviceCount)
     }
 
+    public static var all: [Device] {
+        return (0..<count).map { Device(assumingIndex: Int32($0)) }
+    }
+
     public static var current: Device? {
         get {
             var index: Int32 = 0

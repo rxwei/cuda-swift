@@ -60,7 +60,7 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         buffer = DeviceArrayBuffer(repeating: element, count: count)
     }
 
-    public init<C: Collection>(elements: C) where
+    public init<C: Collection>(_ elements: C) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
         buffer = DeviceArrayBuffer(elements)

@@ -18,14 +18,14 @@ open class Program {
     var handle: nvrtcProgram?
 
     public var name: String?
-    public var data: Data
-    public var headers: [(name: String, data: Data)]?
+    public let source: Data
+    public var headers: [(name: String, header: Data)]?
 
     /// Initialize with source program and headers
-    public init(data: Data, name: String? = nil,
-                headers: [(name: String, data: Data)]) throws {
+    public init(source data: Data, name: String? = nil,
+                headers: [(name: String, header: Data)] = []) throws {
         self.name = name
-        self.data = data
+        self.source = data
         self.headers = headers
         var headerNames: [UnsafePointer<Int8>?] = self.headers!.map { name, _ in
             name.withCString{$0}
@@ -35,7 +35,7 @@ open class Program {
         }
         var handle: nvrtcProgram?
         try ensureSuccess(
-            self.data.withUnsafeBytes { bytes in
+            self.source.withUnsafeBytes { bytes in
                 nvrtcCreateProgram(
                     &handle,                          /// Handle
                     bytes,                            /// Source
@@ -48,37 +48,41 @@ open class Program {
         )
         self.handle = handle! /// Safe
     }
-
-    /// Initialize with source program
-    public init(data: Data, name: String? = nil) throws {
-        self.name = name
-        self.data = data
-        var handle: nvrtcProgram?
-        try ensureSuccess(
-            self.data.withUnsafeBytes { bytes in
-                nvrtcCreateProgram(
-                    &handle,                          /// Handle
-                    bytes,                            /// Source
-                    name?.utf8CString.map{$0} ?? nil, /// Program name
-                    0, nil, nil                       /// No headers
-                )
-            }
-        )
-        self.handle = handle! /// Safe
+    
+    /// Initialize with static source program and headers
+    public convenience init(source: StaticString, name: String? = nil,
+                            headers: [(name: String, header: StaticString)] = []) throws {
+        let staticData = Data(bytesNoCopy: UnsafeMutableRawPointer(mutating: source.utf8Start),
+                                count: source.utf8CodeUnitCount,
+                                deallocator: .none)
+        let staticHeaders = headers.map { name, source in
+            (name, Data(bytesNoCopy: UnsafeMutableRawPointer(mutating: source.utf8Start),
+                        count: source.utf8CodeUnitCount,
+                        deallocator: .none))
+        }
+        try self.init(source: staticData, name: name, headers: staticHeaders)
     }
 
-    public convenience init(source: String, name: String? = nil) throws {
+    public convenience init(source: String, name: String? = nil,
+                            headers: [(name: String, header: String)] = []) throws {
         guard let data = source.data(using: .utf8, allowLossyConversion: true) else {
             throw CompilerError.invalidEncoding
         }
-        try self.init(data: data, name: name)
+        let headerData = try headers.map {
+            (name: String, header: String) -> (name: String, header: Data) in
+            guard let data = header.data(using: .utf8, allowLossyConversion: true) else {
+                throw CompilerError.invalidEncoding
+            }
+            return (name, data)
+        }
+        try self.init(source: data, name: name, headers: headerData)
     }
 
     public convenience init(sourceFile: String) throws {
         let url = URL(fileURLWithPath: sourceFile)
         let name = url.deletingPathExtension().lastPathComponent
         let data = try Data(contentsOf: url)
-        try self.init(data: data, name: name)
+        try self.init(source: data, name: name)
     }
 
     deinit {
@@ -107,6 +111,17 @@ open class Compiler {
         var minor: Int32 = 0
         nvrtcVersion(&major, &minor)
         return (major: Int(major), minor: Int(minor))
+    }
+
+    open class func compile(_ source: StaticString, named name: String? = nil) throws -> PTX {
+        let program = try Program(source: source, name: name)
+        return try compile(program)
+    }
+
+    open class func compile(_ source: StaticString, named name: String? = nil,
+                            options: [CompileOption]) throws -> PTX {
+        let program = try Program(source: source, name: name)
+        return try compile(program, options: options)
     }
 
     open class func compile(_ source: String, named name: String? = nil) throws -> PTX {
@@ -144,6 +159,10 @@ open class Compiler {
 }
 
 public extension Module {
+
+    public convenience init(source: StaticString, compileOptions options: [CompileOption]) throws {
+        try self.init(ptx: Compiler.compile(source, options: options))
+    }
 
     public convenience init(source: String, compileOptions options: [CompileOption]) throws {
         try self.init(ptx: Compiler.compile(source, options: options))

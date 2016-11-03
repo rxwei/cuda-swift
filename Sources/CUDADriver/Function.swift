@@ -64,8 +64,8 @@ public struct KernelArgument {
         unsafeAddress = UnsafeMutableRawPointer(&self.value!)
     }
 
-    public init(address: UnsafeMutableRawPointer?) {
-        self.unsafeAddress = address
+    public init(unsafeAddress: UnsafeMutableRawPointer?) {
+        self.unsafeAddress = unsafeAddress
     }
 
     public static func char(_ number: Int8) -> KernelArgument {
@@ -117,7 +117,7 @@ public struct KernelArgument {
     }
 
     public static func pointer(_ address: UnsafeMutableRawPointer?) -> KernelArgument {
-        return self.init(address: address)
+        return self.init(unsafeAddress: address)
     }
 
 }
