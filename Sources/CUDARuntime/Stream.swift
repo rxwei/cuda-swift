@@ -43,7 +43,7 @@ open class Stream : CHandleCarrier {
 
     deinit {
         Stream.instances.removeValue(forKey: handle)
-        !!cudaStreamDestroy(handle)
+        cudaStreamDestroy(handle)
     }
 
     open func synchronize() {

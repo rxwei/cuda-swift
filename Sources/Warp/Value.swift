@@ -1,16 +1,18 @@
 //
 //  Value.swift
-//  CUDA
+//  Warp
 //
 //  Created by Richard Wei on 10/23/16.
 //
 //
 
+import CUDARuntime
+
 public struct DeviceValue<Element> : DeviceAddressible {
 
     var buffer: DeviceValueBuffer<Element>
 
-    private var mutatingBuffer: DeviceValueBuffer<Element> {
+    var mutatingBuffer: DeviceValueBuffer<Element> {
         mutating get {
             if !isKnownUniquelyReferenced(&buffer) || buffer.owner != nil {
                 buffer = DeviceValueBuffer(buffer)
@@ -25,16 +27,18 @@ public struct DeviceValue<Element> : DeviceAddressible {
 
     public var value: Element {
         get {
-            return buffer.baseAddress.load()
+            return buffer.value
         }
         set {
-            mutatingBuffer.baseAddress.assign(newValue)
+            mutatingBuffer.value = newValue
         }
     }
 
-    public init(_ initial: Element? = nil) {
+    public init(_ initialValue: Element? = nil) {
         buffer = DeviceValueBuffer()
-        initial.flatMap(buffer.baseAddress.assign)
+        if let initialValue = initialValue {
+            buffer.value = initialValue
+        }
     }
 
     public init(_ other: DeviceValue<Element>) {
@@ -58,13 +62,20 @@ public struct DeviceValue<Element> : DeviceAddressible {
 
 }
 
-extension DeviceValue where Element : DeviceCollection {
+extension DeviceValue where Element : MutableDeviceCollection {
 
     public subscript(i: Int) -> Element.Iterator.Element {
+        set {
+            value[i] = newValue
+        }
         get {
             return value[i]
         }
     }
+
+}
+
+extension DeviceValue where Element : DeviceCollection {
 
     public func copyToHost() -> [Element.Element] {
         return value.copyToHost()

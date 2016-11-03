@@ -15,7 +15,7 @@ import Foundation
 /// Source-level program
 open class Program {
 
-    let handle: nvrtcProgram
+    var handle: nvrtcProgram?
 
     public var name: String?
     public var data: Data
@@ -82,8 +82,7 @@ open class Program {
     }
 
     deinit {
-        var handle: nvrtcProgram? = self.handle
-        !!nvrtcDestroyProgram(&handle)
+        nvrtcDestroyProgram(&handle)
     }
 
     internal func retrievePTX() throws -> PTX {

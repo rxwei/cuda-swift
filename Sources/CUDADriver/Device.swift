@@ -64,12 +64,10 @@ public struct Device : Equatable, CHandleCarrier {
 
     public init?(atIndex index: Int) {
         var handle: CUdevice = 0
-        do {
-            try ensureSuccess(cuDeviceGet(&handle, Int32(index)))
-            self.handle = handle
-        } catch {
+        guard cuDeviceGet(&handle, Int32(index)) == CUDA_SUCCESS else {
             return nil
         }
+        self.handle = handle
     }
 
     public func withUnsafeHandle<Result>

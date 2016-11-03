@@ -1,25 +1,12 @@
 //
 //  Array.swift
-//  CUDA
+//  Warp
 //
 //  Created by Richard Wei on 10/19/16.
 //
 //
 
-import CCUDARuntime
-
-public protocol DeviceCollection : RandomAccessCollection {
-    typealias Index = Int
-    typealias IndexDistance = Int
-    associatedtype Element
-    associatedtype SubSequence : RandomAccessCollection
-    func copyToHost() -> [Element]
-    subscript(index: Int) -> Iterator.Element { get }
-}
-
-public protocol MutableDeviceCollection : DeviceCollection {
-    subscript(index: Int) -> Iterator.Element { get set }
-}
+import CUDARuntime
 
 protocol DeviceArrayProtocol :
     DeviceAddressible, MutableDeviceCollection,
@@ -38,7 +25,7 @@ extension DeviceArrayProtocol where Buffer : DeviceArrayBufferProtocol {
     }
 }
 
-public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol {
+public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
 
     public typealias Index = Int
     public typealias IndexDistance = Int
@@ -70,24 +57,25 @@ public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
     }
 
     public init(repeating element: Element, count: Int) {
-        buffer = DeviceArrayBuffer(capacity: count)
-        buffer.baseAddress.assign(element, count: count)
+        buffer = DeviceArrayBuffer(repeating: element, count: count)
     }
 
-    public init<C: Collection>(fromHost elements: C) where
+    public init<C: Collection>(elements: C) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
-        buffer = DeviceArrayBuffer(capacity: elements.count)
-        buffer.retainee = elements
-        buffer.baseAddress.assign(fromHost: elements)
+        buffer = DeviceArrayBuffer(elements)
     }
 
     public init(arrayLiteral elements: Element...) {
-        self.init(fromHost: elements)
+        buffer = DeviceArrayBuffer(elements)
     }
 
     public init(_ other: DeviceArray<Element>) {
         self = other
+    }
+
+    private init(viewing buffer: DeviceArrayBuffer<Element>, range: Range<Int>) {
+        self.buffer = DeviceArrayBuffer(viewing: buffer, in: range)
     }
 
     public func copyToHost() -> [Element] {
@@ -95,7 +83,7 @@ public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
         elements.reserveCapacity(count)
         /// Temporary array copy solution
         var temp = UnsafeMutablePointer<Element>.allocate(capacity: count)
-        temp.assign(fromDevice: buffer.baseAddress.advanced(by: buffer.startIndex), count: count)
+        temp.assign(fromDevice: buffer.startAddress, count: count)
         elements.append(contentsOf: UnsafeBufferPointer(start: temp, count: count))
         temp.deallocate(capacity: count)
         return elements
@@ -135,17 +123,12 @@ public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
 
     public subscript(i: Int) -> DeviceValue<Element> {
         get {
-            return DeviceValue(buffer:
-                DeviceValueBuffer(viewing: buffer, offsetBy: i)
-            )
+            return DeviceValue(buffer: DeviceValueBuffer(viewing: buffer, offsetBy: i))
         }
         set {
-            mutatingBuffer[bufferIndex(fromLocal: i)] = newValue.buffer
+            var newValue = newValue
+            mutatingBuffer[bufferIndex(fromLocal: i)] = newValue.mutatingBuffer
         }
-    }
-
-    private init(viewing buffer: DeviceArrayBuffer<Element>, range: Range<Int>) {
-        self.buffer = DeviceArrayBuffer(viewing: buffer, in: range)
     }
 
     @inline(__always)
@@ -163,32 +146,32 @@ public struct DeviceArray<Element> : RandomAccessCollection, DeviceArrayProtocol
             return DeviceArray(viewing: buffer, range: bufferRange(fromLocal: range))
         }
         mutating set {
-            mutatingBuffer[bufferRange(fromLocal: range)] = newValue.buffer
+            var newValue = newValue
+            mutatingBuffer[bufferRange(fromLocal: range)] = newValue.mutatingBuffer
         }
     }
 
     var unsafePointer: UnsafeDevicePointer<Element> {
-        return UnsafeDevicePointer(buffer.baseAddress.advanced(by: buffer.startIndex))
+        return UnsafeDevicePointer(buffer.startAddress)
     }
 
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
-        let buffer = mutatingBuffer
-        var baseAddress = buffer.baseAddress.advanced(by: buffer.startIndex)
-        return try body(&baseAddress)
+        var startAddress = mutatingBuffer.startAddress
+        return try body(&startAddress)
     }
 
     public func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result {
-        return try body(UnsafeDevicePointer(buffer.baseAddress.advanced(by: buffer.startIndex)))
+        return try body(UnsafeDevicePointer(buffer.startAddress))
     }
 
 }
 
 public extension Array {
 
-    public init(_ elementsOnDevice: DeviceArray<Element>) {
-        self = elementsOnDevice.copyToHost()
+    public init(_ deviceElements: DeviceArray<Element>) {
+        self = deviceElements.copyToHost()
     }
 
 }

@@ -7,7 +7,6 @@
 //
 
 import CCuBLAS
-import struct CUDARuntime.DeviceValue
 import struct CUDARuntime.UnsafeMutableDevicePointer
 import struct CUDARuntime.UnsafeDevicePointer
 

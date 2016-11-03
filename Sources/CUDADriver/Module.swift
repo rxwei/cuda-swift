@@ -38,11 +38,7 @@ open class Module : CHandleCarrier {
 
     open func function(named name: String) -> Function? {
         var function: CUfunction?
-        do {
-            try name.withCString { cStr in
-                try ensureSuccess(cuModuleGetFunction(&function, handle, cStr))
-            }
-        } catch {
+        guard name.withCString({cuModuleGetFunction(&function, handle, $0)}) == CUDA_SUCCESS else {
             return nil
         }
         return Function(function!)

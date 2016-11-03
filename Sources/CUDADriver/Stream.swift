@@ -13,7 +13,6 @@ open class Stream : CHandleCarrier {
     public typealias Handle = CUstream
 
     let handle: CUstream
-    let owning: Bool
 
     private static var instances: [CUstream : Stream] = [:]
     
@@ -22,7 +21,6 @@ open class Stream : CHandleCarrier {
     }
 
     public init() {
-        owning = true
         var handle: CUstream?
         !!cuStreamCreate(&handle, 0)
         self.handle = handle! // Safe
@@ -36,28 +34,13 @@ open class Stream : CHandleCarrier {
         } catch {
             return nil
         }
-        owning = true
         self.handle = handle! // Safe
         Stream.instances[self.handle] = self
     }
 
-    /// Unsafely reference a stream handle.
-    /// This is *not* intended for public use. Currently it acts as a bridge
-    /// between Runtime API and Driver API, specifically for `Function.launch`
-    /// to take a runtime stream argument.
-    /// - note: This will be removed once runtmie has its own `Function` logic
-    /// implemented.
-    public init!(unsafelyReferencing handle: Handle) {
-        owning = false
-        self.handle = handle
-        Stream.instances[self.handle] = self
-    }
-
     deinit {
-        if owning {
-            Stream.instances.removeValue(forKey: handle)
-            cuStreamDestroy_v2(handle)
-        }
+        Stream.instances.removeValue(forKey: handle)
+        cuStreamDestroy_v2(handle)
     }
 
     open func synchronize() {

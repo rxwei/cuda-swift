@@ -54,28 +54,72 @@ public struct BlockSize {
     }
 }
 
-public struct ArgumentList {
+public struct KernelArgument {
     
-    private var references: [Any] = []
-    var addresses: [UnsafeMutableRawPointer?] = []
+    private var value: Any?
+    public var unsafeAddress: UnsafeMutableRawPointer?
 
-    /// Capacity is assumed to be 16. We need a better solution.
-    public init() {
-        references.reserveCapacity(16)
-    }
-    
-    public init(capacity: Int) {
-        references.reserveCapacity(capacity)
+    public init(value: Any?) {
+        self.value = value
+        unsafeAddress = UnsafeMutableRawPointer(&self.value!)
     }
 
-    public mutating func append<T>(_ argument: T) {
-        guard references.count < references.capacity else {
-            fatalError("Exceeded capacity of the argument list")
-        }
-        references.append(argument)
-        addresses.append(&references[references.count-1])
+    public init(address: UnsafeMutableRawPointer?) {
+        self.unsafeAddress = address
     }
-    
+
+    public static func char(_ number: Int8) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func short(_ number: Int16) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func int(_ number: Int32) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func long(_ number: Int32) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func longLong(_ number: Int64) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func unsignedChar(_ number: UInt8) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func unsignedShort(_ number: UInt16) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func unsignedInt(_ number: UInt32) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func unsignedLong(_ number: UInt32) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func unsignedLongLong(_ number: UInt64) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func float(_ number: Float) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func double(_ number: Double) -> KernelArgument {
+        return self.init(value: number)
+    }
+
+    public static func pointer(_ address: UnsafeMutableRawPointer?) -> KernelArgument {
+        return self.init(address: address)
+    }
+
 }
 
 public enum CachePreference : UInt32 {
@@ -89,7 +133,7 @@ public struct Function : CHandleCarrier {
     
     public typealias Handle = CUfunction
     
-    let handle: CUfunction
+    fileprivate let handle: CUfunction
     
     public var cachePreference: CachePreference = .none {
         didSet {
@@ -112,11 +156,11 @@ public struct Function : CHandleCarrier {
         self.handle = handle
     }
     
-    public init(assumingDeviceAddress address: UnsafeRawPointer) {
+    public init(deviceAddress address: UnsafeRawPointer) {
         handle = OpaquePointer(address)
     }
 
-    public init(assumingDeviceAddress address: UnsafeMutableRawPointer) {
+    public init(deviceAddress address: UnsafeMutableRawPointer) {
         handle = OpaquePointer(address)
     }
     
@@ -124,20 +168,20 @@ public struct Function : CHandleCarrier {
         return try body(handle)
     }
     
-    public func launch(with arguments: inout ArgumentList,
+    public func launch(with arguments: [KernelArgument],
                        gridSize: GridSize, blockSize: BlockSize, stream: Stream?) throws {
+        var addresses = arguments.map{$0.unsafeAddress}
         try ensureSuccess(
             cuLaunchKernel(handle, UInt32(gridSize.x), UInt32(gridSize.y), UInt32(gridSize.z),
                            UInt32(blockSize.x), UInt32(blockSize.y), UInt32(blockSize.z),
-                           UInt32(blockSize.memory), stream?.handle, &arguments.addresses, nil)
+                           UInt32(blockSize.memory), stream?.handle, &addresses, nil)
         )
-        try Context.synchronize()
     }
     
-    public func launch(with arguments: inout ArgumentList,
+    public func launch(with arguments: [KernelArgument],
                        blockCount: Int, threadCount: Int,
                        memory: Int, stream: Stream?) throws {
-        try launch(with: &arguments,
+        try launch(with: arguments,
                    gridSize: GridSize(blockCount),
                    blockSize: BlockSize(threadCount: threadCount, memory: memory),
                    stream: stream)
@@ -145,41 +189,35 @@ public struct Function : CHandleCarrier {
     
 }
 
+/// A variation of CUDA <<<>>> Operators
 precedencegroup CUDAKernelPrecedence {
     associativity: left
     higherThan: TernaryPrecedence
     lowerThan: DefaultPrecedence
 }
-
 infix operator <<< : CUDAKernelPrecedence
 infix operator >>> : CUDAKernelPrecedence
 
-/// CUDA-like <<<>>> operator
-public extension Function {
-    
-    public static func <<<(lhs: Function, rhs: (Int, Int)) -> (inout ArgumentList) throws -> () {
-        return {
-            try lhs.launch(with: &$0, blockCount: rhs.0, threadCount: rhs.1, memory: 0, stream: nil)
-        }
+public func <<<(lhs: Function, rhs: (Int, Int)) -> ([KernelArgument]) throws -> () {
+    return { (args: [KernelArgument]) in
+        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: 0, stream: nil)
     }
-    
-    public static func <<<(lhs: Function, rhs: (Int, Int, Int)) -> (inout ArgumentList) throws -> () {
-        return {
-            try lhs.launch(with: &$0, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: nil)
-        }
-    }
-    
-    public static func <<<(lhs: Function, rhs: (Int, Int, Int, Stream)) -> (inout ArgumentList) throws -> () {
-        return {
-            try lhs.launch(with: &$0, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: rhs.3)
-        }
-    }
-    
 }
 
-public func >>>(lhs: (inout ArgumentList) throws -> (),
-                rhs: (inout ArgumentList)) rethrows {
-    try lhs(&rhs)
+public func <<<(lhs: Function, rhs: (Int, Int, Int)) -> ([KernelArgument]) throws -> () {
+    return { (args: [KernelArgument]) in
+        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: nil)
+    }
+}
+
+public func <<<(lhs: Function, rhs: (Int, Int, Int, Stream)) -> ([KernelArgument]) throws -> () {
+    return { (args: [KernelArgument]) in
+        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: rhs.3)
+    }
+}
+
+public func >>>(lhs: ([KernelArgument]) throws -> (), rhs: [KernelArgument]) rethrows {
+    try lhs(rhs)
 }
 
 public extension Function {
@@ -200,7 +238,7 @@ public extension Function {
         return Int(maxThreads)
     }
     
-    public var userConstSize: Int {
+    public var constSize: Int {
         var maxThreads: Int32 = 0
         cuFuncGetAttribute(&maxThreads,
                            CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES,

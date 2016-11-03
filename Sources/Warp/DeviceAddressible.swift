@@ -1,10 +1,12 @@
 //
 //  DeviceAddressible.swift
-//  CUDA
+//  Warp
 //
 //  Created by Richard Wei on 10/29/16.
 //
 //
+
+import CUDARuntime
 
 public protocol DeviceAddressible {
     associatedtype Element

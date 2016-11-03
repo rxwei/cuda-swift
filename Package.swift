@@ -6,10 +6,11 @@ let package = Package(
         Target(name: "CUDADriver"),
         Target(name: "CUDARuntime", dependencies: [ "CUDADriver" ]),
         Target(name: "NVRTC", dependencies: [ "CUDADriver" ]),
-        Target(name: "CuBLAS", dependencies: [ "CUDARuntime" ])
+        Target(name: "CuBLAS", dependencies: [ "CUDADriver", "CUDARuntime" ]),
+        Target(name: "Warp", dependencies: [ "CUDADriver", "CUDARuntime", "CuBLAS" ])
     ],
     dependencies: [
-        .Package(url: "https://github.com/rxwei/CCUDA", majorVersion: 1)
+        .Package(url: "https://github.com/rxwei/CCUDA", majorVersion: 1, minor: 4)
     ]
 )
 

@@ -175,14 +175,22 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     
 }
 
-extension UnsafeMutableDevicePointer {
+public extension UnsafeMutableDevicePointer {
 
-    typealias Attributes = cudaPointerAttributes
+    private typealias Attributes = cudaPointerAttributes
 
-    var attributes: Attributes {
+    private var attributes: Attributes {
         var attributes = cudaPointerAttributes()
         !!cudaPointerGetAttributes(&attributes, deviceAddress)
         return attributes
+    }
+
+    public var isManaged: Bool {
+        return attributes.isManaged != 0
+    }
+
+    public var device: Device {
+        return Device(assumingIndex: attributes.device)
     }
     
 }

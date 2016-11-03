@@ -1,10 +1,12 @@
 //
 //  Buffer.swift
-//  CUDA
+//  Warp
 //
 //  Created by Richard Wei on 10/26/16.
 //
 //
+
+import CUDARuntime
 
 protocol DeviceBufferProtocol : class {
     associatedtype Element
@@ -25,10 +27,12 @@ protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, Ra
 
     var baseAddress: UnsafeMutableDevicePointer<Element> { get }
     var capacity: Int { get }
-    var retainee: Any? { get set }
 
     init(capacity: Int)
     init(viewing other: Self, in range: Range<Int>)
+
+    var startAddress: UnsafeMutableDevicePointer<Element> { get }
+    var endAddress: UnsafeMutableDevicePointer<Element> { get }
 
     subscript(i: Int) -> DeviceValueBuffer<Element> { get set }
 }
@@ -42,6 +46,7 @@ extension DeviceArrayBufferProtocol {
 final class DeviceValueBuffer<Element> : ArrayViewingBufferProtocol {
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let owner: AnyObject?
+    private var retainee: Element?
 
     required init() {
         baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: 1)
@@ -51,6 +56,7 @@ final class DeviceValueBuffer<Element> : ArrayViewingBufferProtocol {
     convenience init(_ other: DeviceValueBuffer<Element>) {
         self.init()
         baseAddress.assign(from: other.baseAddress)
+        retainee = other.retainee
     }
 
     required init(viewing other: DeviceValueBuffer<Element>) {
@@ -63,6 +69,16 @@ final class DeviceValueBuffer<Element> : ArrayViewingBufferProtocol {
     {
         baseAddress = arrayBuffer.baseAddress.advanced(by: arrayBuffer.startIndex + offset)
         owner = arrayBuffer
+    }
+
+    var value: Element {
+        get {
+            return baseAddress.load()
+        }
+        set {
+            retainee = newValue
+            baseAddress.assign(newValue)
+        }
     }
 
     deinit {
@@ -80,7 +96,8 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     let capacity: Int
     let startIndex: Int, endIndex: Int
     var owner: AnyObject?
-    var retainee: Any?
+    private var retainees: [Element]?
+    private var valueRetainees: [DeviceValueBuffer<Element>?]
 
     init(capacity: Int) {
         self.capacity = capacity
@@ -88,6 +105,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         startIndex = 0
         endIndex = capacity
         owner = nil
+        valueRetainees = Array(repeating: nil, count: capacity)
     }
 
     init(viewing other: DeviceArrayBuffer<Element>) {
@@ -96,13 +114,8 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         startIndex = other.startIndex
         endIndex = other.endIndex
         owner = other
-        retainee = other.retainee
-    }
-
-    /// Copy elements from the other buffer
-    convenience init(_ other: DeviceArrayBuffer<Element>) {
-        self.init(capacity: other.count)
-        baseAddress.assign(from: other.baseAddress.advanced(by: other.startIndex), count: count)
+        retainees = other.retainees
+        valueRetainees = other.valueRetainees
     }
 
     init(viewing other: DeviceArrayBuffer<Element>, in range: Range<Int>) {
@@ -115,6 +128,27 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         startIndex = range.lowerBound
         endIndex = range.upperBound
         owner = other
+        retainees = other.retainees
+        valueRetainees = other.valueRetainees
+    }
+
+    convenience init<C: Collection>(_ elements: C) where
+        C.Iterator.Element == Element, C.IndexDistance == Int
+    {
+        self.init(capacity: elements.count)
+        var elements = Array(elements)
+        baseAddress.assign(fromHost: &elements, count: elements.count)
+        retainees = elements
+    }
+
+    convenience init(repeating repeatedValue: Element, count: Int) {
+        self.init(Array(repeating: repeatedValue, count: count))
+    }
+
+    convenience init(_ other: DeviceArrayBuffer<Element>) {
+        self.init(capacity: other.count)
+        retainees = other.retainees
+        baseAddress.assign(from: other.startAddress, count: other.count)
     }
     
     deinit {
@@ -139,6 +173,14 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         return startIndex..<endIndex
     }
 
+    var startAddress: UnsafeMutableDevicePointer<Element> {
+        return baseAddress.advanced(by: startIndex)
+    }
+
+    var endAddress: UnsafeMutableDevicePointer<Element> {
+        return baseAddress.advanced(by: endIndex)
+    }
+
     /// Accesses the subsequence bounded by the given range.
     ///
     /// - Parameter bounds: A range of the collection's indices. The upper and
@@ -152,8 +194,11 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
             guard bounds.lowerBound >= startIndex && bounds.upperBound <= endIndex else {
                 fatalError("Array index out of bounds")
             }
+            for (i, valueBuf) in zip(CountableRange(bounds), newValue) {
+                valueRetainees[i] = valueBuf
+            }
             baseAddress.advanced(by: bounds.lowerBound)
-                       .assign(from: newValue.baseAddress.advanced(by: newValue.startIndex),
+                       .assign(from: newValue.startAddress,
                                count: Swift.min(bounds.count, count))
         }
     }
@@ -163,6 +208,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
             return DeviceValueBuffer(viewing: self, offsetBy: i)
         }
         set {
+            valueRetainees[i] = newValue
             baseAddress.advanced(by: i).assign(from: newValue.baseAddress)
         }
     }

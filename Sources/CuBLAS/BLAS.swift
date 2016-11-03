@@ -7,36 +7,24 @@
 //
 
 import CCuBLAS
-import typealias CCUDARuntime.cudaStream_t
-
 @_exported import class CUDARuntime.Stream
-import struct CUDARuntime.DeviceArray
+@_exported import protocol CUDADriver.CHandleCarrier
 
-public typealias DeviceVector<T> = DeviceArray<T>
-@_exported import struct CUDARuntime.DeviceValue
+open class BLAS : CHandleCarrier {
 
-open class BLAS {
+    public typealias Handle = cublasHandle_t
 
     let handle: cublasHandle_t
-
-    open static let main = BLAS()
-
-    /// Lazy instances of 1 on the device
-    lazy var floatOne = { DeviceValue<Float>(1) }()
-    lazy var doubleOne = { DeviceValue<Double>(1) }()
 
     public init() {
         var handle: cublasHandle_t?
         !!cublasCreate_v2(&handle)
         self.handle = handle!
-
-        /// We will use device pointer reference in this library
-        /// for safety and type consistency
-        pointerMode = .deviceReference
+        pointerMode = .hostReference
     }
 
     deinit {
-        !!cublasDestroy_v2(handle)
+        cublasDestroy_v2(handle)
     }
 
     open var version: Int {
@@ -71,11 +59,14 @@ open class BLAS {
         }
     }
 
+    /// Whether the scalar values are passed by reference on the host or device
     public enum PointerMode : UInt32 {
         case hostReference = 0
         case deviceReference = 1
     }
 
+    /// Whether the scalar values are passed by reference on the host or device.
+    /// Currently only host reference is supported.
     open internal(set) var pointerMode: PointerMode {
         get {
             var mode: cublasPointerMode_t = CUBLAS_POINTER_MODE_HOST
@@ -88,6 +79,10 @@ open class BLAS {
                 cublasPointerMode_t(rawValue: newValue.rawValue)
             )
         }
+    }
+
+    public func withUnsafeHandle<Result>(_ body: (Handle) throws -> Result) rethrows -> Result {
+        return try body(handle)
     }
 
 }
