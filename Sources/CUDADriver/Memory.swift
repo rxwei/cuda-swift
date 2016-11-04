@@ -91,19 +91,54 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     }
 
     public func assign(_ value: Pointee) throws {
-        var value = value
-        try ensureSuccess(
-            cuMemcpyHtoD_v2(deviceAddressHandle, &value, MemoryLayout<Pointee>.size)
-        )
+        switch MemoryLayout<Pointee>.size {
+        case 4:
+            try ensureSuccess(
+                cuMemsetD32_v2(deviceAddressHandle,
+                               unsafeBitCast(value, to: UInt32.self), 1)
+            )
+        case 1:
+            try ensureSuccess(
+                cuMemsetD8_v2(deviceAddressHandle,
+                              unsafeBitCast(value, to: UInt8.self), 1)
+            )
+        case 2:
+            try ensureSuccess(
+                cuMemsetD16_v2(deviceAddressHandle,
+                               unsafeBitCast(value, to: UInt16.self), 1)
+            )
+        default:
+            var value = value
+            try ensureSuccess(
+                cuMemcpyHtoD_v2(deviceAddressHandle, &value, MemoryLayout<Pointee>.size)
+            )
+        }
     }
 
     public func assign(_ value: Pointee, count: Int) throws {
-        /// Ideally we want to use `cudaMemset`, but `cudaMemset` only supports a
-        /// limited number of data types, and thus is not suitable for our generic case.
-        var array = Array(repeating: value, count: count)
-        try ensureSuccess(
-            cuMemcpyHtoD_v2(deviceAddressHandle, &array, count * MemoryLayout<Pointee>.stride)
-        )
+        switch MemoryLayout<Pointee>.stride {
+        case 4:
+            try ensureSuccess(
+                cuMemsetD32_v2(deviceAddressHandle,
+                               unsafeBitCast(value, to: UInt32.self), count)
+            )
+        case 1:
+            try ensureSuccess(
+                cuMemsetD8_v2(deviceAddressHandle,
+                              unsafeBitCast(value, to: UInt8.self), count)
+            )
+        case 2:
+            try ensureSuccess(
+                cuMemsetD16_v2(deviceAddressHandle,
+                               unsafeBitCast(value, to: UInt16.self), count)
+            )
+        default:
+            var value = value
+            try ensureSuccess(
+                cuMemcpyHtoD_v2(deviceAddressHandle, &value,
+                                MemoryLayout<Pointee>.stride * count)
+            )
+        }
     }
 
     public func assign<C: Collection>(fromHost elements: C) throws

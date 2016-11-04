@@ -104,18 +104,25 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     }
 
     public func assign(_ value: Pointee) {
-        var value = value
-        !!cudaMemcpy(deviceAddress, &value,
-                     MemoryLayout<Pointee>.size, cudaMemcpyHostToDevice)
+        if MemoryLayout<Pointee>.size == MemoryLayout<Int32>.size {
+            !!cudaMemset(deviceAddress, unsafeBitCast(value, to: Int32.self), 1)
+        }
+        else {
+            var value = value
+            !!cudaMemcpy(deviceAddress, &value,
+                         MemoryLayout<Pointee>.size, cudaMemcpyHostToDevice)
+        }
     }
 
     public func assign(_ value: Pointee, count: Int) {
-        /// Ideally we want to use `cudaMemset`, but `cudaMemset` only supports
-        /// Int32 which is not suitable for our generic case. Thus we copy
-        /// memory from a host array.
-        var array = Array(repeating: value, count: count)
-        !!cudaMemcpy(deviceAddress, &array,
-                     count * MemoryLayout<Pointee>.stride, cudaMemcpyHostToDevice)
+        if MemoryLayout<Pointee>.stride == MemoryLayout<Int32>.stride {
+            !!cudaMemset(deviceAddress, unsafeBitCast(value, to: Int32.self), count)
+        }
+        else {
+            var value = value
+            !!cudaMemcpy(deviceAddress, &value,
+                         MemoryLayout<Pointee>.stride * count, cudaMemcpyHostToDevice)
+        }
     }
 
     public func assign<C: Collection>(fromHost elements: C)
