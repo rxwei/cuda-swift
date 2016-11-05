@@ -3,7 +3,6 @@ import XCTest
 @testable import CUDARuntimeTests
 @testable import CuBLASTests
 @testable import NVRTCTests
-@testable import CUDATests
 @testable import WarpTests
 
 XCTMain([
@@ -11,6 +10,5 @@ XCTMain([
      testCase(CUDARuntimeTests.allTests),
      testCase(CuBLASTests.allTests),
      testCase(NVRTCTests.allTests),
-     testCase(CUDATests.allTests),
      testCase(WarpTests.allTests),
 ])

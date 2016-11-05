@@ -6,7 +6,15 @@
 //
 //
 
-import Foundation
+import CUDARuntime
+
+public protocol DeviceAddressible {
+    associatedtype Element
+    func withUnsafeDevicePointer<Result>
+        (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
+    mutating func withUnsafeMutableDevicePointer<Result>
+        (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result
+}
 
 public protocol DeviceCollection : DeviceAddressible, RandomAccessCollection {
     typealias Index = Int

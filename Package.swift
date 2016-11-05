@@ -7,8 +7,7 @@ let package = Package(
         Target(name: "CUDARuntime", dependencies: [ "CUDADriver" ]),
         Target(name: "NVRTC", dependencies: [ "CUDADriver" ]),
         Target(name: "CuBLAS", dependencies: [ "CUDADriver", "CUDARuntime" ]),
-        Target(name: "CUDA", dependencies: [ "CUDADriver", "CUDARuntime", "CuBLAS" ]),
-        Target(name: "Warp", dependencies: [ "CUDA" ])
+        Target(name: "Warp", dependencies: [ "CUDADriver", "CUDARuntime", "CuBLAS" ])
     ],
     dependencies: [
         .Package(url: "https://github.com/rxwei/CCUDA", majorVersion: 1, minor: 4)
@@ -18,13 +17,13 @@ let package = Package(
 let dylib = Product(
     name: "CUDA",
     type: .Library(.Dynamic),
-    modules: [ "CUDADriver", "CUDARuntime", "NVRTC", "CuBLAS", "CUDA" ]
+    modules: [ "CUDADriver", "CUDARuntime", "NVRTC", "CuBLAS", ]
 )
 products.append(dylib)
 let a = Product(
     name: "CUDA",
     type: .Library(.Static),
-    modules: [ "CUDADriver", "CUDARuntime", "NVRTC", "CuBLAS", "CUDA" ]
+    modules: [ "CUDADriver", "CUDARuntime", "NVRTC", "CuBLAS", ]
 )
 products.append(a)
 

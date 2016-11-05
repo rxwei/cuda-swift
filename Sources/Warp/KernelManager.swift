@@ -7,14 +7,15 @@
 //
 
 import CUDARuntime
+import class CUDADriver.Module
+import struct CUDADriver.Function
 import NVRTC
-@_exported import struct CUDARuntime.Device
 
-public class KernelManager {
+final class KernelManager {
 
     fileprivate static var instances: [Int : KernelManager] = [:]
 
-    open class func main(on device: Device) -> KernelManager {
+    static func main(on device: Device) -> KernelManager {
         if let manager = instances[device.index] {
             return manager
         }
@@ -23,7 +24,7 @@ public class KernelManager {
         return manager
     }
 
-    open static var compileOptions: [CompileOption] = [
+    static var compileOptions: [CompileOption] = [
         .useFastMath
     ]
 
@@ -33,18 +34,6 @@ public class KernelManager {
 
     public init(device: Device) throws {
         self.device = device
-        try loadKernels()
-    }
-
-    private func loadKernels() throws {
-        let intrinsicOptions: [CompileOption] = [
-            .computeCapability(device.computeCapability)
-        ]
-        let module = try Module(
-            source: builtinKernelSource,
-            compileOptions: intrinsicOptions + KernelManager.compileOptions
-        )
-        modules.append(module)
     }
 
 }

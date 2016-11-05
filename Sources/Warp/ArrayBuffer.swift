@@ -8,19 +8,6 @@
 
 import CUDARuntime
 
-protocol DeviceBufferProtocol : class {
-    associatedtype Element
-    var owner: AnyObject? { get }
-    var baseAddress: UnsafeMutableDevicePointer<Element> { get }
-    init()
-    init(viewing other: Self)
-}
-
-protocol ArrayViewingBufferProtocol : DeviceBufferProtocol {
-    init<ArrayBuffer: DeviceArrayBufferProtocol>(viewing other: ArrayBuffer, offsetBy offset: Int)
-        where ArrayBuffer.Element == Element
-}
-
 protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, RandomAccessCollection {
     typealias Index = Int
     typealias Indices = CountableRange<Int>
@@ -38,55 +25,29 @@ protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, Ra
 }
 
 extension DeviceArrayBufferProtocol {
+    var startAddress: UnsafeMutableDevicePointer<Element> {
+        return baseAddress.advanced(by: startIndex)
+    }
+
+    var endAddress: UnsafeMutableDevicePointer<Element> {
+        return baseAddress.advanced(by: endIndex)
+    }
+
+    var count: Int {
+        return endIndex - startIndex
+    }
+
+    func index(after i: Int) -> Int {
+        return i + 1
+    }
+
+    func index(before i: Int) -> Int {
+        return i - 1
+    }
+    
     init() {
         self.init(capacity: 0)
     }
-}
-
-final class DeviceValueBuffer<Element> : ArrayViewingBufferProtocol {
-    let baseAddress: UnsafeMutableDevicePointer<Element>
-    let owner: AnyObject?
-    private var retainee: Element?
-
-    required init() {
-        baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: 1)
-        owner = nil
-    }
-
-    convenience init(_ other: DeviceValueBuffer<Element>) {
-        self.init()
-        baseAddress.assign(from: other.baseAddress)
-        retainee = other.retainee
-    }
-
-    required init(viewing other: DeviceValueBuffer<Element>) {
-        baseAddress = other.baseAddress
-        owner = other
-    }
-
-    required init<Buffer: DeviceArrayBufferProtocol>
-        (viewing arrayBuffer: Buffer, offsetBy offset: Int) where Buffer.Element == Element
-    {
-        baseAddress = arrayBuffer.baseAddress.advanced(by: arrayBuffer.startIndex + offset)
-        owner = arrayBuffer
-    }
-
-    var value: Element {
-        get {
-            return baseAddress.load()
-        }
-        set {
-            retainee = newValue
-            baseAddress.assign(newValue)
-        }
-    }
-
-    deinit {
-        if owner == nil {
-            baseAddress.deallocate()
-        }
-    }
-
 }
 
 final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
@@ -157,28 +118,8 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         }
     }
 
-    var count: Int {
-        return endIndex - startIndex
-    }
-
-    func index(after i: Int) -> Int {
-        return i + 1
-    }
-
-    func index(before i: Int) -> Int {
-        return i - 1
-    }
-
     var indices: CountableRange<Int> {
         return startIndex..<endIndex
-    }
-
-    var startAddress: UnsafeMutableDevicePointer<Element> {
-        return baseAddress.advanced(by: startIndex)
-    }
-
-    var endAddress: UnsafeMutableDevicePointer<Element> {
-        return baseAddress.advanced(by: endIndex)
     }
 
     /// Accesses the subsequence bounded by the given range.

@@ -16,15 +16,7 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     /// Raw address on CUDA device
     public let deviceAddress: UnsafeMutablePointer<Pointee>
 
-    /// Convert from raw memory address on graphic device
-    /// - parameter deviceAddress: address on graphic device
-    /// - note: Initializer for other CUDA Runtime API calls within the module
-    /// Maybe we need a safer solution, e.g. only treat 
-    /// `init(_: UnsafeMutablePointer<Float>)` as value preserving type conversion,
-    /// while using an argument-labeled initializer for conversion from
-    /// UnsafeMutableRawPointer, e.g.
-    /// `init(assumingMemoryBoundFrom: UnsafeMutableRawPointer)`
-    /// For now, let's leave it as is
+    /// Convert from memory address on device device
     public init(_ deviceAddress: UnsafeMutablePointer<Pointee>) {
         self.deviceAddress = deviceAddress
     }

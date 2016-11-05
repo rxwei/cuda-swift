@@ -30,10 +30,14 @@ public struct GridSize {
         self.y = 1
         self.z = 1
     }
+
+    public init(integerLiteral value: Int) {
+        self.init(x: value, y: 1, z: 1)
+    }
 }
 
 /// Block of threads
-public struct BlockSize {
+public struct BlockSize : ExpressibleByIntegerLiteral {
     /// Dimensions
     public let x: Int, y: Int, z: Int
     /// Shared memory size per thread
@@ -51,6 +55,10 @@ public struct BlockSize {
         self.y = 1
         self.z = 1
         self.memory = memory
+    }
+
+    public init(integerLiteral value: Int) {
+        self.init(x: value, y: 1, z: 1, memory: 1)
     }
 }
 
@@ -191,33 +199,27 @@ public struct Function : CHandleCarrier {
 
 /// A variation of CUDA <<<>>> Operators
 precedencegroup CUDAKernelPrecedence {
-    associativity: left
+    associativity: right
     higherThan: TernaryPrecedence
     lowerThan: DefaultPrecedence
 }
 infix operator <<< : CUDAKernelPrecedence
 infix operator >>> : CUDAKernelPrecedence
 
-public func <<<(lhs: Function, rhs: (Int, Int)) -> ([KernelArgument]) throws -> () {
-    return { (args: [KernelArgument]) in
-        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: 0, stream: nil)
+public func <<<(lhs: Function, rhs: (Function) throws -> ()) rethrows {
+    try rhs(lhs)
+}
+
+public func >>>(lhs: (Int, Int), rhs: [KernelArgument]) -> (Function) throws -> () {
+    return { (f: Function) throws -> () in
+        try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: 0, stream: nil)
     }
 }
 
-public func <<<(lhs: Function, rhs: (Int, Int, Int)) -> ([KernelArgument]) throws -> () {
-    return { (args: [KernelArgument]) in
-        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: nil)
+public func >>>(lhs: (Int, Int, Int, Stream), rhs: [KernelArgument]) -> (Function) throws -> () {
+    return { (f: Function) throws -> () in
+        try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: lhs.2, stream: lhs.3)
     }
-}
-
-public func <<<(lhs: Function, rhs: (Int, Int, Int, Stream)) -> ([KernelArgument]) throws -> () {
-    return { (args: [KernelArgument]) in
-        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: rhs.3)
-    }
-}
-
-public func >>>(lhs: ([KernelArgument]) throws -> (), rhs: [KernelArgument]) rethrows {
-    try lhs(rhs)
 }
 
 public extension Function {
