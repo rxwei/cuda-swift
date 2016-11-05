@@ -11,7 +11,7 @@ import struct CUDARuntime.UnsafeMutableDevicePointer
 import struct CUDARuntime.UnsafeDevicePointer
 
 public extension BLAS {
-    
+
     public func asum(_ vector: UnsafeDevicePointer<Float>, stride: Int32, count: Int32) -> Float {
         var result: Float = 0.0
         !!cublasSasum_v2(handle, count, vector.deviceAddress, stride, &result)
@@ -24,7 +24,7 @@ public extension BLAS {
         return result
     }
     
-    public func axpy(alpha: Float = 0.0,
+    public func axpy(alpha: Float,
                      x: UnsafeDevicePointer<Float>, stride strideX: Int32,
                      y: UnsafeMutableDevicePointer<Float>, stride strideY: Int32,
                      count: Int32) {
@@ -34,7 +34,7 @@ public extension BLAS {
                          y.deviceAddress, strideY)
     }
     
-    public func axpy(alpha: Double = 0.0,
+    public func axpy(alpha: Double,
                      x: UnsafeDevicePointer<Double>, stride strideX: Int32,
                      y: UnsafeMutableDevicePointer<Double>, stride strideY: Int32,
                      count: Int32) {
@@ -42,6 +42,14 @@ public extension BLAS {
         !!cublasDaxpy_v2(handle, count, &alpha,
                          x.deviceAddress, strideX,
                          y.deviceAddress, strideY)
+    }
+
+    public func axpy<T: BLASDataProtocol>(alpha: T,
+                     x: UnsafeDevicePointer<Double>, stride strideX: Int32,
+                     y: UnsafeMutableDevicePointer<Double>, stride strideY: Int32,
+                     count: Int32) {
+        var alpha = alpha
+        cublasAxpyEx(handle, count, &alpha, T.cType, x.deviceAddress, T.cType, strideX, y.deviceAddress, T.cType, strideY, T.cType)
     }
     
     public func copy(_ vector: UnsafeDevicePointer<Float>, stride strideX: Int32,
