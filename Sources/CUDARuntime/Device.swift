@@ -25,18 +25,14 @@ public struct Device : Equatable {
         return (0..<count).map { Device(assumingIndex: Int32($0)) }
     }
 
-    public static var current: Device? {
+    public static var current: Device {
         get {
             var index: Int32 = 0
-            guard cudaGetDevice(&index) == cudaSuccess else {
-                return nil
-            }
+            !!cudaGetDevice(&index)
             return Device(assumingIndex: index)
         }
         set {
-            newValue.flatMap { newValue in
-                !!cudaSetDevice(Int32(newValue.index))
-            }
+            !!cudaSetDevice(Int32(newValue.index))
         }
     }
 

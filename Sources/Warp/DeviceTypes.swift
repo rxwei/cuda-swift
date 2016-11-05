@@ -10,6 +10,7 @@ import CUDARuntime
 
 public protocol DeviceAddressible {
     associatedtype Element
+    var device: Device { get }
     func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
     mutating func withUnsafeMutableDevicePointer<Result>

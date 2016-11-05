@@ -14,10 +14,22 @@ public struct Device : Equatable, CHandleCarrier {
 
     public typealias Properties = CUdevprop
 
+    public static var main: Device = Device(atIndex: 0)!
+
+    public static var all: [Device] {
+        return (0..<count).map { Device(atIndex: $0)! }
+    }
+
     let handle: CUdevice
 
     init(_ handle: CUdevice) {
         self.handle = handle
+    }
+
+    public static var count: Int {
+        var deviceCount: Int32 = 0
+        cuDeviceGetCount(&deviceCount)
+        return Int(deviceCount)
     }
 
     public static func ==(lhs: Device, rhs: Device) -> Bool {
@@ -74,14 +86,6 @@ public struct Device : Equatable, CHandleCarrier {
         (_ body: (Handle) throws -> Result) rethrows -> Result {
         return try body(handle)
     }
-
-    public static var count: Int {
-        var deviceCount: Int32 = 0
-        cuDeviceGetCount(&deviceCount)
-        return Int(deviceCount)
-    }
-
-    public static var main: Device? = Device(atIndex: 0)
 
 }
 

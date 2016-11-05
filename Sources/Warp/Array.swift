@@ -16,6 +16,8 @@ protocol DeviceArrayProtocol :
     var capacity: Int { get }
     subscript(i: Int) -> Iterator.Element { get set }
     var buffer: Buffer { get set }
+    init()
+    init(device: Device)
     init(_ buffer: Buffer)
 }
 
@@ -43,31 +45,54 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         }
     }
 
+    public var device: Device {
+        return buffer.device
+    }
+
     init(_ buffer: DeviceArrayBuffer<Element>) {
         self.buffer = buffer
     }
 
     /// Creates an empty instance.
     public init() {
-        buffer = DeviceArrayBuffer(capacity: 0)
+        buffer = DeviceArrayBuffer(device: Device.current, capacity: 0)
+    }
+
+    /// Creates an empty instance.
+    public init(device: Device) {
+        buffer = DeviceArrayBuffer(device: device, capacity: 0)
+    }
+
+    public init(device: Device, capacity: Int) {
+        buffer = DeviceArrayBuffer(device: device, capacity: capacity)
     }
 
     public init(capacity: Int) {
-        buffer = DeviceArrayBuffer(capacity: capacity)
+        buffer = DeviceArrayBuffer(device: Device.current, capacity: capacity)
     }
 
     public init(repeating element: Element, count: Int) {
-        buffer = DeviceArrayBuffer(repeating: element, count: count)
+        buffer = DeviceArrayBuffer(repeating: element, count: count, device: Device.current)
+    }
+
+    public init(repeating element: Element, count: Int, device: Device) {
+        buffer = DeviceArrayBuffer(repeating: element, count: count, device: device)
     }
 
     public init<C: Collection>(_ elements: C) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
-        buffer = DeviceArrayBuffer(elements)
+        buffer = DeviceArrayBuffer(elements, device: Device.current)
+    }
+
+    public init<C: Collection>(_ elements: C, device: Device) where
+        C.Iterator.Element == Element, C.IndexDistance == Int
+    {
+        buffer = DeviceArrayBuffer(elements, device: device)
     }
 
     public init(arrayLiteral elements: Element...) {
-        buffer = DeviceArrayBuffer(elements)
+        buffer = DeviceArrayBuffer(elements, device: Device.current)
     }
 
     public init(_ other: DeviceArray<Element>) {
@@ -149,10 +174,6 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
             var newValue = newValue
             mutatingBuffer[bufferRange(fromLocal: range)] = newValue.mutatingBuffer
         }
-    }
-
-    var unsafePointer: UnsafeDevicePointer<Element> {
-        return UnsafeDevicePointer(buffer.startAddress)
     }
 
     public mutating func withUnsafeMutableDevicePointer<Result>

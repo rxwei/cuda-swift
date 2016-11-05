@@ -15,7 +15,7 @@ protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, Ra
     var baseAddress: UnsafeMutableDevicePointer<Element> { get }
     var capacity: Int { get }
 
-    init(capacity: Int)
+    init(device: Device, capacity: Int)
     init(viewing other: Self, in range: Range<Int>)
 
     var startAddress: UnsafeMutableDevicePointer<Element> { get }
@@ -44,15 +44,12 @@ extension DeviceArrayBufferProtocol {
     func index(before i: Int) -> Int {
         return i - 1
     }
-    
-    init() {
-        self.init(capacity: 0)
-    }
 }
 
 final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     typealias SubSequence = DeviceArrayBuffer<Element>
 
+    let device: Device
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let capacity: Int
     let startIndex: Int, endIndex: Int
@@ -60,8 +57,13 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     private var retainees: [Element]?
     private var valueRetainees: [DeviceValueBuffer<Element>?]
 
-    init(capacity: Int) {
+    convenience init(device: Device) {
+        self.init(device: device, capacity: 0)
+    }
+
+    init(device: Device, capacity: Int) {
         self.capacity = capacity
+        self.device = device
         baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: capacity)
         startIndex = 0
         endIndex = capacity
@@ -71,6 +73,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
 
     init(viewing other: DeviceArrayBuffer<Element>) {
         capacity = other.capacity
+        device = other.device
         baseAddress = other.baseAddress
         startIndex = other.startIndex
         endIndex = other.endIndex
@@ -80,12 +83,13 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     }
 
     init(viewing other: DeviceArrayBuffer<Element>, in range: Range<Int>) {
+        device = other.device
+        capacity = other.capacity
         baseAddress = other.baseAddress
         guard other.startIndex <= range.lowerBound &&
             other.endIndex >= range.upperBound else {
             fatalError("Array index out of bounds")
         }
-        capacity = other.capacity
         startIndex = range.lowerBound
         endIndex = range.upperBound
         owner = other
@@ -93,21 +97,21 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         valueRetainees = other.valueRetainees
     }
 
-    convenience init<C: Collection>(_ elements: C) where
+    convenience init<C: Collection>(_ elements: C, device: Device) where
         C.Iterator.Element == Element, C.IndexDistance == Int
     {
-        self.init(capacity: elements.count)
+        self.init(device: device, capacity: elements.count)
         var elements = Array(elements)
         baseAddress.assign(fromHost: &elements, count: elements.count)
         retainees = elements
     }
 
-    convenience init(repeating repeatedValue: Element, count: Int) {
-        self.init(Array(repeating: repeatedValue, count: count))
+    convenience init(repeating repeatedValue: Element, count: Int, device: Device) {
+        self.init(Array(repeating: repeatedValue, count: count), device: device)
     }
 
     convenience init(_ other: DeviceArrayBuffer<Element>) {
-        self.init(capacity: other.count)
+        self.init(device: other.device, capacity: other.count)
         retainees = other.retainees
         baseAddress.assign(from: other.startAddress, count: other.count)
     }

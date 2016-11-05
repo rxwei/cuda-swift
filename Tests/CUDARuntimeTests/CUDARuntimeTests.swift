@@ -5,7 +5,7 @@ import NVRTC
 class CUDARuntimeTests: XCTestCase {
 
     func testDevice() {
-        let computability = CUDARuntime.Device.current!.computeCapability
+        let computability = CUDARuntime.Device.current.computeCapability
         XCTAssertGreaterThanOrEqual(computability.major, 1)
         XCTAssertGreaterThanOrEqual(computability.minor, 0)
     }

@@ -21,6 +21,10 @@ public struct DeviceValue<Element> : DeviceAddressible {
         }
     }
 
+    public var device: Device {
+        return buffer.device
+    }
+
     init(buffer: DeviceValueBuffer<Element>) {
         self.buffer = buffer
     }
@@ -34,8 +38,8 @@ public struct DeviceValue<Element> : DeviceAddressible {
         }
     }
 
-    public init(_ initialValue: Element? = nil) {
-        buffer = DeviceValueBuffer()
+    public init(_ initialValue: Element? = nil, device: Device = Device.current) {
+        buffer = DeviceValueBuffer(device: device)
         if let initialValue = initialValue {
             buffer.value = initialValue
         }
@@ -43,10 +47,6 @@ public struct DeviceValue<Element> : DeviceAddressible {
 
     public init(_ other: DeviceValue<Element>) {
         self = other
-    }
-
-    var unsafePointer: UnsafeDevicePointer<Element> {
-        return UnsafeDevicePointer(buffer.baseAddress)
     }
 
     public func withUnsafeDevicePointer<Result>
