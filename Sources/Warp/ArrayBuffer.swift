@@ -64,7 +64,14 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     init(device: Device, capacity: Int) {
         self.capacity = capacity
         self.device = device
+        
+        /// Switch to desired device
+        let prevDevice = Device.current
+        Device.current = device
         baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: capacity)
+        /// Switch back to previous device
+        Device.current = prevDevice
+        
         startIndex = 0
         endIndex = capacity
         owner = nil
