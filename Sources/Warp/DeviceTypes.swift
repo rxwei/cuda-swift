@@ -21,7 +21,7 @@ public protocol DeviceCollection : DeviceAddressible, RandomAccessCollection {
     typealias IndexDistance = Int
     associatedtype Element
     associatedtype SubSequence : RandomAccessCollection
-    func copyToHost() -> [Element]
+    var hostArray: [Element] { get }
     subscript(index: Int) -> Iterator.Element { get }
 }
 

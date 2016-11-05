@@ -77,16 +77,16 @@ extension DeviceValue where Element : MutableDeviceCollection {
 
 extension DeviceValue where Element : DeviceCollection {
 
-    public func copyToHost() -> [Element.Element] {
-        return value.copyToHost()
+    public var hostArray: [Element.Element] {
+        return value.hostArray
     }
     
 }
 
 extension DeviceValue where Element : DeviceCollection, Element.Element : DeviceCollection {
 
-    public func copyToHost() -> [[Element.Element.Element]] {
-        return value.copyToHost().map{$0.copyToHost()}
+    public var hostArray: [[Element.Element.Element]] {
+        return value.hostArray.map{$0.hostArray}
     }
     
 }

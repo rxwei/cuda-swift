@@ -78,7 +78,7 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         self.buffer = DeviceArrayBuffer(viewing: buffer, in: range)
     }
 
-    public func copyToHost() -> [Element] {
+    public var hostArray: [Element] {
         var elements: [Element] = []
         elements.reserveCapacity(count)
         /// Temporary array copy solution
@@ -171,7 +171,7 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
 public extension Array {
 
     public init(_ deviceElements: DeviceArray<Element>) {
-        self = deviceElements.copyToHost()
+        self = deviceElements.hostArray
     }
 
 }
