@@ -9,8 +9,20 @@
 import CCuBLAS
 import protocol CUDADriver.CHandleCarrier
 @_exported import class CUDARuntime.Stream
+@_exported import struct CUDARuntime.Device
 
 open class BLAS : CHandleCarrier {
+
+    private static var blasInstances: [Int : BLAS] = Dictionary(minimumCapacity: Device.count)
+
+    open class func global(on device: Device = Device.current) -> BLAS {
+        guard let blas = BLAS.blasInstances[device.index] else {
+            let blas = BLAS()
+            blasInstances[device.index] = blas
+            return blas
+        }
+        return blas
+    }
 
     public typealias Handle = cublasHandle_t
 

@@ -23,33 +23,15 @@ public extension BLAS {
         !!cublasDasum_v2(handle, count, vector.deviceAddress, stride, &result)
         return result
     }
-    
-    public func axpy(alpha: Float,
-                     x: UnsafeDevicePointer<Float>, stride strideX: Int32,
-                     y: UnsafeMutableDevicePointer<Float>, stride strideY: Int32,
-                     count: Int32) {
-        var alpha = alpha
-        !!cublasSaxpy_v2(handle, count, &alpha,
-                         x.deviceAddress, strideX,
-                         y.deviceAddress, strideY)
-    }
-    
-    public func axpy(alpha: Double,
-                     x: UnsafeDevicePointer<Double>, stride strideX: Int32,
-                     y: UnsafeMutableDevicePointer<Double>, stride strideY: Int32,
-                     count: Int32) {
-        var alpha = alpha
-        !!cublasDaxpy_v2(handle, count, &alpha,
-                         x.deviceAddress, strideX,
-                         y.deviceAddress, strideY)
-    }
 
     public func axpy<T: BLASDataProtocol>(alpha: T,
                      x: UnsafeDevicePointer<Double>, stride strideX: Int32,
                      y: UnsafeMutableDevicePointer<Double>, stride strideY: Int32,
                      count: Int32) {
         var alpha = alpha
-        cublasAxpyEx(handle, count, &alpha, T.cType, x.deviceAddress, T.cType, strideX, y.deviceAddress, T.cType, strideY, T.cType)
+        cublasAxpyEx(handle, count, &alpha, T.cType,
+                     x.deviceAddress, T.cType, strideX,
+                     y.deviceAddress, T.cType, strideY, T.cType)
     }
     
     public func copy(_ vector: UnsafeDevicePointer<Float>, stride strideX: Int32,
@@ -67,19 +49,11 @@ public extension BLAS {
                          vector.deviceAddress, strideX,
                          y.deviceAddress, strideY)
     }
-    
-    public func scal(_ x: UnsafeMutableDevicePointer<Float>, stride: Int32, count: Int32,
-                     by alpha: UnsafeDevicePointer<Float>) {
-        !!cublasSscal_v2(handle, count,
-                         alpha.deviceAddress, x.deviceAddress,
-                         stride)
-    }
-    
-    public func scal(_ x: UnsafeMutableDevicePointer<Double>, stride: Int32, count: Int32,
-                     by alpha: UnsafeDevicePointer<Double>) {
-        !!cublasDscal_v2(handle, count,
-                         alpha.deviceAddress, x.deviceAddress,
-                         stride)
+
+    public func scale<T: BLASDataProtocol>(
+        _ x: UnsafeMutableDevicePointer<T>, stride: Int32, count: Int32, by alpha: T) {
+        var alpha = alpha
+        !!cublasScalEx(handle, count, &alpha, T.cType, x.deviceAddress, T.cType, stride, T.cType)
     }
     
     public func swap(_ x: inout UnsafeMutableDevicePointer<Float>, stride strideX: Int32,
@@ -133,25 +107,16 @@ public extension BLAS {
         )
         return Int32(result)
     }
-    
-    public func dot(_ x: UnsafeDevicePointer<Float>, stride strideX: Int32,
-                    _ y: UnsafeDevicePointer<Float>, stride strideY: Int32, count: Int32) -> Float {
-        var result: Float = 0.0
-        !!cublasSdot_v2(handle, count,
-                        x.deviceAddress, strideX,
-                        y.deviceAddress, strideY,
-                        &result)
-        return result
+
+    public func dot<T: BLASDataProtocol>(
+        x: UnsafeDevicePointer<T>, stride strideX: Int32,
+        y: UnsafeDevicePointer<T>, stride strideY: Int32, count: Int32) -> T {
+        var result: T?
+        !!cublasDotEx(handle, count,
+                    x.deviceAddress, T.cType, strideX,
+                    y.deviceAddress, T.cType, strideY,
+                    &result, T.cType, T.cType)
+        return result!
     }
-    
-    public func dot(_ x: UnsafeDevicePointer<Double>, stride strideX: Int32,
-                    _ y: UnsafeDevicePointer<Double>, stride strideY: Int32, count: Int32) -> Double {
-        var result: Double = 0.0
-        !!cublasDdot_v2(handle, count,
-                        x.deviceAddress, strideX,
-                        y.deviceAddress, strideY,
-                        &result)
-        return result
-    }
-    
+
 }
