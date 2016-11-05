@@ -1,7 +1,6 @@
 import XCTest
 @testable import CUDADriver
-@testable import class NVRTC.Compiler
-@testable import class NVRTC.Program
+import NVRTC
 
 class CUDADriverTests: XCTestCase {
 

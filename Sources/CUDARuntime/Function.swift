@@ -6,16 +6,14 @@
 //
 //
 
-/*
-
 import CCUDARuntime
 import struct CUDADriver.Function
 import class CUDADriver.Stream
-@_exported import enum CUDADriver.SharedMemoryBankSize
-@_exported import struct CUDADriver.GridSize
-@_exported import struct CUDADriver.BlockSize
-@_exported import enum CUDADriver.CachePreference
-@_exported import struct CUDADriver.KernelArgument
+import enum CUDADriver.SharedMemoryBankSize
+import struct CUDADriver.GridSize
+import struct CUDADriver.BlockSize
+import enum CUDADriver.CachePreference
+import struct CUDADriver.KernelArgument
 
 
 public struct Kernel {
@@ -50,7 +48,8 @@ public struct Kernel {
 
     public func launch(with arguments: [KernelArgument],
                        gridSize: GridSize, blockSize: BlockSize, stream: Stream?) throws {
-        var addresses = arguments.map{$0.unsafeAddress}
+        var arguments = arguments
+        var addresses = (0..<arguments.count).map{i in arguments[i].unsafeAddress}
         try ensureSuccess(
             cudaLaunchKernel(address,
                              dim3(x: UInt32(blockSize.x),
@@ -68,33 +67,11 @@ public struct Kernel {
                        blockCount: Int, threadCount: Int,
                        memory: Int, stream: Stream?) throws {
         try launch(with: arguments,
-                   gridSize: GridSize(blockCount),
+                   gridSize: GridSize(blockCount: blockCount),
                    blockSize: BlockSize(threadCount: threadCount, memory: memory),
                    stream: stream)
     }
 
-}
-
-public func <<<(lhs: Kernel, rhs: (Int, Int)) -> ([KernelArgument]) throws -> () {
-    return { (args: [KernelArgument]) in
-        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: 0, stream: nil)
-    }
-}
-
-public func <<<(lhs: Kernel, rhs: (Int, Int, Int)) -> ([KernelArgument]) throws -> () {
-    return { (args: [KernelArgument]) in
-        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: nil)
-    }
-}
-
-public func <<<(lhs: Kernel, rhs: (Int, Int, Int, Stream)) -> ([KernelArgument]) throws -> () {
-    return { (args: [KernelArgument]) in
-        try lhs.launch(with: args, blockCount: rhs.0, threadCount: rhs.1, memory: rhs.2, stream: rhs.3)
-    }
-}
-
-public func >>>(lhs: ([KernelArgument]) throws -> (), rhs: [KernelArgument]) rethrows {
-    try lhs(rhs)
 }
 
 public extension Kernel {
@@ -132,5 +109,3 @@ public extension Kernel {
     }
 
 }
-
- */

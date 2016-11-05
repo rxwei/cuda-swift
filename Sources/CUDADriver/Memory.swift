@@ -15,9 +15,8 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
     /// Raw address on CUDA device
     let deviceAddressHandle: CUdeviceptr
 
-    private var deviceAddress: UnsafePointer<Pointee> {
-        /// Safe since deviceAddressHandle is never 0!
-        return UnsafePointer(bitPattern: UInt(deviceAddressHandle))!
+    public var deviceAddress: UnsafeMutablePointer<Pointee> {
+        return UnsafeMutablePointer(bitPattern: UInt(deviceAddressHandle))!
     }
 
     init?(_ deviceAddressHandle: CUdeviceptr) {
