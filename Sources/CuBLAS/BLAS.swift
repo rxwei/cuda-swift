@@ -7,8 +7,8 @@
 //
 
 import CCuBLAS
+import protocol CUDADriver.CHandleCarrier
 @_exported import class CUDARuntime.Stream
-@_exported import protocol CUDADriver.CHandleCarrier
 
 open class BLAS : CHandleCarrier {
 
