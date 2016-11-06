@@ -25,8 +25,8 @@ public extension BLAS {
     }
 
     public func axpy<T: BLASDataProtocol>(alpha: T,
-                     x: UnsafeDevicePointer<Double>, stride strideX: Int32,
-                     y: UnsafeMutableDevicePointer<Double>, stride strideY: Int32,
+                     x: UnsafeDevicePointer<T>, stride strideX: Int32,
+                     y: UnsafeMutableDevicePointer<T>, stride strideY: Int32,
                      count: Int32) {
         var alpha = alpha
         cublasAxpyEx(handle, count, &alpha, T.cType,
