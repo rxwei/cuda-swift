@@ -7,8 +7,6 @@
 //
 
 import CUDARuntime
-import struct CUDADriver.Context
-import enum CUDADriver.Driver
 
 protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, RandomAccessCollection {
     typealias Index = Int
@@ -56,6 +54,7 @@ extension DeviceArrayBufferProtocol {
 final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     typealias SubSequence = DeviceArrayBuffer<Element>
 
+    let device: Device
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let capacity: Int
     let startIndex: Int, endIndex: Int
@@ -63,11 +62,9 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     private var retainees: [Element]?
     private var valueRetainees: [DeviceValueBuffer<Element>?]
 
-    var device: Device {
-        return baseAddress.device
-    }
 
     init(capacity: Int) {
+        device = Device.current
         self.capacity = capacity
         baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: capacity)
         startIndex = 0
@@ -81,16 +78,18 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     }
     
     convenience init(device: Device, capacity: Int) {
-        /// Switch to desired device
-        Driver.initialize()
-        let context = Context.current
-        Device.current = device
-        self.init(capacity: capacity)
-        /// Switch back to previous device
-        context?.pushToThread()
+        let contextualDevice = Device.current
+        if device == contextualDevice {
+            self.init(capacity: capacity)
+        } else {
+            Device.current = device
+            self.init(capacity: capacity)
+            Device.current = contextualDevice
+        }
     }
 
     init(viewing other: DeviceArrayBuffer<Element>) {
+        device = other.device
         capacity = other.capacity
         baseAddress = other.baseAddress
         startIndex = other.startIndex
@@ -101,6 +100,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     }
 
     init(viewing other: DeviceArrayBuffer<Element>, in range: Range<Int>) {
+        device = other.device
         capacity = other.capacity
         baseAddress = other.baseAddress
         guard other.startIndex <= range.lowerBound &&

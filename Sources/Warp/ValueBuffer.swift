@@ -7,8 +7,6 @@
 //
 
 import CUDARuntime
-import enum CUDADriver.Driver
-import struct CUDADriver.Context
 
 protocol DeviceBufferProtocol : class {
     associatedtype Element
@@ -26,29 +24,28 @@ protocol DeviceArrayViewingBufferProtocol : DeviceBufferProtocol {
 }
 
 final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
+    let device: Device
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let owner: AnyObject?
     private var retainee: Element?
 
-    var device: Device {
-        return baseAddress.device
-    }
-
     init() {
+        device = Device.current
         baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: 1)
         owner = nil
     }
 
     convenience init(device: Device) {
-        /// Switch to desired device
-        Driver.initialize()
-        let context = Context.current
-        Device.current = device
-        self.init()
-        /// Switch back to previous device
-        context?.pushToThread()
+        let contextualDevice = Device.current
+        if device == contextualDevice {
+            self.init()
+        } else {
+            Device.current = device
+            self.init()
+            Device.current = contextualDevice
+        }
     }
-    
+
     convenience init(_ other: DeviceValueBuffer<Element>) {
         self.init(device: other.device)
         baseAddress.assign(from: other.baseAddress)
@@ -56,6 +53,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
     }
 
     init(viewing other: DeviceValueBuffer<Element>) {
+        device = other.device
         baseAddress = other.baseAddress
         owner = other
     }
@@ -63,6 +61,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
     init<Buffer: DeviceArrayBufferProtocol>
         (viewing arrayBuffer: Buffer, offsetBy offset: Int) where Buffer.Element == Element
     {
+        device = arrayBuffer.device
         baseAddress = arrayBuffer.baseAddress.advanced(by: arrayBuffer.startIndex + offset)
         owner = arrayBuffer
     }

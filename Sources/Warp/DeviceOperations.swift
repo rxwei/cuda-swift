@@ -8,7 +8,6 @@
 
 import CuBLAS
 import CUDARuntime
-import struct CUDADriver.Device
 
 infix operator • : MultiplicationPrecedence
 
@@ -76,7 +75,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     public func reduced() -> Element {
         var copy = self
         var result = DeviceValue<Element>()
-        KernelManager.global(on: device.driverDevice).launchKernel(
+        KernelManager.global(on: device).launchKernel(
             .sum, forType: Element.self,
             arguments: [.array(&copy), .longLong(Int64(count)), .value(&result)],
             blockCount: 1, threadCount: 1
@@ -87,7 +86,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     public func sumOfAbsoluteValues() -> Element {
         var copy = self
         var result = DeviceValue<Element>()
-        KernelManager.global(on: device.driverDevice).launchKernel(
+        KernelManager.global(on: device).launchKernel(
             .asum, forType: Element.self,
             arguments: [.array(&copy), .longLong(Int64(count)), .value(&result)],
             blockCount: 1, threadCount: 1

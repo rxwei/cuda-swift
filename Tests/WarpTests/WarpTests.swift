@@ -8,15 +8,12 @@
 
 import XCTest
 @testable import Warp
+@testable import CUDARuntime
 @testable import CUDADriver
 @testable import NVRTC
 @testable import CuBLAS
 
 class WarpTests: XCTestCase {
-
-    override func setUp() {
-        Driver.initialize()
-    }
 
     func testArray() {
         let hostArray: [Int] = [1, 2, 3, 4, 5]
@@ -135,7 +132,7 @@ class WarpTests: XCTestCase {
     }
 
     func testModuleMult() throws {
-        try Device.main.withContext { context in
+        try Device.current.sync {
             let source: String =
                 "extern \"C\" __global__ void mult(float a, float *x, size_t n) {"
               + "    size_t i = blockIdx.x * blockDim.x + threadIdx.x;"
@@ -144,7 +141,7 @@ class WarpTests: XCTestCase {
             let ptx = try Compiler.compile(
                 Program(source: source),
                 options: [
-                    .computeCapability(Device.main.computeCapability),
+                    .computeCapability(Device.current.computeCapability),
                     .cpp11,
                     .lineInfo,
                     .contractIntoFMAD(true),
@@ -166,15 +163,15 @@ class WarpTests: XCTestCase {
     }
     
     func testModuleSaxpy() throws {
-        try Device.main.withContext { context in
+        try Device.current.sync {
             let source =
                 "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, size_t n) {"
-                    + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
-                    + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
-                    + "}"
+              + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
+              + "    if (tid < n) out[tid] = a * x[tid] + y[tid];"
+              + "}"
 
             let ptx = try Compiler.compile(source, options: [
-                .computeCapability(Device.main.computeCapability),
+                .computeCapability(Device.current.computeCapability),
                 .contractIntoFMAD(false),
                 .useFastMath
             ])
@@ -193,14 +190,14 @@ class WarpTests: XCTestCase {
     }
 
     func testModuleValueReference() throws {
-        try Device.main.withContext { context in
+        try Device.current.sync {
             let source =
                 "extern \"C\" __global__ void sum(float *x, int count, float *out) {"
               + "    *out = 0; for (int i = 0; i < count; i++) *out += x[i]; "
               + "}"
 
             let ptx = try Compiler.compile(source, options: [
-                .computeCapability(Device.main.computeCapability),
+                .computeCapability(Device.current.computeCapability),
                 .contractIntoFMAD(false),
                 .useFastMath
             ])

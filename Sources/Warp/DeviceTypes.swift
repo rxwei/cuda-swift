@@ -7,6 +7,7 @@
 //
 
 import CUDARuntime
+@_exported import struct CUDARuntime.Device
 
 public protocol DeviceAddressible {
     associatedtype Element

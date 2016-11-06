@@ -6,6 +6,7 @@
 //
 //
 
+import struct CUDARuntime.Device
 import CUDADriver
 import NVRTC
 
@@ -23,16 +24,11 @@ final class KernelManager {
     }
 
     let device: Device
-    var context: Context?
 
     fileprivate var modules: [KernelDataType : [KernelSource : Module]] = Dictionary(minimumCapacity: 16)
 
     init(device: Device) {
         self.device = device
-    }
-
-    deinit {
-        context?.end()
     }
 
     func launchKernel<T: KernelDataProtocol>(_ source: KernelSource, forType type: T.Type,
@@ -44,39 +40,29 @@ final class KernelManager {
             modules[cTypeName] = Dictionary(minimumCapacity: 32)
         }
 
-        /// Push context
-        if let context = context {
-            context.pushToThread()
-        } else {
-            context = Context.begin(on: device)
+        device.sync {
+            let module: Module
+            if let cachedModule = modules[cTypeName]![source] {
+                module = cachedModule
+            } else {
+                /// Compile using NVRTC
+                module = try! Module(
+                    source: source.rawValue,
+                    compileOptions: [
+                        .computeCapability(device.computeCapability),
+                        .useFastMath,
+                        .disableWarnings,
+                        .defineMacro("TYPE", as: T.kernelDataType.rawValue)
+                    ]
+                )
+                /// Cache it
+                modules[cTypeName]![source] = module
+            }
+            
+            /// Launch function
+            let function = module.function(named: String(describing: source))!
+            try! function<<<(blockCount, threadCount, memory, stream)>>>(arguments)
         }
-
-        /// Load module from cache. If it's not cached, compile kernel from source
-        let module: Module
-        if let cachedModule = modules[cTypeName]![source] {
-            module = cachedModule
-        } else {
-            /// Compile using NVRTC
-            module = try! Module(
-                source: source.rawValue,
-                compileOptions: [
-                    .computeCapability(device.computeCapability),
-                    .useFastMath,
-                    .disableWarnings,
-                    .defineMacro("TYPE", as: T.kernelDataType.rawValue)
-                ]
-            )
-            /// Cache it
-            modules[cTypeName]![source] = module
-        }
-
-        /// Launch function
-        let function = module.function(named: String(describing: source))!
-        try! function<<<(blockCount, threadCount, memory, stream)>>>(arguments)
-        Context.synchronize()
-
-        /// Pop context
-        Context.popFromThread()
     }
 
 }
