@@ -7,6 +7,7 @@
 //
 
 import CUDARuntime
+import struct CUDADriver.Context
 
 protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, RandomAccessCollection {
     typealias Index = Int
@@ -15,6 +16,7 @@ protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, Ra
     var baseAddress: UnsafeMutableDevicePointer<Element> { get }
     var capacity: Int { get }
 
+    init(capacity: Int)
     init(device: Device, capacity: Int)
     init(viewing other: Self, in range: Range<Int>)
 
@@ -25,6 +27,10 @@ protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, Ra
 }
 
 extension DeviceArrayBufferProtocol {
+    init() {
+        self.init(capacity: 0)
+    }
+    
     var startAddress: UnsafeMutableDevicePointer<Element> {
         return baseAddress.advanced(by: startIndex)
     }
@@ -49,7 +55,6 @@ extension DeviceArrayBufferProtocol {
 final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     typealias SubSequence = DeviceArrayBuffer<Element>
 
-    let device: Device
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let capacity: Int
     let startIndex: Int, endIndex: Int
@@ -57,30 +62,36 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     private var retainees: [Element]?
     private var valueRetainees: [DeviceValueBuffer<Element>?]
 
-    convenience init(device: Device) {
-        self.init(device: device, capacity: 0)
+    var device: Device {
+        return baseAddress.device
     }
 
-    init(device: Device, capacity: Int) {
+    init(capacity: Int) {
         self.capacity = capacity
-        self.device = device
-        
-        /// Switch to desired device
-        let prevDevice = Device.current
-        Device.current = device
         baseAddress = UnsafeMutableDevicePointer<Element>.allocate(capacity: capacity)
-        /// Switch back to previous device
-        Device.current = prevDevice
-        
         startIndex = 0
         endIndex = capacity
         owner = nil
         valueRetainees = Array(repeating: nil, count: capacity)
     }
 
+    convenience init(device: Device) {
+        self.init(device: device, capacity: 0)
+    }
+    
+    convenience init(device: Device, capacity: Int) {
+        /// Switch to desired device
+        let context = Context.current
+        let prevDevice = Device.current
+        Device.current = device
+        self.init(capacity: capacity)
+        /// Switch back to previous device
+        Device.current = prevDevice
+        context?.pushToThread()
+    }
+
     init(viewing other: DeviceArrayBuffer<Element>) {
         capacity = other.capacity
-        device = other.device
         baseAddress = other.baseAddress
         startIndex = other.startIndex
         endIndex = other.endIndex
@@ -90,7 +101,6 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     }
 
     init(viewing other: DeviceArrayBuffer<Element>, in range: Range<Int>) {
-        device = other.device
         capacity = other.capacity
         baseAddress = other.baseAddress
         guard other.startIndex <= range.lowerBound &&

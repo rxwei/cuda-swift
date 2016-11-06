@@ -21,12 +21,12 @@ public struct DeviceValue<Element> : DeviceAddressible {
         }
     }
 
-    public var device: Device {
-        return buffer.device
-    }
-
     init(buffer: DeviceValueBuffer<Element>) {
         self.buffer = buffer
+    }
+
+    public var device: Device {
+        return buffer.device
     }
 
     public var value: Element {
@@ -38,7 +38,14 @@ public struct DeviceValue<Element> : DeviceAddressible {
         }
     }
 
-    public init(_ initialValue: Element? = nil, device: Device = Device.current) {
+    public init(_ initialValue: Element? = nil) {
+        buffer = DeviceValueBuffer()
+        if let initialValue = initialValue {
+            buffer.value = initialValue
+        }
+    }
+
+    public init(_ initialValue: Element? = nil, device: Device) {
         buffer = DeviceValueBuffer(device: device)
         if let initialValue = initialValue {
             buffer.value = initialValue

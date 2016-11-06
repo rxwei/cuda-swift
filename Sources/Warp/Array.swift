@@ -45,12 +45,12 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         }
     }
 
-    public var device: Device {
-        return buffer.device
-    }
-
     init(_ buffer: DeviceArrayBuffer<Element>) {
         self.buffer = buffer
+    }
+
+    public var device: Device {
+        return buffer.device
     }
 
     /// Creates an empty instance.
