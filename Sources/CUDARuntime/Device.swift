@@ -7,6 +7,7 @@
 //
 
 import CCUDARuntime
+import struct CUDADriver.Device
 @_exported import struct CUDADriver.ComputeCapability
 
 public struct Device : Equatable {
@@ -76,5 +77,25 @@ public struct Device : Equatable {
     public static func ==(lhs: Device, rhs: Device) -> Bool {
         return lhs.index == rhs.index
     }
+
+    public init(_ driverDevice: CUDADriver.Device) {
+        self.init(assumingIndex: Int32(driverDevice.index))
+    }
+
+    /// Convert to driver device
+    public var driverDevice: CUDADriver.Device {
+        return CUDADriver.Device(atIndex: index)!
+    }
     
+}
+
+/// Conversion from runtime device
+public extension CUDADriver.Device {
+    public init(_ device: CUDARuntime.Device) {
+        self = device.driverDevice
+    }
+
+    public var runtimeDevice: CUDARuntime.Device {
+        return CUDARuntime.Device(self)
+    }
 }
