@@ -37,11 +37,16 @@ extension Int : KernelDataProtocol {
     }
 }
 
+extension UInt : KernelDataProtocol {
+    public static var kernelTypeName: String {
+        return "unsigned long long"
+    }
+}
+
 extension Float : KernelDataProtocol {
     public static var kernelTypeName: String {
         return "float"
     }
-    
 }
 
 extension Double : KernelDataProtocol {
@@ -62,7 +67,7 @@ extension Int16 : KernelDataProtocol {
 }
 extension Int32 : KernelDataProtocol {
     public static var kernelTypeName: String {
-        return "long"
+        return "int"
     }
 }
 
@@ -84,7 +89,7 @@ extension UInt16 : KernelDataProtocol {
 }
 extension UInt32 : KernelDataProtocol {
     public static var kernelTypeName: String {
-        return "unsigned long"
+        return "unsigned int"
     }
 }
 
