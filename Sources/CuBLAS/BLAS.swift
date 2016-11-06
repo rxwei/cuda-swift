@@ -13,7 +13,7 @@ import protocol CUDADriver.CHandleCarrier
 
 open class BLAS : CHandleCarrier {
 
-    private static var blasInstances: [Int : BLAS] = Dictionary(minimumCapacity: Device.count)
+    private static var blasInstances: [BLAS?] = Array(repeating: nil, count: Device.count)
 
     open class func global(on device: Device = Device.current) -> BLAS {
         guard let blas = BLAS.blasInstances[device.index] else {

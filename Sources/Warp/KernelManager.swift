@@ -12,7 +12,7 @@ import NVRTC
 
 final class KernelManager {
 
-    fileprivate static var instances: [Int : KernelManager] = [:]
+    private static var instances: [KernelManager?] = Array(repeating: nil, count: Device.count)
 
     static func global(on device: Device) -> KernelManager {
         if let manager = instances[device.index] {
