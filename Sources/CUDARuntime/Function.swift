@@ -34,13 +34,6 @@ public struct Function {
         }
     }
 
-    init(unsafeAddress address: UnsafeRawPointer) {
-        self.address = address
-        var attributes = cudaFuncAttributes()
-        cudaFuncGetAttributes(&attributes, address)
-        self.attributes = attributes
-    }
-
     func withUnsafeDeviceAddress<Result>
         (_ body: (UnsafeRawPointer) throws -> Result) rethrows -> Result {
         return try body(address)

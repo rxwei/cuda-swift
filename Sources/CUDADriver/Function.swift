@@ -35,14 +35,6 @@ public struct Function : CHandleCarrier {
         self.handle = handle
     }
     
-    public init(deviceAddress address: UnsafeRawPointer) {
-        handle = OpaquePointer(address)
-    }
-
-    public init(deviceAddress address: UnsafeMutableRawPointer) {
-        handle = OpaquePointer(address)
-    }
-    
     public func withUnsafeHandle<Result>(_ body: (Handle) throws -> Result) rethrows -> Result {
         return try body(handle)
     }
