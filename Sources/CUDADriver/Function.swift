@@ -138,17 +138,20 @@ precedencegroup CUDAKernelPrecedence {
 infix operator <<< : CUDAKernelPrecedence
 infix operator >>> : CUDAKernelPrecedence
 
+@inline(__always)
 public func <<<(lhs: Function, rhs: (Function) throws -> ()) rethrows {
     try rhs(lhs)
 }
 
+@inline(__always)
 public func >>>(lhs: (Int, Int), rhs: [KernelArgument]) -> (Function) throws -> () {
     return { (f: Function) throws -> () in
         try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: 0, stream: nil)
     }
 }
 
-public func >>>(lhs: (Int, Int, Int, Stream), rhs: [KernelArgument]) -> (Function) throws -> () {
+@inline(__always)
+public func >>>(lhs: (Int, Int, Int, Stream?), rhs: [KernelArgument]) -> (Function) throws -> () {
     return { (f: Function) throws -> () in
         try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: lhs.2, stream: lhs.3)
     }
@@ -233,7 +236,7 @@ public struct KernelArgument {
         return self.init(number)
     }
 
-    public static func long(_ number: Int32) -> KernelArgument {
+    public static func long(_ number: Int64) -> KernelArgument {
         return self.init(number)
     }
 
