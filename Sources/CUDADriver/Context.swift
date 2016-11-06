@@ -52,6 +52,17 @@ public struct Context : CHandleCarrier {
         handle = nil
     }
 
+    public var isEnded: Bool {
+        return handle == nil
+    }
+
+    public func sync(_ execute: () -> ()) {
+        pushToThread()
+        execute()
+        Context.synchronize()
+        Context.popFromThread()
+    }
+
     public static var currentDevice: Device {
         var deviceHandle: CUdevice = 0
         !!cuCtxGetDevice(&deviceHandle)
@@ -100,8 +111,8 @@ public struct Context : CHandleCarrier {
         return handle.flatMap { Context($0) }
     }
 
-    public static func synchronize() throws {
-        try ensureSuccess(cuCtxSynchronize())
+    public static func synchronize() {
+        !!cuCtxSynchronize()
     }
     
     public func withUnsafeHandle<Result>

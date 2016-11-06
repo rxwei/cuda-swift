@@ -73,7 +73,7 @@ final class KernelManager {
         /// Launch function
         let function = module.function(named: String(describing: source))!
         try! function<<<(blockCount, threadCount, memory, stream)>>>(arguments)
-        try! Context.synchronize()
+        Context.synchronize()
 
         /// Pop context
         Context.popFromThread()
