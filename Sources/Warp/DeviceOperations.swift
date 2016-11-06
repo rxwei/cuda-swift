@@ -8,6 +8,7 @@
 
 import CuBLAS
 import CUDARuntime
+import struct CUDADriver.Device
 
 public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 
@@ -44,3 +45,21 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
     }
 
 }
+
+/*
+public extension DeviceArray where Element : KernelDataProtocol {
+
+    public func reduced() -> Element {
+        var copy = self
+        var result = DeviceValue<Element>()
+        try! KernelManager.global(on: .main).launchKernel(
+            from: .sum, forType: Element.self,
+            arguments: [.array(&copy), .long(1), .value(&result)],
+            gridSize: .init(blockCount: 1),
+            blockSize: .init(threadCount: 1)
+        )
+        return result.value
+    }
+
+}
+ */

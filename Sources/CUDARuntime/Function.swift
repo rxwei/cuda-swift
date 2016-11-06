@@ -16,7 +16,7 @@ import enum CUDADriver.CachePreference
 import struct CUDADriver.KernelArgument
 
 
-public struct Kernel {
+public struct Function {
 
     fileprivate let address: UnsafeRawPointer
 
@@ -74,7 +74,7 @@ public struct Kernel {
 
 }
 
-public extension Kernel {
+public extension Function {
     
     public var maxThreadsPerBlock: Int {
         return Int(attributes.maxThreadsPerBlock)

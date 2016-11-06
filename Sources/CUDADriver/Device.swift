@@ -21,6 +21,10 @@ public struct Device : Equatable, CHandleCarrier {
     }
 
     let handle: CUdevice
+    
+    public var index: Int {
+        return Int(handle)
+    }
 
     init(_ handle: CUdevice) {
         self.handle = handle
