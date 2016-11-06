@@ -25,7 +25,7 @@ final class KernelManager {
     let device: Device
     var context: Context?
 
-    fileprivate var modules: [String : [KernelSource : Module]] = Dictionary(minimumCapacity: 16)
+    fileprivate var modules: [KernelDataType : [KernelSource : Module]] = Dictionary(minimumCapacity: 16)
 
     init(device: Device) {
         self.device = device
@@ -39,8 +39,8 @@ final class KernelManager {
                       arguments: [KernelArgument], blockCount: Int, threadCount: Int,
                       memory: Int = 0, stream: Stream? = nil) {
         /// Check and add entry for type T
-        let cTypeName = T.kernelTypeName
-        if !modules.keys.contains(T.kernelTypeName) {
+        let cTypeName = T.kernelDataType
+        if !modules.keys.contains(T.kernelDataType) {
             modules[cTypeName] = Dictionary(minimumCapacity: 32)
         }
 
@@ -63,7 +63,7 @@ final class KernelManager {
                     .computeCapability(device.computeCapability),
                     .useFastMath,
                     .disableWarnings,
-                    .defineMacro("TYPE", as: T.kernelTypeName)
+                    .defineMacro("TYPE", as: T.kernelDataType.rawValue)
                 ]
             )
             /// Cache it

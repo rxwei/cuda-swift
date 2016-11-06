@@ -7,7 +7,6 @@
 //
 
 import CUDADriver
-@_exported import struct CUDADriver.KernelArgument
 
 /// Kernel operators
 
@@ -27,74 +26,87 @@ public extension KernelArgument {
 
 }
 
+public enum KernelDataType : String {
+    case float            = "float"
+    case double           = "double"
+    case char             = "char"
+    case short            = "short"
+    case int              = "int"
+    case longLong         = "long long"
+    case unsignedChar     = "unsigned char"
+    case unsignedShort    = "unsigned short"
+    case unsignedInt      = "unsigned int"
+    case unsignedLongLong = "unsigned long long"
+}
+
 public protocol KernelDataProtocol {
-    static var kernelTypeName: String { get }
+    static var kernelDataType: KernelDataType { get }
 }
 
 extension Int : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "long long"
+    public static var kernelDataType: KernelDataType {
+        return .longLong
     }
 }
 
 extension UInt : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "unsigned long long"
+    public static var kernelDataType: KernelDataType {
+        return .unsignedLongLong
     }
 }
 
 extension Float : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "float"
+    public static var kernelDataType: KernelDataType {
+        return .float
     }
 }
 
 extension Double : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "double"
+    public static var kernelDataType: KernelDataType {
+        return .double
     }
 }
 
 extension Int8 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "char"
+    public static var kernelDataType: KernelDataType {
+        return .char
     }
 }
 extension Int16 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "short"
+    public static var kernelDataType: KernelDataType {
+        return .short
     }
 }
 extension Int32 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "int"
+    public static var kernelDataType: KernelDataType {
+        return .int
     }
 }
 
 extension Int64 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "long long"
+    public static var kernelDataType: KernelDataType {
+        return .longLong
     }
 }
 
 extension UInt8 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "unsigned char"
+    public static var kernelDataType: KernelDataType {
+        return .unsignedChar
     }
 }
 extension UInt16 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "unsigned short"
+    public static var kernelDataType: KernelDataType {
+        return .unsignedShort
     }
 }
 extension UInt32 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "unsigned int"
+    public static var kernelDataType: KernelDataType {
+        return .unsignedInt
     }
 }
 
 extension UInt64 : KernelDataProtocol {
-    public static var kernelTypeName: String {
-        return "unsigned long long"
+    public static var kernelDataType: KernelDataType {
+        return .unsignedLongLong
     }
 }
