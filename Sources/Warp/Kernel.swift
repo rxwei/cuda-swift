@@ -14,13 +14,13 @@ public extension KernelArgument {
 
     public static func array<T>(_ array: inout DeviceArray<T>) -> KernelArgument {
         return array.withUnsafeMutableDevicePointer { ptr in
-            KernelArgument(unsafeAddress: ptr.deviceAddress)
+            self.init(ptr.deviceAddress)
         }
     }
 
     public static func reference<T>(_ value: inout DeviceValue<T>) -> KernelArgument {
         return value.withUnsafeMutableDevicePointer { ptr in
-            KernelArgument(unsafeAddress: ptr.deviceAddress)
+            self.init(ptr.deviceAddress)
         }
     }
 
