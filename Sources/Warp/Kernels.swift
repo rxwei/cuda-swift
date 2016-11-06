@@ -17,16 +17,12 @@ extension StaticString : Equatable {
 }
 
 enum KernelSource: StaticString {
-    case sum =
-        "extern \"C\" __global__ void sum(TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
+    case sum = "extern \"C\" __global__ void sum(TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
+    case asum = "extern \"C\" __global__ void asum(TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
 }
 
-
 extension KernelSource : Hashable {
-
     var hashValue: Int {
-        var copy = self
-        return Int(bitPattern: UnsafeMutablePointer(&copy))
+        return rawValue.utf8Start.hashValue
     }
-
 }

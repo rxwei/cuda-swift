@@ -192,13 +192,55 @@ class WarpTests: XCTestCase {
         }
     }
 
+    func testModuleValueReference() throws {
+        try Device.main.withContext { context in
+            let source =
+                "extern \"C\" __global__ void sum(float *x, int count, float *out) {"
+              + "    *out = 0; for (int i = 0; i < count; i++) *out += x[i]; "
+              + "}"
+
+            let ptx = try Compiler.compile(source, options: [
+                .computeCapability(Device.main.computeCapability),
+                .contractIntoFMAD(false),
+                .useFastMath
+            ])
+            let module = try Module(ptx: ptx)
+            let saxpy = module.function(named: "sum")!
+
+            var x = DeviceArray<Float>(Array(sequence(first: 0, next: {$0+1}).prefix(512)))
+            var out = DeviceValue<Float>()
+
+            /// Launch kernel
+            try saxpy<<<(1, 1)>>>[.array(&x), .int(Int32(x.count)), .value(&out)]
+
+            XCTAssertEqual(out.value, 130816)
+        }
+    }
+
     func testCollectionOperations() {
-        let hostX: [Float] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(4096))
+        let hostX: [Float] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(10000))
+        let hostXD: [Double] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(10000))
+        let hostXI64: [Int] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
+        let hostXI32: [Int32] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
+        let hostXI8: [Int8] = Array(sequence(first: 0, next: {$0+1}).prefix(20))
         let X = DeviceArray(hostX)
+        let XD = DeviceArray(hostXD)
+        let XI64 = DeviceArray(hostXI64)
+        let XI32 = DeviceArray(hostXI32)
+        let XI8 = DeviceArray(hostXI8)
         XCTAssertEqual(X.reduced(), hostX.reduce(0, +))
+        XCTAssertEqual(XD.reduced(), hostXD.reduce(0, +))
+        XCTAssertEqual(XI64.reduced(), hostXI64.reduce(0, &+))
+        XCTAssertEqual(XI64.sumOfAbsoluteValues(), hostXI64.reduce(0, {$0+abs($1)}))
+        XCTAssertEqual(XI32.reduced(), hostXI32.reduce(0, &+))
+        XCTAssertEqual(XI8.reduced(), hostXI8.reduce(0, &+))
         XCTAssertEqual(X.scaled(by: 10.0).hostArray, hostX.map{$0*10.0})
         measure {
             _ = X.reduced()
+            _ = XD.reduced()
+            _ = XI64.reduced()
+            _ = XI32.reduced()
+            _ = XI8.reduced()
         }
     }
     
