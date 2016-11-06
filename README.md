@@ -40,6 +40,9 @@ x • y // => 165.0
 /// A chain of operations
 x *= x • y // x => [495.0, 990.0, 1485.0, 1980.0, 2475.0] on device
 
+/// Sum
+x.reduced() // => 15
+
 /// Absolute sum
 x.sumOfAbsoluteValues() // => 15
 ```
