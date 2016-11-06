@@ -43,11 +43,9 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
         /// Switch to desired device
         Driver.initialize()
         let context = Context.current
-        let prevDevice = Device.current
         Device.current = device
         self.init()
         /// Switch back to previous device
-        Device.current = prevDevice
         context?.pushToThread()
     }
     

@@ -56,9 +56,9 @@ public struct Context : CHandleCarrier {
         return handle == nil
     }
 
-    public func sync(_ execute: () -> ()) {
+    public func sync(_ execute: () throws -> ()) rethrows {
         pushToThread()
-        execute()
+        try execute()
         Context.synchronize()
         Context.popFromThread()
     }

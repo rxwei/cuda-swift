@@ -8,6 +8,7 @@
 
 import CUDARuntime
 import struct CUDADriver.Context
+import enum CUDADriver.Driver
 
 protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, RandomAccessCollection {
     typealias Index = Int
@@ -81,12 +82,11 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     
     convenience init(device: Device, capacity: Int) {
         /// Switch to desired device
+        Driver.initialize()
         let context = Context.current
-        let prevDevice = Device.current
         Device.current = device
         self.init(capacity: capacity)
         /// Switch back to previous device
-        Device.current = prevDevice
         context?.pushToThread()
     }
 

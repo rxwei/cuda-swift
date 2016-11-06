@@ -8,6 +8,8 @@
 
 import CCUDARuntime
 import struct CUDADriver.Device
+import struct CUDADriver.Context
+import enum CUDADriver.Driver
 @_exported import struct CUDADriver.ComputeCapability
 
 public struct Device : Equatable {
@@ -58,6 +60,19 @@ public struct Device : Equatable {
         } catch {
             return nil
         }
+    }
+
+    public func sync(_ execute: () throws -> ()) rethrows {
+        Driver.initialize()
+        let context = CUDADriver.Context.current
+        Device.current = self
+        try execute()
+        Device.synchronize()
+        context?.pushToThread()
+    }
+
+    public static func synchronize() {
+        !!cudaDeviceSynchronize()
     }
 
     public var properties: Properties {

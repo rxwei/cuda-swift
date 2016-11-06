@@ -64,7 +64,7 @@ public struct Device : Equatable, CHandleCarrier {
         return String(cString: id)
     }
 
-    /// Create a context and execute the body.
+    /// Create a context and execute the body synchronously.
     /// The lifetime of the context = the lifetype of the body
     /// - parameter body: closure with the new context
     /// - returns: result of the body
