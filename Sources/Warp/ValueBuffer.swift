@@ -7,6 +7,7 @@
 //
 
 import CUDARuntime
+import enum CUDADriver.Driver
 import struct CUDADriver.Context
 
 protocol DeviceBufferProtocol : class {
@@ -40,6 +41,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
 
     convenience init(device: Device) {
         /// Switch to desired device
+        Driver.initialize()
         let context = Context.current
         let prevDevice = Device.current
         Device.current = device
