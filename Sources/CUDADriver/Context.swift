@@ -93,6 +93,7 @@ public struct Context : CHandleCarrier {
 
     /// Pops the current CUDA context from the CPU thread and returns it
     /// - returns: the popped context, if any
+    @discardableResult
     public static func popFromThread() -> Context? {
         var handle: CUcontext?
         !!cuCtxPopCurrent_v2(&handle)
