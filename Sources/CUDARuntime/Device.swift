@@ -64,12 +64,14 @@ public struct Device : Equatable {
         let contexualDevice = Device.current
         /// Synchronously execute directly if it's the same device
         if self == contexualDevice {
+            Device.synchronize()
             try execute()
             Device.synchronize()
         }
         /// Otherwise, switch back to the previous device after executing
         else {
             Device.current = self
+            Device.synchronize()
             try execute()
             Device.synchronize()
             Device.current = contexualDevice
