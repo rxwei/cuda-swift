@@ -18,8 +18,20 @@ public extension KernelArgument {
         }
     }
 
+    public static func constantArray<T>(_ array: DeviceArray<T>) -> KernelArgument {
+        return array.withUnsafeDevicePointer { ptr in
+            self.init(ptr.deviceAddress)
+        }
+    }
+
     public static func value<T>(_ value: inout DeviceValue<T>) -> KernelArgument {
         return value.withUnsafeMutableDevicePointer { ptr in
+            self.init(ptr.deviceAddress)
+        }
+    }
+
+    public static func constantValue<T>(_ value: DeviceValue<T>) -> KernelArgument {
+        return value.withUnsafeDevicePointer { ptr in
             self.init(ptr.deviceAddress)
         }
     }

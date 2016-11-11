@@ -82,21 +82,19 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 public extension DeviceArray where Element : KernelDataProtocol {
 
     public func reduced() -> Element {
-        var copy = self
         var result = DeviceValue<Element>()
         let sum = kernelManager.kernel(.sum, forType: Element.self)
         device.sync {
-            try! sum<<<(1, 1)>>>[.array(&copy), .longLong(Int64(count)), .value(&result)]
+            try! sum<<<(1, 1)>>>[.constantArray(self), .longLong(Int64(count)), .value(&result)]
         }
         return result.value
     }
 
     public func sumOfAbsoluteValues() -> Element {
-        var copy = self
         var result = DeviceValue<Element>()
         let asum = kernelManager.kernel(.asum, forType: Element.self)
         device.sync {
-            try! asum<<<(1, 1)>>>[.array(&copy), .longLong(Int64(count)), .value(&result)]
+            try! asum<<<(1, 1)>>>[.constantArray(self), .longLong(Int64(count)), .value(&result)]
         }
         return result.value
     }

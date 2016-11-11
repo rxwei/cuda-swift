@@ -1,5 +1,5 @@
 //
-//  Kernels.swift
+//  KernelSources.swift
 //  CUDA
 //
 //  Created by Richard Wei on 11/3/16.
@@ -13,8 +13,8 @@ extension StaticString : Equatable {
 }
 
 enum KernelSource: StaticString {
-    case sum = "extern \"C\" __global__ void sum(TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
-    case asum = "extern \"C\" __global__ void asum(TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
+    case sum = "extern \"C\" __global__ void sum(const TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
+    case asum = "extern \"C\" __global__ void asum(const TYPE *vector, long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
 }
 
 extension KernelSource : Hashable {

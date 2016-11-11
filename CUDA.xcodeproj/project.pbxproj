@@ -25,7 +25,7 @@
 		OBJ_132 /* DeviceTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* DeviceTypes.swift */; };
 		OBJ_134 /* Kernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* Kernel.swift */; };
 		OBJ_135 /* KernelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* KernelManager.swift */; };
-		OBJ_136 /* Kernels.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* Kernels.swift */; };
+		OBJ_136 /* KernelSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* KernelSources.swift */; };
 		OBJ_137 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* Value.swift */; };
 		OBJ_139 /* CUDADriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_61 /* CUDADriver.framework */; };
 		OBJ_140 /* CUDARuntime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_62 /* CUDARuntime.framework */; };
@@ -231,7 +231,7 @@
 		OBJ_38 /* DeviceTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTypes.swift; sourceTree = "<group>"; };
 		OBJ_40 /* Kernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kernel.swift; sourceTree = "<group>"; };
 		OBJ_41 /* KernelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KernelManager.swift; sourceTree = "<group>"; };
-		OBJ_42 /* Kernels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kernels.swift; sourceTree = "<group>"; };
+		OBJ_42 /* KernelSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KernelSources.swift; sourceTree = "<group>"; };
 		OBJ_43 /* Value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
 		OBJ_46 /* CuBLASTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuBLASTests.swift; sourceTree = "<group>"; };
 		OBJ_48 /* CUDADriverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CUDADriverTests.swift; sourceTree = "<group>"; };
@@ -410,7 +410,7 @@
 				2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */,
 				OBJ_40 /* Kernel.swift */,
 				OBJ_41 /* KernelManager.swift */,
-				OBJ_42 /* Kernels.swift */,
+				OBJ_42 /* KernelSources.swift */,
 			);
 			name = Warp;
 			path = Sources/Warp;
@@ -455,7 +455,7 @@
 			path = Tests/CUDARuntimeTests;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -467,7 +467,6 @@
 				OBJ_58 /* Scripts */,
 				OBJ_59 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_51 /* NVRTCTests */ = {
@@ -727,7 +726,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_59 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -780,7 +779,7 @@
 				OBJ_134 /* Kernel.swift in Sources */,
 				OBJ_135 /* KernelManager.swift in Sources */,
 				2989D06A1DCE720600ED8CE2 /* DeviceOperations.swift in Sources */,
-				OBJ_136 /* Kernels.swift in Sources */,
+				OBJ_136 /* KernelSources.swift in Sources */,
 				OBJ_137 /* Value.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
