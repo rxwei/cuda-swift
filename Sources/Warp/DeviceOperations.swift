@@ -8,12 +8,21 @@
 
 import CuBLAS
 import CUDARuntime
+import CUDADriver
 
 infix operator • : MultiplicationPrecedence
 
+extension DeviceArray {
+
+    var kernelManager: KernelManager {
+        return KernelManager.global(on: device)
+    }
+    
+}
+
 public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 
-    public mutating func add(_ other: DeviceArray<Element>, multipliedBy alpha: Element = 0) {
+    public mutating func add(_ other: DeviceArray<Element>, multipliedBy alpha: Element = 1) {
         withUnsafeMutableDevicePointer { ptr in
             other.withUnsafeDevicePointer { otherPtr in
                 BLAS.global(on: self.device).axpy(
@@ -26,7 +35,7 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
         }
     }
 
-    public func adding(_ other: DeviceArray<Element>, multipliedBy alpha: Element = 0) -> DeviceArray<Element> {
+    public func adding(_ other: DeviceArray<Element>, multipliedBy alpha: Element = 1) -> DeviceArray<Element> {
         var copy = self
         copy.add(other, multipliedBy: alpha)
         return copy
@@ -75,22 +84,20 @@ public extension DeviceArray where Element : KernelDataProtocol {
     public func reduced() -> Element {
         var copy = self
         var result = DeviceValue<Element>()
-        KernelManager.global(on: device).launchKernel(
-            .sum, forType: Element.self,
-            arguments: [.array(&copy), .longLong(Int64(count)), .value(&result)],
-            blockCount: 1, threadCount: 1
-        )
+        let sum = kernelManager.kernel(.sum, forType: Element.self)
+        device.sync {
+            try! sum<<<(1, 1)>>>[.array(&copy), .longLong(Int64(count)), .value(&result)]
+        }
         return result.value
     }
 
     public func sumOfAbsoluteValues() -> Element {
         var copy = self
         var result = DeviceValue<Element>()
-        KernelManager.global(on: device).launchKernel(
-            .asum, forType: Element.self,
-            arguments: [.array(&copy), .longLong(Int64(count)), .value(&result)],
-            blockCount: 1, threadCount: 1
-        )
+        let asum = kernelManager.kernel(.asum, forType: Element.self)
+        device.sync {
+            try! asum<<<(1, 1)>>>[.array(&copy), .longLong(Int64(count)), .value(&result)]
+        }
         return result.value
     }
 

@@ -25,43 +25,48 @@ final class KernelManager {
 
     let device: Device
 
-    fileprivate var modules: [KernelDataType : [KernelSource : Module]] = Dictionary(minimumCapacity: 16)
+    struct ModuleCacheKey : Equatable, Hashable {
+        let type: KernelDataType
+        let source: KernelSource
+
+        static func ==(lhs: ModuleCacheKey, rhs: ModuleCacheKey) -> Bool {
+            return lhs.type == rhs.type && lhs.source == rhs.source
+        }
+
+        var hashValue: Int {
+            return type.hashValue ^ source.hashValue
+        }
+    }
+
+    fileprivate var modules: [ModuleCacheKey : (Module, Function)] = Dictionary(minimumCapacity: 16)
 
     init(device: Device) {
         self.device = device
     }
 
-    func launchKernel<T: KernelDataProtocol>(_ source: KernelSource, forType type: T.Type,
-                      arguments: [KernelArgument], blockCount: Int, threadCount: Int,
-                      memory: Int = 0, stream: Stream? = nil) {
+    func kernel<T: KernelDataProtocol>(_ source: KernelSource, forType: T.Type) -> Function {
         /// Check and add entry for type T
-        let cTypeName = T.kernelDataType
-        if !modules.keys.contains(T.kernelDataType) {
-            modules[cTypeName] = Dictionary(minimumCapacity: 32)
-        }
-
-        device.sync {
-            let module: Module
-            if let cachedModule = modules[cTypeName]![source] {
-                module = cachedModule
-            } else {
-                /// Compile using NVRTC
-                module = try! Module(
-                    source: source.rawValue,
-                    compileOptions: [
-                        .computeCapability(device.computeCapability),
-                        .useFastMath,
-                        .disableWarnings,
-                        .defineMacro("TYPE", as: T.kernelDataType.rawValue)
-                    ]
-                )
-                /// Cache it
-                modules[cTypeName]![source] = module
+        let key = ModuleCacheKey(type: T.kernelDataType, source: source)
+        if let (_, function) = modules[key] {
+            return function
+        } else {
+            /// Compile using NVRTC
+            let ptx = try! Compiler.compile(
+                source.rawValue,
+                options: [
+                    .computeCapability(device.computeCapability),
+                    .useFastMath,
+                    .disableWarnings,
+                    .defineMacro("TYPE", as: T.kernelDataType.rawValue)
+                ]
+            )
+            var function: Function!
+            device.sync {
+                let module = try! Module(ptx: ptx)
+                function = module.function(named: String(describing: source))!
+                modules[key] = (module, function)
             }
-            
-            /// Launch function
-            let function = module.function(named: String(describing: source))!
-            try! function<<<(blockCount, threadCount, memory, stream)>>>(arguments)
+            return function
         }
     }
 

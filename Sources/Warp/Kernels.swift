@@ -8,11 +8,7 @@
 
 extension StaticString : Equatable {
     public static func == (lhs: StaticString, rhs: StaticString) -> Bool {
-        return lhs.withUTF8Buffer { lBuf in
-            rhs.withUTF8Buffer { rBuf in
-                lBuf.elementsEqual(rBuf)
-            }
-        }
+        return lhs.utf8Start == rhs.utf8Start
     }
 }
 
