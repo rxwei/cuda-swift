@@ -66,8 +66,10 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
     public func dotProduct(with other: DeviceArray) -> Element {
         return withUnsafeDevicePointer { ptr in
             other.withUnsafeDevicePointer { otherPtr in
-                BLAS.global(on: self.device).dot(x: ptr, stride: 1, y: otherPtr, stride: 1,
-                                                 count: Int32(Swift.min(self.count, other.count)))
+                BLAS.global(on: self.device).dot(
+                    x: ptr, stride: 1, y: otherPtr, stride: 1,
+                    count: Int32(Swift.min(self.count, other.count))
+                )
             }
         }
     }
