@@ -38,7 +38,7 @@ final class KernelManager {
         }
     }
 
-    fileprivate var modules: [ModuleCacheKey : (Module, Function)] = Dictionary(minimumCapacity: 16)
+    fileprivate var modules: [ModuleCacheKey : (Module, Function)] = Dictionary(minimumCapacity: 32)
 
     init(device: Device) {
         self.device = device

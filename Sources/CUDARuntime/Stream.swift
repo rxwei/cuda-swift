@@ -65,7 +65,7 @@ open class Stream : CHandleCarrier {
         let cuCallback: cudaStreamCallback_t = { handle, result, userDataPtr in
             let callback = userDataPtr?.assumingMemoryBound(
                 to: ((Stream?, RuntimeError?) -> ()).self).pointee
-            callback?(Stream.current(with: handle!),
+            callback?(handle.flatMap(Stream.current(with:)),
                       result == cudaSuccess ? nil : RuntimeError(result))
         }
         callbacks.append(callback)

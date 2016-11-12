@@ -62,12 +62,11 @@ open class Stream : CHandleCarrier {
         let cuCallback: CUstreamCallback = { handle, result, userDataPtr in
             let callback = userDataPtr?.assumingMemoryBound(
                 to: ((Stream?, DriverError?) -> ()).self).pointee
-            callback?(Stream.current(with: handle!),
+            callback?(handle.flatMap(Stream.current(with:)),
                       result == CUDA_SUCCESS ? nil : DriverError(result))
         }
         callbacks.append(callback)
-        cuStreamAddCallback(handle, cuCallback,
-                            &callbacks[callbacks.endIndex-1], 0)
+        cuStreamAddCallback(handle, cuCallback, &callbacks[callbacks.endIndex-1], 0)
     }
 
     public func withUnsafeHandle<Result>
