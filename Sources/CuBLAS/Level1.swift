@@ -74,49 +74,37 @@ public extension BLAS {
     
     public func iamin(_ vector: UnsafeDevicePointer<Float>, stride: Int32, count: Int32) -> Int32 {
         var result: Int32 = 0
-        !!cublasIsamin_v2(handle, count,
-                          vector.deviceAddress, stride,
-                          &result
-        )
+        !!cublasIsamin_v2(handle, count, vector.deviceAddress, stride, &result)
         return Int32(result)
     }
     
     public func iamin(_ vector: UnsafeDevicePointer<Double>, stride: Int32, count: Int32) -> Int32 {
         var result: Int32 = 0
-        !!cublasIdamin_v2(handle, count,
-                          vector.deviceAddress, stride,
-                          &result
-        )
+        !!cublasIdamin_v2(handle, count, vector.deviceAddress, stride, &result)
         return Int32(result)
     }
     
     public func iamax(_ vector: UnsafeDevicePointer<Float>, stride: Int32, count: Int32) -> Int32 {
         var result: Int32 = 0
-        !!cublasIsamax_v2(handle, count,
-                          vector.deviceAddress, stride,
-                          &result
-        )
+        !!cublasIsamax_v2(handle, count, vector.deviceAddress, stride, &result)
         return Int32(result)
     }
     
     public func iamax(_ vector: UnsafeDevicePointer<Double>, stride: Int32, count: Int32) -> Int32 {
         var result: Int32 = 0
-        !!cublasIdamax_v2(handle, count,
-                          vector.deviceAddress, stride,
-                          &result
-        )
+        !!cublasIdamax_v2(handle, count, vector.deviceAddress, stride, &result)
         return Int32(result)
     }
 
     public func dot<T: BLASDataProtocol>(
         x: UnsafeDevicePointer<T>, stride strideX: Int32,
         y: UnsafeDevicePointer<T>, stride strideY: Int32, count: Int32) -> T {
-        var result: T?
+        var result: T!
         !!cublasDotEx(handle, count,
-                    x.deviceAddress, T.cType, strideX,
-                    y.deviceAddress, T.cType, strideY,
-                    &result, T.cType, T.cType)
-        return result!
+                      x.deviceAddress, T.cType, strideX,
+                      y.deviceAddress, T.cType, strideY,
+                      &result, T.cType, T.cType)
+        return result
     }
 
 }

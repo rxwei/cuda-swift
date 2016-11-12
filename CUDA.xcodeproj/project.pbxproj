@@ -10,6 +10,7 @@
 		2989D0671DCD737400ED8CE2 /* ValueBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D0661DCD737400ED8CE2 /* ValueBuffer.swift */; };
 		2989D06A1DCE720600ED8CE2 /* DeviceOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */; };
 		2989D06C1DCE763200ED8CE2 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D06B1DCE763200ED8CE2 /* Types.swift */; };
+		29B5897C1DD65FA10069D423 /* Level3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B5897B1DD65FA10069D423 /* Level3.swift */; };
 		OBJ_105 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* Device.swift */; };
 		OBJ_106 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* Error.swift */; };
 		OBJ_107 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* Function.swift */; };
@@ -205,6 +206,7 @@
 		2989D0661DCD737400ED8CE2 /* ValueBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueBuffer.swift; sourceTree = "<group>"; };
 		2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceOperations.swift; sourceTree = "<group>"; };
 		2989D06B1DCE763200ED8CE2 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		29B5897B1DD65FA10069D423 /* Level3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level3.swift; sourceTree = "<group>"; };
 		OBJ_10 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		OBJ_11 /* Level1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level1.swift; sourceTree = "<group>"; };
 		OBJ_12 /* Level2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level2.swift; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 				OBJ_10 /* Error.swift */,
 				OBJ_11 /* Level1.swift */,
 				OBJ_12 /* Level2.swift */,
+				29B5897B1DD65FA10069D423 /* Level3.swift */,
 			);
 			name = CuBLAS;
 			path = Sources/CuBLAS;
@@ -828,6 +831,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				29B5897C1DD65FA10069D423 /* Level3.swift in Sources */,
 				OBJ_75 /* BLAS.swift in Sources */,
 				OBJ_76 /* Error.swift in Sources */,
 				OBJ_77 /* Level1.swift in Sources */,
