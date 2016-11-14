@@ -8,29 +8,34 @@
 
 import CCUDARuntime
 import struct CUDADriver.Function
-import class CUDADriver.Stream
-import enum CUDADriver.SharedMemoryBankSize
-import struct CUDADriver.GridSize
-import struct CUDADriver.BlockSize
-import enum CUDADriver.CachePreference
-import struct CUDADriver.KernelArgument
-
+@_exported import enum CUDADriver.SharedMemoryBankSize
+@_exported import struct CUDADriver.GridSize
+@_exported import struct CUDADriver.BlockSize
+@_exported import enum CUDADriver.CachePreference
+@_exported import struct CUDADriver.KernelArgument
 
 public struct Function {
 
-    fileprivate let address: UnsafeRawPointer
+    let address: UnsafeRawPointer
 
     fileprivate let attributes: cudaFuncAttributes
 
+    public init(_ driverFunction: CUDADriver.Function) {
+        address = UnsafeRawPointer(driverFunction.withUnsafeHandle{$0})
+        var attr = cudaFuncAttributes()
+        !!cudaFuncGetAttributes(&attr, address)
+        attributes = attr
+    }
+
     public var cachePreference: CachePreference = .none {
         didSet {
-            cudaFuncSetCacheConfig(address, cudaFuncCache(cachePreference.rawValue))
+            !!cudaFuncSetCacheConfig(address, cudaFuncCache(cachePreference.rawValue))
         }
     }
 
     public var sharedMemoryBankSize: SharedMemoryBankSize = .default {
         didSet {
-            cudaFuncSetSharedMemConfig(address, cudaSharedMemConfig(sharedMemoryBankSize.rawValue))
+            !!cudaFuncSetSharedMemConfig(address, cudaSharedMemConfig(sharedMemoryBankSize.rawValue))
         }
     }
 
@@ -55,7 +60,7 @@ public struct Function {
                              blockSize.memory, stream?.handle)
         )
     }
-    
+
     public func launch(with arguments: [KernelArgument],
                        blockCount: Int, threadCount: Int,
                        memory: Int, stream: Stream?) throws {
@@ -101,4 +106,26 @@ public extension Function {
         return attributes.cacheModeCA != 0
     }
 
+}
+
+infix operator <<< : CUDAKernelPrecedence
+infix operator >>> : CUDAKernelPrecedence
+
+@inline(__always)
+public func <<<(lhs: CUDARuntime.Function, rhs: (CUDARuntime.Function) throws -> ()) rethrows {
+    try rhs(lhs)
+}
+
+@inline(__always)
+public func >>>(lhs: (Int, Int), rhs: [KernelArgument]) -> (CUDARuntime.Function) throws -> () {
+    return { f in
+        try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: 0, stream: nil)
+    }
+}
+
+@inline(__always)
+public func >>>(lhs: (Int, Int, Int, Stream?), rhs: [KernelArgument]) -> (CUDARuntime.Function) throws -> () {
+    return { f in
+        try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: lhs.2, stream: lhs.3)
+    }
 }
