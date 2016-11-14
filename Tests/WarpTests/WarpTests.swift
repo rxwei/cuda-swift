@@ -207,7 +207,7 @@ class WarpTests: XCTestCase {
             var out = DeviceValue<Float>()
 
             /// Launch kernel
-            try saxpy<<<(1, 1)>>>[.constantArray(x), .int(Int32(x.count)), .value(&out)]
+            try saxpy<<<(1, 1)>>>[.constantArray(x), .int(Int32(x.count)), .valuePointer(&out)]
 
             XCTAssertEqual(out.value, 130816)
         }
@@ -219,11 +219,17 @@ class WarpTests: XCTestCase {
         let hostXI64: [Int] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI32: [Int32] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI8: [Int8] = Array(sequence(first: 0, next: {$0+1}).prefix(20))
-        let X = DeviceArray(hostX)
+        var X = DeviceArray(hostX)
         let XD = DeviceArray(hostXD)
         let XI64 = DeviceArray(hostXI64)
         let XI32 = DeviceArray(hostXI32)
         let XI8 = DeviceArray(hostXI8)
+        var XD_axpy = XD
+        XD_axpy.add(XD, multipliedBy: 100)
+        var XD_scaled = XD
+        XD_scaled.scale(by: 8.8)
+        XCTAssertEqual(XD_axpy.hostArray, zip(hostXD, hostXD).map{$0+$1*100})
+        XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
         XCTAssertEqual(X.reduced(), hostX.reduce(0, +))
         XCTAssertEqual(XD.reduced(), hostXD.reduce(0, +))
         XCTAssertEqual(XI64.reduced(), hostXI64.reduce(0, &+))
@@ -232,6 +238,8 @@ class WarpTests: XCTestCase {
         XCTAssertEqual(XI8.reduced(), hostXI8.reduce(0, &+))
         XCTAssertEqual(X.scaled(by: 10.0).hostArray, hostX.map{$0*10.0})
         measure {
+            X.scale(by: 10.0)
+            X.add(X, multipliedBy: 10.0)
             _ = X.reduced()
             _ = XD.reduced()
             _ = XI64.reduced()

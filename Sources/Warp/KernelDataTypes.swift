@@ -1,12 +1,12 @@
 //
-//  Kernel.swift
+//  KernelDataTypes.swift
 //  Warp
 //
 //  Created by Richard Wei on 11/2/16.
 //
 //
 
-import CUDADriver
+import CUDARuntime
 
 /// Kernel operators
 
@@ -24,16 +24,20 @@ public extension KernelArgument {
         }
     }
 
-    public static func value<T>(_ value: inout DeviceValue<T>) -> KernelArgument {
+    public static func valuePointer<T>(_ value: inout DeviceValue<T>) -> KernelArgument {
         return value.withUnsafeMutableDevicePointer { ptr in
             self.init(ptr.deviceAddress)
         }
     }
 
-    public static func constantValue<T>(_ value: DeviceValue<T>) -> KernelArgument {
+    public static func constantValuePointer<T>(_ value: DeviceValue<T>) -> KernelArgument {
         return value.withUnsafeDevicePointer { ptr in
             self.init(ptr.deviceAddress)
         }
+    }
+
+    public static func value<T: KernelDataProtocol>(_ value: T) -> KernelArgument {
+        return self.init(value)
     }
 
 }
@@ -51,7 +55,7 @@ public enum KernelDataType : String {
     case unsignedLongLong = "unsigned long long"
 }
 
-public protocol KernelDataProtocol {
+public protocol KernelDataProtocol : ExpressibleByIntegerLiteral {
     static var kernelDataType: KernelDataType { get }
 }
 

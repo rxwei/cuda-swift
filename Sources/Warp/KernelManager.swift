@@ -14,7 +14,7 @@ final class KernelManager {
 
     private static var instances: [KernelManager?] = Array(repeating: nil, count: Device.count)
 
-    static func global(on device: Device) -> KernelManager {
+    static func shared(on device: Device) -> KernelManager {
         if let manager = instances[device.index] {
             return manager
         }
@@ -43,31 +43,30 @@ final class KernelManager {
     init(device: Device) {
         self.device = device
     }
-
+    
     func kernel<T: KernelDataProtocol>(_ source: KernelSource, forType: T.Type) -> Function {
-        /// Check and add entry for type T
+        /// Get cached function
         let key = ModuleCacheKey(type: T.kernelDataType, source: source)
         if let (_, function) = modules[key] {
             return function
-        } else {
-            /// Compile using NVRTC
-            let ptx = try! Compiler.compile(
-                source.rawValue,
-                options: [
-                    .computeCapability(device.computeCapability),
-                    .useFastMath,
-                    .disableWarnings,
-                    .defineMacro("TYPE", as: T.kernelDataType.rawValue)
-                ]
-            )
-            var function: Function!
-            device.sync {
-                let module = try! Module(ptx: ptx)
-                function = module.function(named: String(describing: source))!
-                modules[key] = (module, function)
-            }
-            return function
         }
+        /// If not cached, compile using NVRTC
+        let ptx = try! Compiler.compile(
+            source.rawValue,
+            options: [
+                .computeCapability(device.computeCapability),
+                .useFastMath,
+                .disableWarnings,
+                .defineMacro("TYPE", as: T.kernelDataType.rawValue)
+            ]
+        )
+        var function: Function!
+        device.sync {
+            let module = try! Module(ptx: ptx)
+            function = module.function(named: String(describing: source))!
+            modules[key] = (module, function)
+        }
+        return function
     }
 
 }
