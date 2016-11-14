@@ -7,12 +7,14 @@ let package = Package(
         Target(name: "CUDARuntime", dependencies: [ "CUDADriver" ]),
         Target(name: "NVRTC", dependencies: [ "CUDADriver" ]),
         Target(name: "CuBLAS", dependencies: [ "CUDADriver", "CUDARuntime" ]),
-        Target(name: "Warp", dependencies: [ "CUDADriver", "CUDARuntime", "CuBLAS" ])
+        Target(name: "Warp", dependencies: [ "CUDADriver", "CUDARuntime", "CuBLAS", "NVRTC" ])
     ],
     dependencies: [
         .Package(url: "https://github.com/rxwei/CCUDA", majorVersion: 1, minor: 4)
     ]
 )
+
+#if os(Linux) || os(macOS)
 
 let dylib = Product(
     name: "CUDA",
@@ -34,3 +36,5 @@ let warpA = Product(
     modules: [ "Warp" ]
 )
 products.append(warpA)
+
+#endif
