@@ -129,3 +129,9 @@ public func >>>(lhs: (Int, Int, Int, Stream?), rhs: [KernelArgument]) -> (CUDARu
         try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: lhs.2, stream: lhs.3)
     }
 }
+
+public extension KernelArgument {
+    public static func pointer<T>(_ pointer: UnsafeMutableDevicePointer<T>) -> KernelArgument {
+        return self.init(pointer.deviceAddress)
+    }
+}

@@ -43,7 +43,12 @@ public extension DeviceArray where Element : KernelDataProtocol {
         let axpy = kernelManager.kernel(.axpy, forType: Element.self)
         device.sync {
             let blockCount = (count+127)/128
-            try! axpy<<<(blockCount, 128)>>>[.value(alpha), .constantArray(other), .array(&self), .longLong(Int64(count))]
+            try! axpy<<<(blockCount, 128)>>>[
+                .value(alpha),
+                .constPointer(to: other),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
         }
     }
 
@@ -61,7 +66,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
         let scale = kernelManager.kernel(.scale, forType: Element.self)
         device.sync {
             let blockCount = (count+127)/128
-            try! scale<<<(blockCount, 128)>>>[.array(&self), .value(alpha), .longLong(Int64(count))]
+            try! scale<<<(blockCount, 128)>>>[
+                .pointer(to: &self), .value(alpha), .longLong(Int64(count))
+            ]
         }
     }
 
@@ -80,7 +87,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
         var result = DeviceValue<Element>()
         let sum = kernelManager.kernel(.sum, forType: Element.self)
         device.sync {
-            try! sum<<<(1, 1)>>>[.constantArray(self), .longLong(Int64(count)), .valuePointer(&result)]
+            try! sum<<<(1, 1)>>>[
+                .constPointer(to: self), .longLong(Int64(count)), .pointer(to: &result)
+            ]
         }
         return result.value
     }
@@ -89,7 +98,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
         var result = DeviceValue<Element>()
         let asum = kernelManager.kernel(.asum, forType: Element.self)
         device.sync {
-            try! asum<<<(1, 1)>>>[.constantArray(self), .longLong(Int64(count)), .valuePointer(&result)]
+            try! asum<<<(1, 1)>>>[
+                .constPointer(to: self), .longLong(Int64(count)), .pointer(to: &result)
+            ]
         }
         return result.value
     }

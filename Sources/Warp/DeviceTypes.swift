@@ -9,7 +9,7 @@
 import CUDARuntime
 @_exported import struct CUDARuntime.Device
 
-public protocol DeviceAddressible {
+public protocol DeviceAddressable {
     associatedtype Element
     var device: Device { get }
     func withUnsafeDevicePointer<Result>
@@ -18,7 +18,7 @@ public protocol DeviceAddressible {
         (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result
 }
 
-public protocol DeviceCollection : DeviceAddressible, RandomAccessCollection {
+public protocol DeviceCollection : DeviceAddressable, RandomAccessCollection {
     typealias Index = Int
     typealias IndexDistance = Int
     associatedtype Element

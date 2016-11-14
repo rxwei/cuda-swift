@@ -9,7 +9,7 @@
 import CUDARuntime
 
 protocol DeviceArrayProtocol :
-    DeviceAddressible, MutableDeviceCollection,
+    DeviceAddressable, MutableDeviceCollection,
     RangeReplaceableCollection, ExpressibleByArrayLiteral
 {
     associatedtype Buffer : AnyObject

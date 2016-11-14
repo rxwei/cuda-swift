@@ -264,8 +264,8 @@ public struct KernelArgument {
         return self.init(number)
     }
 
-    public static func pointer<T>(_ address: UnsafeMutableDevicePointer<T>) -> KernelArgument {
-        return self.init(address.deviceAddress)
+    public static func pointer<T>(_ pointer: UnsafeMutableDevicePointer<T>) -> KernelArgument {
+        return self.init(pointer.deviceAddress)
     }
 
 }

@@ -8,7 +8,7 @@
 
 import CUDARuntime
 
-public struct DeviceValue<Element> : DeviceAddressible {
+public struct DeviceValue<Element> : DeviceAddressable {
 
     var buffer: DeviceValueBuffer<Element>
 

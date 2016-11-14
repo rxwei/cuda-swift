@@ -12,25 +12,13 @@ import CUDARuntime
 
 public extension KernelArgument {
 
-    public static func array<T>(_ array: inout DeviceArray<T>) -> KernelArgument {
-        return array.withUnsafeMutableDevicePointer { ptr in
-            self.init(ptr.deviceAddress)
-        }
-    }
-
-    public static func constantArray<T>(_ array: DeviceArray<T>) -> KernelArgument {
-        return array.withUnsafeDevicePointer { ptr in
-            self.init(ptr.deviceAddress)
-        }
-    }
-
-    public static func valuePointer<T>(_ value: inout DeviceValue<T>) -> KernelArgument {
+    public static func pointer<T: DeviceAddressable>(to value: inout T) -> KernelArgument {
         return value.withUnsafeMutableDevicePointer { ptr in
             self.init(ptr.deviceAddress)
         }
     }
 
-    public static func constantValuePointer<T>(_ value: DeviceValue<T>) -> KernelArgument {
+    public static func constPointer<T: DeviceAddressable>(to value: T) -> KernelArgument {
         return value.withUnsafeDevicePointer { ptr in
             self.init(ptr.deviceAddress)
         }
