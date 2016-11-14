@@ -171,8 +171,7 @@ class WarpTests: XCTestCase {
             
             let ptx = try Compiler.compile(source, options: [
                 .computeCapability(Device.current.computeCapability),
-                .contractIntoFMAD(false),
-                .useFastMath
+                .contractIntoFMAD(false)
             ])
             let module = try Module(ptx: ptx)
             let saxpy = module.function(named: "saxpy")!
@@ -199,8 +198,7 @@ class WarpTests: XCTestCase {
 
             let ptx = try Compiler.compile(source, options: [
                 .computeCapability(Device.current.computeCapability),
-                .contractIntoFMAD(false),
-                .useFastMath
+                .contractIntoFMAD(false)
             ])
             let module = try Module(ptx: ptx)
             let saxpy = module.function(named: "sum")!
