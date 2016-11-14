@@ -49,7 +49,7 @@ open class Stream : CHandleCarrier {
 
     open var priority: Int {
         var priority: Int32 = 0
-        cuStreamGetPriority(handle, &priority)
+        !!cuStreamGetPriority(handle, &priority)
         return Int(priority)
     }
 
@@ -66,7 +66,7 @@ open class Stream : CHandleCarrier {
                       result == CUDA_SUCCESS ? nil : DriverError(result))
         }
         callbacks.append(callback)
-        cuStreamAddCallback(handle, cuCallback, &callbacks[callbacks.endIndex-1], 0)
+        !!cuStreamAddCallback(handle, cuCallback, &callbacks[callbacks.endIndex-1], 0)
     }
 
     public func withUnsafeHandle<Result>

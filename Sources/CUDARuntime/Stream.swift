@@ -30,13 +30,9 @@ open class Stream : CHandleCarrier {
 
     public init?(priority: Int) {
         var handle: Handle?
-        do {
-            try ensureSuccess(
-                cudaStreamCreateWithPriority(&handle, 0, Int32(priority))
-            )
-        } catch {
-            return nil
-        }
+        guard
+            let _ = try? ensureSuccess(cudaStreamCreateWithPriority(&handle, 0, Int32(priority)))
+            else { return nil }
         self.handle = handle! // Safe
         Stream.instances[self.handle] = self
     }
@@ -69,7 +65,7 @@ open class Stream : CHandleCarrier {
                       result == cudaSuccess ? nil : RuntimeError(result))
         }
         callbacks.append(callback)
-        cudaStreamAddCallback(handle, cuCallback, &callbacks[callbacks.endIndex-1], 0)
+        !!cudaStreamAddCallback(handle, cuCallback, &callbacks[callbacks.endIndex-1], 0)
     }
 
     public func withUnsafeHandle<Result>

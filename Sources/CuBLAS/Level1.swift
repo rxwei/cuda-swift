@@ -29,7 +29,7 @@ public extension BLAS {
                      y: UnsafeMutableDevicePointer<T>, stride strideY: Int32,
                      count: Int32) {
         var alpha = alpha
-        cublasAxpyEx(handle, count, &alpha, T.cType,
+        !!cublasAxpyEx(handle, count, &alpha, T.cType,
                      x.deviceAddress, T.cType, strideX,
                      y.deviceAddress, T.cType, strideY, T.cType)
     }

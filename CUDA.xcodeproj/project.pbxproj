@@ -24,7 +24,7 @@
 		OBJ_130 /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* Array.swift */; };
 		OBJ_131 /* ArrayBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* ArrayBuffer.swift */; };
 		OBJ_132 /* DeviceTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* DeviceTypes.swift */; };
-		OBJ_134 /* Kernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* Kernel.swift */; };
+		OBJ_134 /* KernelDataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* KernelDataTypes.swift */; };
 		OBJ_135 /* KernelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* KernelManager.swift */; };
 		OBJ_136 /* KernelSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* KernelSources.swift */; };
 		OBJ_137 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* Value.swift */; };
@@ -231,7 +231,7 @@
 		OBJ_36 /* Array.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
 		OBJ_37 /* ArrayBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayBuffer.swift; sourceTree = "<group>"; };
 		OBJ_38 /* DeviceTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTypes.swift; sourceTree = "<group>"; };
-		OBJ_40 /* Kernel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kernel.swift; sourceTree = "<group>"; };
+		OBJ_40 /* KernelDataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KernelDataTypes.swift; sourceTree = "<group>"; };
 		OBJ_41 /* KernelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KernelManager.swift; sourceTree = "<group>"; };
 		OBJ_42 /* KernelSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KernelSources.swift; sourceTree = "<group>"; };
 		OBJ_43 /* Value.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
@@ -410,7 +410,7 @@
 			children = (
 				2989D0681DCD740900ED8CE2 /* DeviceTypes */,
 				2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */,
-				OBJ_40 /* Kernel.swift */,
+				OBJ_40 /* KernelDataTypes.swift */,
 				OBJ_41 /* KernelManager.swift */,
 				OBJ_42 /* KernelSources.swift */,
 			);
@@ -779,7 +779,7 @@
 				OBJ_131 /* ArrayBuffer.swift in Sources */,
 				OBJ_132 /* DeviceTypes.swift in Sources */,
 				2989D0671DCD737400ED8CE2 /* ValueBuffer.swift in Sources */,
-				OBJ_134 /* Kernel.swift in Sources */,
+				OBJ_134 /* KernelDataTypes.swift in Sources */,
 				OBJ_135 /* KernelManager.swift in Sources */,
 				2989D06A1DCE720600ED8CE2 /* DeviceOperations.swift in Sources */,
 				OBJ_136 /* KernelSources.swift in Sources */,

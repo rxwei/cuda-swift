@@ -32,7 +32,7 @@ public struct Device : Equatable, CHandleCarrier {
 
     public static var count: Int {
         var deviceCount: Int32 = 0
-        cuDeviceGetCount(&deviceCount)
+        !!cuDeviceGetCount(&deviceCount)
         return Int(deviceCount)
     }
 
@@ -42,25 +42,25 @@ public struct Device : Equatable, CHandleCarrier {
 
     public var name: String {
         var name: [CChar] = Array(repeating: 0, count: 32)
-        cuDeviceGetName(&name, 32, handle)
+        !!cuDeviceGetName(&name, 32, handle)
         return String(cString: name)
     }
 
     public var computeCapability: ComputeCapability {
         var major: Int32 = 0, minor: Int32 = 0
-        cuDeviceComputeCapability(&major, &minor, handle)
+        !!cuDeviceComputeCapability(&major, &minor, handle)
         return ComputeCapability(major: Int(major), minor: Int(minor))
     }
 
     public var properties: Properties {
         var props: CUdevprop = CUdevprop()
-        cuDeviceGetProperties(&props, handle)
+        !!cuDeviceGetProperties(&props, handle)
         return props
     }
 
     public var pciBusIdentifier: String {
         var id: [CChar] = Array(repeating: 0, count: 32)
-        cuDeviceGetPCIBusId(&id, 32, handle)
+        !!cuDeviceGetPCIBusId(&id, 32, handle)
         return String(cString: id)
     }
 

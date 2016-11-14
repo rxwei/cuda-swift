@@ -9,14 +9,12 @@
 import CCuBLAS
 
 public extension BLAS {
-
     public enum DataType : UInt32 {
         case float = 0
         case double = 1
         case half = 2
         case int8 = 3
     }
-
 }
 
 public protocol BLASDataProtocol {

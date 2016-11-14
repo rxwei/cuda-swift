@@ -16,7 +16,7 @@ public struct Function : CHandleCarrier {
     
     public var cachePreference: CachePreference = .none {
         didSet {
-            cuFuncSetCacheConfig(
+            !!cuFuncSetCacheConfig(
                 handle, CUfunc_cache(rawValue: cachePreference.rawValue)
             )
         }
@@ -24,7 +24,7 @@ public struct Function : CHandleCarrier {
 
     public var sharedMemoryBankSize: SharedMemoryBankSize = .default {
         didSet {
-            cuFuncSetSharedMemConfig(
+            !!cuFuncSetSharedMemConfig(
                 handle,
                 CUsharedconfig(rawValue: sharedMemoryBankSize.rawValue)
             )
@@ -65,57 +65,57 @@ public extension Function {
     
     public var maxThreadsPerBlock: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK,
+                             handle)
         return Int(maxThreads)
     }
     
     public var sharedSize: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES,
+                             handle)
         return Int(maxThreads)
     }
     
     public var constSize: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_CONST_SIZE_BYTES,
+                             handle)
         return Int(maxThreads)
     }
     
     public var localSize: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_LOCAL_SIZE_BYTES,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_LOCAL_SIZE_BYTES,
+                             handle)
         return Int(maxThreads)
     }
     
     public var registerCount: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_NUM_REGS,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_NUM_REGS,
+                             handle)
         return Int(maxThreads)
     }
     
     public var ptxVersion: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_PTX_VERSION,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_PTX_VERSION,
+                             handle)
         return Int(maxThreads)
     }
-
+    
     public var binaryVersion: Int {
         var maxThreads: Int32 = 0
-        cuFuncGetAttribute(&maxThreads,
-                           CU_FUNC_ATTRIBUTE_BINARY_VERSION,
-                           handle)
+        !!cuFuncGetAttribute(&maxThreads,
+                             CU_FUNC_ATTRIBUTE_BINARY_VERSION,
+                             handle)
         return Int(maxThreads)
     }
     
@@ -137,14 +137,14 @@ public func <<<(lhs: Function, rhs: (Function) throws -> ()) rethrows {
 
 @inline(__always)
 public func >>>(lhs: (Int, Int), rhs: [KernelArgument]) -> (Function) throws -> () {
-    return { (f: Function) throws -> () in
+    return { f in
         try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: 0, stream: nil)
     }
 }
 
 @inline(__always)
 public func >>>(lhs: (Int, Int, Int, Stream?), rhs: [KernelArgument]) -> (Function) throws -> () {
-    return { (f: Function) throws -> () in
+    return { f in
         try f.launch(with: rhs, blockCount: lhs.0, threadCount: lhs.1, memory: lhs.2, stream: lhs.3)
     }
 }

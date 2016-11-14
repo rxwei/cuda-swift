@@ -171,8 +171,8 @@ public struct UnsafeMutableDevicePointer<Pointee> : Equatable, Hashable, Stridea
         }
         nonmutating set {
             var newValue = newValue
-            cuMemcpyHtoD_v2(advanced(by: i).deviceAddressHandle, &newValue,
-                            MemoryLayout<Pointee>.size)
+            !!cuMemcpyHtoD_v2(advanced(by: i).deviceAddressHandle, &newValue,
+                              MemoryLayout<Pointee>.size)
         }
     }
     
