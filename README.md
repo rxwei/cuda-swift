@@ -25,8 +25,8 @@ native Swift types. Warp provides higher level value types, `DeviceArray` and
 import Warp
 
 /// Initialize two arrays on device
-var x: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
-let y: DeviceVector<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
+var x: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
+let y: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 
 /// Scalar multiplication
 x *= 2 // x => [2.0, 4.0, 6.0, 8.0, 10.0] on device
@@ -51,6 +51,10 @@ x.sumOfAbsoluteValues() // => 15
 
 #### Compile source string to PTX
 ```swift
+import NVRTC
+import CUDADriver
+import Warp
+
 let source: String =
   + "extern \"C\" __global__ void saxpy(float a, float *x, float *y, float *out, int n) {"
   + "    size_t tid = blockIdx.x * blockDim.x + threadIdx.x;"
@@ -65,11 +69,11 @@ Device.main.withContext { context in
     let module = try Module(ptx: ptx)
     let function = module.function(named: "saxpy")
     
-    var x: DeviceArray<Float> = [1, 2, 3, 4, 5, 6, 7, 8]
-    var y: DeviceArray<Float> = [2, 3, 4, 5, 6, 7, 8, 9]
+    let x: DeviceArray<Float> = [1, 2, 3, 4, 5, 6, 7, 8]
+    let y: DeviceArray<Float> = [2, 3, 4, 5, 6, 7, 8, 9]
     var result = DeviceArray<Float>(capacity: 8)
 
-    try function<<<(1, 8)>>>[.float(1.0), .array(&x), .array(&y), .array(&result), .int(8)]
+    try function<<<(1, 8)>>>[.float(1.0), .constPointer(to: x), .constPointer(to: y), .pointer(to: &result), .int(8)]
 
     /// result => [3, 5, 7, 9, 11, 13, 15, 17] on device
 }
@@ -120,12 +124,13 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib64
     - [x] `Compiler`
 - [x] CuBLAS - GPU Basic Linear Algebra Subprograms (in-progress)
     - [x] Level 1 BLAS operations
-    - [ ] Level 2 BLAS operations
-    - [ ] Level 3 BLAS operations
-- [x] Warp - GPU Acceleration Library (Thrust counterpart)
+    - [x] Level 2 BLAS operations (GEMV)
+    - [x] Level 3 BLAS operations (GEMM)
+- [x] Warp - GPU Acceleration Library ([Thrust](https://github.com/thrust/thrust) counterpart)
     - [x] `DeviceArray<T>` (generic array in device memory)
     - [x] `DeviceValue<T>` (generic value in device memory)
-    - [x] Acclerated vector operations ([Thrust](https://github.com/thrust/thrust) counterpart)
+    - [x] Acclerated vector operations
+    - [x] Type-safe kernel argument helpers
 
 ### Optional
 
@@ -134,10 +139,6 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib64
     symbols" problem for which we don't have a solution until Xcode is fixed.
   - To use the playground, open the Xcode workspace file, and add a library for
     every modulemap under `Frameworks`.
-
-### Next steps
-
-TBA
 
 ## Dependencies
 
