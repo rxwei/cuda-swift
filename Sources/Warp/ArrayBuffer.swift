@@ -104,10 +104,8 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         device = other.device
         capacity = other.capacity
         baseAddress = other.baseAddress
-        guard other.startIndex <= range.lowerBound &&
-            other.endIndex >= range.upperBound else {
-            fatalError("Array index out of bounds")
-        }
+        precondition(other.startIndex <= range.lowerBound && other.endIndex >= range.upperBound,
+                     "Array index out of bounds")
         startIndex = range.lowerBound
         endIndex = range.upperBound
         owner = other
@@ -155,9 +153,8 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
 
     public func replaceSubrange
         (_ subrange: Range<Int>, with newElements: DeviceArrayBuffer<Element>) {
-        guard subrange.lowerBound >= startIndex && subrange.upperBound <= endIndex else {
-            fatalError("Array index out of subrange")
-        }
+        precondition(subrange.lowerBound >= startIndex && subrange.upperBound <= endIndex, 
+                     "Array index out of subrange")
         for (i, valueBuf) in zip(CountableRange(subrange), newElements) {
             valueRetainees[i] = valueBuf
         }
