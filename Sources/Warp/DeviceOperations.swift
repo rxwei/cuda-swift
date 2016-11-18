@@ -42,8 +42,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
     public mutating func add(_ other: DeviceArray<Element>, multipliedBy alpha: Element = 1) {
         let axpy = kernelManager.kernel(.axpy, forType: Element.self)
         device.sync {
-            let blockCount = (count+127)/128
-            try! axpy<<<(blockCount, 128)>>>[
+            let blockSize = Swift.min(128, count)
+            let blockCount = (count+blockSize-1)/blockSize
+            try! axpy<<<(blockCount, blockSize)>>>[
                 .value(alpha),
                 .constPointer(to: other),
                 .pointer(to: &self),
@@ -65,8 +66,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
     public mutating func scale(by alpha: Element) {
         let scale = kernelManager.kernel(.scale, forType: Element.self)
         device.sync {
-            let blockCount = (count+127)/128
-            try! scale<<<(blockCount, 128)>>>[
+            let blockSize = Swift.min(128, count)
+            let blockCount = (count+blockSize-1)/blockSize
+            try! scale<<<(blockCount, blockSize)>>>[
                 .pointer(to: &self), .value(alpha), .longLong(Int64(count))
             ]
         }
