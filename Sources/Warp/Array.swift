@@ -9,8 +9,7 @@
 import CUDARuntime
 
 protocol DeviceArrayProtocol :
-    DeviceAddressable, MutableDeviceCollection,
-    RangeReplaceableCollection, ExpressibleByArrayLiteral
+    DeviceAddressable, MutableDeviceCollection, ExpressibleByArrayLiteral
 {
     associatedtype Buffer : AnyObject
     var capacity: Int { get }
@@ -19,12 +18,6 @@ protocol DeviceArrayProtocol :
     init()
     init(device: Device)
     init(_ buffer: Buffer)
-}
-
-extension DeviceArrayProtocol where Buffer : DeviceArrayBufferProtocol {
-    var capacity: Int {
-        return buffer.capacity
-    }
 }
 
 public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
@@ -114,6 +107,13 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         return elements
     }
 
+    /// - note: Currently `DeviceArray` is length-immutable. Need to implement variable
+    /// startIndex/endIndex to support `.reserveCapacity(_:)` and `.append(_:)`. In that
+    /// case, we'll be conforming to `RangeReplaceableCollection`
+    var capacity: Int {
+        return buffer.count
+    }
+
     public var count: Int {
         return buffer.count
     }
@@ -137,13 +137,15 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
     public var indices: CountableRange<Int> {
         return 0..<count
     }
-    /// Replaces the specified subrange of elements with the given collection.
+
+    public mutating func replaceSubrange
+        (_ subrange: Range<Int>, with newElements: DeviceArray<Element>) {
+        mutatingBuffer.replaceSubrange(bufferRange(fromLocal: subrange), with: newElements.buffer)
+    }
+
     public mutating func replaceSubrange<C : Collection>
         (_ subrange: Range<Int>, with newElements: C) where C.Iterator.Element == DeviceValue<Element> {
-        let subrange = CountableRange(subrange)
-        for (index, element) in zip(subrange, newElements) {
-            self[index] = element
-        }
+        buffer.replaceSubrange(bufferRange(fromLocal: subrange), with: newElements.map{$0.buffer})
     }
 
     public subscript(i: Int) -> DeviceValue<Element> {
@@ -171,8 +173,7 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
             return DeviceArray(viewing: buffer, range: bufferRange(fromLocal: range))
         }
         mutating set {
-            var newValue = newValue
-            mutatingBuffer[bufferRange(fromLocal: range)] = newValue.mutatingBuffer
+            replaceSubrange(range, with: newValue)
         }
     }
 

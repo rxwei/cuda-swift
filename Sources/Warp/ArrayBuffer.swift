@@ -52,10 +52,11 @@ extension DeviceArrayBufferProtocol {
 }
 
 final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
+
     typealias SubSequence = DeviceArrayBuffer<Element>
 
     let device: Device
-    let baseAddress: UnsafeMutableDevicePointer<Element>
+    var baseAddress: UnsafeMutableDevicePointer<Element>
     let capacity: Int
     let startIndex: Int, endIndex: Int
     var owner: AnyObject?
@@ -143,6 +144,28 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         return startIndex..<endIndex
     }
 
+    /// Replaces the specified subrange of elements with the given collection.
+    public func replaceSubrange<C : Collection>
+        (_ subrange: Range<Int>, with newElements: C) where C.Iterator.Element == DeviceValueBuffer<Element> {
+        let subrange = CountableRange(subrange)
+        for (index, element) in zip(subrange, newElements) {
+            self[index] = element
+        }
+    }
+
+    public func replaceSubrange
+        (_ subrange: Range<Int>, with newElements: DeviceArrayBuffer<Element>) {
+        guard subrange.lowerBound >= startIndex && subrange.upperBound <= endIndex else {
+            fatalError("Array index out of subrange")
+        }
+        for (i, valueBuf) in zip(CountableRange(subrange), newElements) {
+            valueRetainees[i] = valueBuf
+        }
+        baseAddress.advanced(by: subrange.lowerBound)
+            .assign(from: newElements.startAddress,
+                    count: Swift.min(subrange.count, count))
+    }
+
     /// Accesses the subsequence bounded by the given range.
     ///
     /// - Parameter bounds: A range of the collection's indices. The upper and
@@ -153,15 +176,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
             return DeviceArrayBuffer(viewing: self, in: bounds)
         }
         set {
-            guard bounds.lowerBound >= startIndex && bounds.upperBound <= endIndex else {
-                fatalError("Array index out of bounds")
-            }
-            for (i, valueBuf) in zip(CountableRange(bounds), newValue) {
-                valueRetainees[i] = valueBuf
-            }
-            baseAddress.advanced(by: bounds.lowerBound)
-                       .assign(from: newValue.startAddress,
-                               count: Swift.min(bounds.count, count))
+            replaceSubrange(bounds, with: newValue)
         }
     }
 
