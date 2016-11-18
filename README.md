@@ -4,10 +4,10 @@ This project provides a native Swift interface to CUDA with the following
 modules:
 
 - [x] CUDA Driver API `import CUDADriver`
-- [x] CUDA Runtime API `import CUDADriver`
+- [x] CUDA Runtime API `import CUDARuntime`
 - [x] NVRTC - CUDA Runtime Compiler `import NVRTC`
 - [x] cuBLAS - CUDA Basic Linear Algebra Subprograms `import CuBLAS`
-- [x] Warp - GPU Acceleration Library ([Thrust](https://github.com/thrust/thrust) counterpart)
+- [x] Warp - GPU Acceleration Library `import Warp` ([Thrust](https://github.com/thrust/thrust) counterpart)
 
 Any machine with CUDA 7.0+ and a CUDA-capable GPU is supported. Xcode Playground
 is supported as well. Please refer to [Usage](#Usage)
