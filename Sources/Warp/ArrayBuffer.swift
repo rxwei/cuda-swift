@@ -123,7 +123,8 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     }
 
     convenience init(repeating repeatedValue: Element, count: Int, device: Device) {
-        self.init(Array(repeating: repeatedValue, count: count), device: device)
+        self.init(device: device, capacity: count)
+        baseAddress.assign(repeatedValue, count: count)
     }
 
     convenience init(_ other: DeviceArrayBuffer<Element>) {
