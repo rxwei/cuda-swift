@@ -66,7 +66,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     public mutating func scale(by alpha: Element) {
         let scale = kernelManager.kernel(.scale, forType: Element.self)
         device.sync {
-            let blockSize = Swift.min(128, count)
+            let blockSize = Swift.min(512, count)
             let blockCount = (count+blockSize-1)/blockSize
             try! scale<<<(blockCount, blockSize)>>>[
                 .pointer(to: &self), .value(alpha), .longLong(Int64(count))
@@ -107,4 +107,15 @@ public extension DeviceArray where Element : KernelDataProtocol {
         return result.value
     }
 
+    public mutating func fill(with element: Element) {
+        let fill = kernelManager.kernel(.fill, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! fill<<<(blockSize, blockCount)>>>[
+                .pointer(to: &self), .value(element), .longLong(Int64(count))
+            ]
+        }
+    }
+    
 }

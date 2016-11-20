@@ -17,6 +17,7 @@ enum KernelSource: StaticString {
     case asum = "extern \"C\" __global__ void asum(const TYPE vector[], long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
     case axpy = "extern \"C\" __global__ void axpy(TYPE a, const TYPE x[], TYPE y[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) y[tid] += a * x[tid]; }"
     case scale = "extern \"C\" __global__ void scale(TYPE vector[], TYPE alpha, long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] *= alpha; }"
+    case fill = "extern \"C\" __global__ void fill(TYPE vector[], TYPE x, long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] = x; } "
 }
 
 extension KernelSource : Hashable {

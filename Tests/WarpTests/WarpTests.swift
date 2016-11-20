@@ -227,6 +227,9 @@ class WarpTests: XCTestCase {
         var XD_axpy = XD
         XD_axpy.add(XD, multipliedBy: 100)
         var XD_scaled = XD
+        var XD_filled = XD
+        XD_filled.fill(with: 100.0)
+        XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in 100.0 })
         XD_scaled.scale(by: 8.8)
         XCTAssertEqual(XD_axpy.hostArray, zip(hostXD, hostXD).map{$0+$1*100})
         XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
@@ -245,6 +248,7 @@ class WarpTests: XCTestCase {
             _ = XI64.reduced()
             _ = XI32.reduced()
             _ = XI8.reduced()
+            XD_filled.fill(with: 200.0)
         }
     }
     
