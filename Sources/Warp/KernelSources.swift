@@ -19,6 +19,7 @@ enum KernelSource: StaticString, CompilableKernelSource {
     case asum = "extern \"C\" __global__ void KERNEL(const TYPE vector[], long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
     case axpy = "extern \"C\" __global__ void KERNEL(TYPE a, const TYPE x[], const TYPE y[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = a * x[tid] + y[tid]; }"
     case scale = "extern \"C\" __global__ void KERNEL(TYPE alpha, const TYPE vector[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = vector[tid] * alpha; }"
+    case copy = "extern \"C\" __global__ void KERNEL(const TYPE src[], TYPE dest[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) dest[tid] = src[tid]; }"
     case fill = "extern \"C\" __global__ void KERNEL(TYPE vector[], TYPE x, long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] = x; } "
 }
 

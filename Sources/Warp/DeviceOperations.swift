@@ -76,6 +76,20 @@ public extension DeviceArray where Element : KernelDataProtocol {
         }
     }
 
+    public mutating func assign(_ sourceElements: DeviceArray<Element>, multipliedBy alpha: Element) {
+        let scale = kernelManager.kernel(.scale, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! scale<<<(blockCount, blockSize)>>>[
+                .value(alpha),
+                .constPointer(to: sourceElements),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
     public mutating func formElementwise(_ operation: DeviceBinaryOperation,
                                          with other: DeviceArray<Element>) {
         precondition(count == other.count, "Array count mismatch")
@@ -92,8 +106,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
         }
     }
 
-    public mutating func formElementwiseResult(
-        operation: DeviceBinaryOperation, x: DeviceArray<Element>, y: DeviceArray<Element>) {
+    public mutating func assignElementwiseResult(of operation: DeviceBinaryOperation,
+                                                 x: DeviceArray<Element>, y: DeviceArray<Element>) {
         precondition(count == x.count && count == y.count, "Array count mismatch")
         let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
         let blockSize = Swift.min(512, count)
@@ -102,6 +116,19 @@ public extension DeviceArray where Element : KernelDataProtocol {
             try! elementOp<<<(blockCount, blockSize)>>>[
                 .constPointer(to: x),
                 .constPointer(to: y),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
+    public mutating func assign(_ sourceElements: DeviceArray<Element>) {
+        let copy = kernelManager.kernel(.copy, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! copy<<<(blockCount, blockSize)>>>[
+                .constPointer(to: sourceElements),
                 .pointer(to: &self),
                 .longLong(Int64(count))
             ]
@@ -152,14 +179,15 @@ public extension DeviceArray where Element : KernelDataProtocol {
 
 public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint {
 
-    public mutating func formTransformation(_ transformation: DeviceUnaryTransformation, from source: DeviceArray<Element>) {
-        precondition(count == source.count, "Array count mismatch")
+    public mutating func assign(_ sourceElements: DeviceArray<Element>,
+                                transformedBy transformation: DeviceUnaryTransformation) {
+        precondition(count == sourceElements.count, "Array count mismatch")
         let transformer = kernelManager.kernel(.transform, transformation: transformation, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
         device.sync {
             try! transformer<<<(blockCount, blockSize)>>>[
-                .constPointer(to: source), .pointer(to: &self), .longLong(Int64(count))
+                .constPointer(to: sourceElements), .pointer(to: &self), .longLong(Int64(count))
             ]
         }
     }
