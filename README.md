@@ -29,22 +29,24 @@ var x: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 let y: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 
 /// Scalar multiplication
-x *= 2 // x => [2.0, 4.0, 6.0, 8.0, 10.0] on device
+x.vectorScale(by: 2) // x => [2.0, 4.0, 6.0, 8.0, 10.0] on device
 
 /// Addition
-x += y // x => [3.0, 6.0, 9.0, 12.0, 15.0] on device
+x.vectorAdd(y) // x => [3.0, 6.0, 9.0, 12.0, 15.0] on device
 
 /// Dot product
 x • y // => 165.0
 
-/// A chain of operations
-x *= x • y // x => [495.0, 990.0, 1485.0, 1980.0, 2475.0] on device
-
 /// Sum
-x.reduced() // => 15
+x.sum() // => 15
 
 /// Absolute sum
 x.sumOfAbsoluteValues() // => 15
+
+/// Transform
+x.transform(by: .sin)
+x.transform(by: .tanh)
+x.transform(by: .ceiling)
 ```
 
 ### Real-time compilation
@@ -63,18 +65,17 @@ let source: String =
 let ptx = try Compiler.compile(source)
 ```
 
-#### Load a module from PTX using Driver API within a context
+#### JIT-compile and load PTX using Driver API within a device context
 ```swift
-Device.main.withContext { context in
+try Device.main.withContext { context in
     let module = try Module(ptx: ptx)
-    let function = module.function(named: "saxpy")
+    let function = module.function(named: "saxpy")!
     
     let x: DeviceArray<Float> = [1, 2, 3, 4, 5, 6, 7, 8]
     let y: DeviceArray<Float> = [2, 3, 4, 5, 6, 7, 8, 9]
     var result = DeviceArray<Float>(capacity: 8)
 
     try function<<<(1, 8)>>>[.float(1.0), .constPointer(to: x), .constPointer(to: y), .pointer(to: &result), .int(8)]
-
     /// result => [3, 5, 7, 9, 11, 13, 15, 17] on device
 }
 ```
