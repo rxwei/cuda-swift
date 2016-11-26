@@ -29,10 +29,10 @@ var x: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 let y: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 
 /// Scalar multiplication
-x.vectorScale(by: 2) // x => [2.0, 4.0, 6.0, 8.0, 10.0] on device
+x.multiplyElements(by: 2) // x => [2.0, 4.0, 6.0, 8.0, 10.0] on device
 
 /// Addition
-x.vectorAdd(y) // x => [3.0, 6.0, 9.0, 12.0, 15.0] on device
+x.formAddition(with: y) // x => [3.0, 6.0, 9.0, 12.0, 15.0] on device
 
 /// Dot product
 x • y // => 165.0
@@ -47,6 +47,15 @@ x.sumOfAbsoluteValues() // => 15
 x.transform(by: .sin)
 x.transform(by: .tanh)
 x.transform(by: .ceil)
+
+/// Elementwise operation
+x.formElementwise(.addition, with: y)
+x.formElementwise(.subtraction, with: y)
+x.formElementwise(.multiplication, with: y)
+x.formElementwise(.division, with: y)
+
+/// Fill with the same value
+x.fill(with: 10.0)
 ```
 
 ### Real-time compilation
