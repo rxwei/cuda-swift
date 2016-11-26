@@ -102,6 +102,19 @@ open class Program {
         return PTX(data: outData, name: name)
     }
 
+    open var compilationLog: String? {
+        var size: Int = 0
+        guard nvrtcGetProgramLogSize(handle, &size) == NVRTC_SUCCESS &&
+            size > 0
+            else { return nil }
+        var data = Data(capacity: size)
+        data.count = size
+        data.withUnsafeMutableBytes { ptr in
+            !!nvrtcGetProgramLog(handle, ptr)
+        }
+        return String(data: data, encoding: .utf8)!
+    }
+
 }
 
 open class Compiler {
