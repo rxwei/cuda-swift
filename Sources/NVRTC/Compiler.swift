@@ -107,12 +107,9 @@ open class Program {
         guard nvrtcGetProgramLogSize(handle, &size) == NVRTC_SUCCESS &&
             size > 0
             else { return nil }
-        var data = Data(capacity: size)
-        data.count = size
-        data.withUnsafeMutableBytes { ptr in
-            !!nvrtcGetProgramLog(handle, ptr)
-        }
-        return String(data: data, encoding: .utf8)!
+        let buffer = UnsafeMutablePointer<Int8>.allocate(capacity: size)
+        !!nvrtcGetProgramLog(handle, buffer)
+        return String(bytesNoCopy: buffer, length: size, encoding: .ascii, freeWhenDone: true)
     }
 
 }
