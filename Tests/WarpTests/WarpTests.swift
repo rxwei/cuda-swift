@@ -225,14 +225,17 @@ class WarpTests: XCTestCase {
         let XI32 = DeviceArray(hostXI32)
         let XI8 = DeviceArray(hostXI8)
         var XD_axpy = XD
-        XD_axpy.vectorAdd(XD, multipliedBy: 100)
+        XD_axpy.formAddition(with: XD, multipliedBy: 100)
         var XD_scaled = XD
         var XD_filled = XD
         XD_filled.fill(with: 100.0)
         XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in 100.0 })
         XD_filled.transform(by: .log)
         XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in log(100.0) })
-        XD_scaled.vectorScale(by: 8.8)
+        var XD_multiplied = XD
+        XD_multiplied.formElementwise(.division, with: XD_filled)
+        XCTAssertEqual(XD_multiplied.hostArray, zip(XD.hostArray, XD_filled.hostArray).map{$0/$1})
+        XD_scaled.multiplyElements(by: 8.8)
         XCTAssertEqual(XD_axpy.hostArray, zip(hostXD, hostXD).map{$0+$1*100})
         XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
         XCTAssertEqual(X.sum(), hostX.reduce(0, +))
@@ -241,10 +244,9 @@ class WarpTests: XCTestCase {
         XCTAssertEqual(XI64.sumOfAbsoluteValues(), hostXI64.reduce(0, {$0+abs($1)}))
         XCTAssertEqual(XI32.sum(), hostXI32.reduce(0, &+))
         XCTAssertEqual(XI8.sum(), hostXI8.reduce(0, &+))
-        XCTAssertEqual(X.vectorScaled(by: 10.0).hostArray, hostX.map{$0*10.0})
         measure {
-            X.vectorScale(by: 10.0)
-            X.vectorAdd(X, multipliedBy: 10.0)
+            X.multiplyElements(by: 10.0)
+            X.formAddition(with: X, multipliedBy: 10.0)
             _ = X.sum()
             _ = XD.sum()
             _ = XI64.sum()

@@ -46,39 +46,64 @@ public extension DeviceArray where Element : KernelDataProtocol {
     /// - Parameters:
     ///   - other: the other array
     ///   - alpha: multiplication factor to the other array before adding
-    public mutating func vectorAdd(_ other: DeviceArray<Element>, multipliedBy alpha: Element = 1) {
+    public mutating func formAddition(with other: DeviceArray<Element>,
+                                      multipliedBy alpha: Element = 1) {
         let axpy = kernelManager.kernel(.axpy, forType: Element.self)
+        let blockSize = Swift.min(128, count)
+        let blockCount = (count+blockSize-1)/blockSize
         device.sync {
-            let blockSize = Swift.min(128, count)
-            let blockCount = (count+blockSize-1)/blockSize
             try! axpy<<<(blockCount, blockSize)>>>[
-                .value(alpha), .constPointer(to: other), .pointer(to: &self), .longLong(Int64(count))
+                .value(alpha),
+                .constPointer(to: other),
+                .constPointer(to: self),
+                .pointer(to: &self),
+                .longLong(Int64(count))
             ]
         }
     }
-
-    public func vectorAdding(_ other: DeviceArray<Element>,
-                             multipliedBy alpha: Element = 1) -> DeviceArray<Element> {
-        var copy = self
-        copy.vectorAdd(other, multipliedBy: alpha)
-        return copy
-    }
-
-    public mutating func vectorScale(by alpha: Element) {
+    
+    public mutating func multiplyElements(by alpha: Element) {
         let scale = kernelManager.kernel(.scale, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
         device.sync {
-            let blockSize = Swift.min(512, count)
-            let blockCount = (count+blockSize-1)/blockSize
             try! scale<<<(blockCount, blockSize)>>>[
-                .pointer(to: &self), .value(alpha), .longLong(Int64(count))
+                .value(alpha),
+                .constPointer(to: self),
+                .pointer(to: &self),
+                .longLong(Int64(count))
             ]
         }
     }
 
-    public func vectorScaled(by alpha: Element) -> DeviceArray {
-        var copy = self
-        copy.vectorScale(by: alpha)
-        return copy
+    public mutating func formElementwise(_ operation: BinaryKernelOperation,
+                                         with other: DeviceArray<Element>) {
+        let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! elementOp<<<(blockCount, blockSize)>>>[
+                .constPointer(to: self),
+                .constPointer(to: other),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
+    public mutating func formElementwiseResult(
+        operation: BinaryKernelOperation, x: DeviceArray<Element>, y: DeviceArray<Element>) {
+        let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! elementOp<<<(blockCount, blockSize)>>>[
+                .constPointer(to: x),
+                .constPointer(to: y),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
     }
 
     public func sum() -> Element {
@@ -131,7 +156,7 @@ public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint 
         let blockCount = (count+blockSize-1)/blockSize
         device.sync {
             try! transformer<<<(blockCount, blockSize)>>>[
-                .pointer(to: &self), .longLong(Int64(count))
+                .constPointer(to: self), .pointer(to: &self), .longLong(Int64(count))
             ]
         }
     }

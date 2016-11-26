@@ -34,22 +34,24 @@ final class KernelManager {
         let type: KernelDataType
         let source: StaticString
         let functor: FloatingPointKernelFunctor?
+        let operation: BinaryKernelOperation?
 
         static func ==(lhs: ModuleCacheKey, rhs: ModuleCacheKey) -> Bool {
             return lhs.type == rhs.type && lhs.source == rhs.source
         }
 
         var hashValue: Int {
-            if let functor = functor {
-                return type.hashValue ^ source.hashValue ^ functor.hashValue
-            }
-            return type.hashValue ^ source.hashValue
+            return type.hashValue ^ source.hashValue &+
+                (functor?.hashValue ?? 0) ^ (operation?.hashValue ?? 0)
         }
 
-        init(type: KernelDataType, source: StaticString, functor: FloatingPointKernelFunctor? = nil) {
+        init(type: KernelDataType, source: StaticString,
+             functor: FloatingPointKernelFunctor? = nil,
+             operation: BinaryKernelOperation? = nil) {
             self.type = type
             self.source = source
             self.functor = functor
+            self.operation = operation
         }
     }
 
@@ -85,8 +87,45 @@ final class KernelManager {
                 .computeCapability(device.computeCapability),
                 .useFastMath,
                 .disableWarnings,
+                .defineMacro("KERNEL", as: String(describing: source)),
                 .defineMacro("TYPE", as: T.kernelDataType.rawValue),
                 .defineMacro("FUNC", as: functor.functionName(forType: T.self))
+            ]
+        )
+        var function: Function!
+        device.sync {
+            let module = try! Module(ptx: ptx)
+            function = module.function(named: String(describing: source))!
+            modules[key] = (module, function)
+        }
+        return function
+    }
+
+    /// Get a compiled operator kernel, a.k.a. kernel with a binary operator
+    /// such as `+` and `-`.
+    ///
+    /// - Parameters:
+    ///   - source: kernel source to be compiled (if not cached) and loaded
+    ///   - functor: 1-place functor for element transformation
+    ///   - forType: type of each element
+    /// - Returns: kernel function
+    func kernel<T: KernelDataProtocol>(
+        _ source: BinaryOperationKernelSource, operation: BinaryKernelOperation, forType: T.Type) -> Function {
+        /// Get cached function
+        let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, operation: operation)
+        if let (_, function) = modules[key] {
+            return function
+        }
+        /// If not cached, compile using NVRTC
+        let ptx = try! Compiler.compile(
+            source.rawValue,
+            options: [
+                .computeCapability(device.computeCapability),
+                .useFastMath,
+                .disableWarnings,
+                .defineMacro("KERNEL", as: String(describing: source)),
+                .defineMacro("TYPE", as: T.kernelDataType.rawValue),
+                .defineMacro("OP", as: operation.operatorSymbol)
             ]
         )
         var function: Function!
@@ -117,6 +156,7 @@ final class KernelManager {
                 .computeCapability(device.computeCapability),
                 .useFastMath,
                 .disableWarnings,
+                .defineMacro("KERNEL", as: String(describing: source)),
                 .defineMacro("TYPE", as: T.kernelDataType.rawValue)
             ]
         )

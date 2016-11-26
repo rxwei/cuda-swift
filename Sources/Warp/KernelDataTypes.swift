@@ -123,6 +123,21 @@ public enum FloatingPointKernelFunctor {
     case exp, log, cos, sin, tan, tanh, sinh, cosh, acos, asin, atan, floor, ceil
 }
 
+public enum BinaryKernelOperation {
+    case addition, subtraction, multiplication, division
+}
+
+internal extension BinaryKernelOperation {
+    var operatorSymbol: String {
+        switch self {
+        case .addition: return "+"
+        case .subtraction: return "-"
+        case .multiplication: return "*"
+        case .division: return "/"
+        }
+    }
+}
+
 internal extension FloatingPointKernelFunctor {
     func functionName<T: FloatingPoint>(forType: T.Type) -> String {
         let baseName = String(describing: self)
