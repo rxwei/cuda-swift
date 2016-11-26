@@ -14,6 +14,10 @@ final class KernelManager {
 
     private static var instances: [KernelManager?] = Array(repeating: nil, count: Device.count)
 
+    /// Get shared instance of KernelManager on the specified device.
+    ///
+    /// - Parameter device: CUDA device
+    /// - Returns: kernel manager
     static func shared(on device: Device) -> KernelManager {
         if let manager = instances[device.index] {
             return manager
@@ -25,28 +29,84 @@ final class KernelManager {
 
     let device: Device
 
+    /// Unique hash key for each module
     struct ModuleCacheKey : Equatable, Hashable {
         let type: KernelDataType
-        let source: KernelSource
+        let source: StaticString
+        let functor: FloatingPointKernelFunctor?
 
         static func ==(lhs: ModuleCacheKey, rhs: ModuleCacheKey) -> Bool {
             return lhs.type == rhs.type && lhs.source == rhs.source
         }
 
         var hashValue: Int {
+            if let functor = functor {
+                return type.hashValue ^ source.hashValue ^ functor.hashValue
+            }
             return type.hashValue ^ source.hashValue
+        }
+
+        init(type: KernelDataType, source: StaticString, functor: FloatingPointKernelFunctor? = nil) {
+            self.type = type
+            self.source = source
+            self.functor = functor
         }
     }
 
+    /// Cached (compiled and loaded) modules
     fileprivate var modules: [ModuleCacheKey : (Module, Function)] = Dictionary(minimumCapacity: 32)
 
+    /// Initialize an instance on device
+    ///
+    /// - Parameter device: CUDA device
     init(device: Device) {
         self.device = device
     }
-    
+
+    /// Get a compiled functorial kernel, a.k.a. kernel with a transformation functor
+    /// such as `log` and `tanh`.
+    ///
+    /// - Parameters:
+    ///   - source: kernel source to be compiled (if not cached) and loaded
+    ///   - functor: 1-place functor for element transformation
+    ///   - forType: type of each element
+    /// - Returns: kernel function
+    func kernel<T: KernelDataProtocol & FloatingPoint>(
+        _ source: FunctorialKernelSource, functor: FloatingPointKernelFunctor, forType: T.Type) -> Function {
+        /// Get cached function
+        let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, functor: functor)
+        if let (_, function) = modules[key] {
+            return function
+        }
+        /// If not cached, compile using NVRTC
+        let ptx = try! Compiler.compile(
+            source.rawValue,
+            options: [
+                .computeCapability(device.computeCapability),
+                .useFastMath,
+                .disableWarnings,
+                .defineMacro("TYPE", as: T.kernelDataType.rawValue),
+                .defineMacro("FUNC", as: functor.functionName(forType: T.self))
+            ]
+        )
+        var function: Function!
+        device.sync {
+            let module = try! Module(ptx: ptx)
+            function = module.function(named: String(describing: source))!
+            modules[key] = (module, function)
+        }
+        return function
+    }
+
+    /// Get a compiled kernel
+    ///
+    /// - Parameters:
+    ///   - source: kernel source to be compiled (if not cached) and loaded 
+    ///   - forType: type of each element
+    /// - Returns: kernel function
     func kernel<T: KernelDataProtocol>(_ source: KernelSource, forType: T.Type) -> Function {
         /// Get cached function
-        let key = ModuleCacheKey(type: T.kernelDataType, source: source)
+        let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue)
         if let (_, function) = modules[key] {
             return function
         }

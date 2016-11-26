@@ -12,7 +12,9 @@ extension StaticString : Equatable {
     }
 }
 
-enum KernelSource: StaticString {
+protocol CompilableKernelSource : RawRepresentable, Equatable, Hashable { }
+
+enum KernelSource: StaticString, CompilableKernelSource {
     case sum = "extern \"C\" __global__ void sum(const TYPE vector[], long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
     case asum = "extern \"C\" __global__ void asum(const TYPE vector[], long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
     case axpy = "extern \"C\" __global__ void axpy(TYPE a, const TYPE x[], TYPE y[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) y[tid] += a * x[tid]; }"
@@ -20,8 +22,12 @@ enum KernelSource: StaticString {
     case fill = "extern \"C\" __global__ void fill(TYPE vector[], TYPE x, long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] = x; } "
 }
 
-extension KernelSource : Hashable {
-    var hashValue: Int {
-        return rawValue.utf8Start.hashValue
+enum FunctorialKernelSource: StaticString, CompilableKernelSource {
+    case transform = "extern \"C\" __global__ void transform(TYPE vector[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] = FUNC(vector[tid]); } "
+}
+
+extension StaticString : Hashable {
+    public var hashValue: Int {
+        return utf8Start.hashValue
     }
 }

@@ -76,11 +76,13 @@ extension Int8 : KernelDataProtocol {
         return .char
     }
 }
+
 extension Int16 : KernelDataProtocol {
     public static var kernelDataType: KernelDataType {
         return .short
     }
 }
+
 extension Int32 : KernelDataProtocol {
     public static var kernelDataType: KernelDataType {
         return .int
@@ -98,11 +100,13 @@ extension UInt8 : KernelDataProtocol {
         return .unsignedChar
     }
 }
+
 extension UInt16 : KernelDataProtocol {
     public static var kernelDataType: KernelDataType {
         return .unsignedShort
     }
 }
+
 extension UInt32 : KernelDataProtocol {
     public static var kernelDataType: KernelDataType {
         return .unsignedInt
@@ -112,5 +116,19 @@ extension UInt32 : KernelDataProtocol {
 extension UInt64 : KernelDataProtocol {
     public static var kernelDataType: KernelDataType {
         return .unsignedLongLong
+    }
+}
+
+public enum FloatingPointKernelFunctor {
+    case exp, log, cos, sin, tan, tanh, sinh, cosh, acos, asin, atan, floor, ceil
+}
+
+internal extension FloatingPointKernelFunctor {
+    func functionName<T: FloatingPoint>(forType: T.Type) -> String {
+        let baseName = String(describing: self)
+        if T.self == Float.self {
+            return baseName + "f"
+        }
+        return baseName
     }
 }
