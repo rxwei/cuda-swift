@@ -9,6 +9,7 @@
 import struct CUDARuntime.Device
 import CUDADriver
 import NVRTC
+import Foundation
 
 final class KernelManager {
 
@@ -65,6 +66,13 @@ final class KernelManager {
         self.device = device
     }
 
+    @inline(__always)
+    private func log(_ contents: String) {
+        contents.withCString { ptr -> () in
+            fputs(ptr, stderr)
+        }
+    }
+
     /// Get a compiled functorial kernel, a.k.a. kernel with a transformation functor
     /// such as `log` and `tanh`.
     ///
@@ -81,6 +89,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
+        log("Loading CUDA kernel \(source) for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
@@ -105,7 +114,7 @@ final class KernelManager {
     /// such as `+` and `-`.
     ///
     /// - Parameters:
-    ///   - source: kernel source to be compiled (if not cached) and loaded
+    ///   - source: kernel source to be compiled and loaded, if not cached
     ///   - functor: 1-place functor for element transformation
     ///   - forType: type of each element
     /// - Returns: kernel function
@@ -117,6 +126,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
+        log("Loading CUDA kernel \(source) for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
@@ -150,6 +160,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
+        log("Loading CUDA kernel \(source) for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
