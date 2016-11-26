@@ -43,10 +43,10 @@ x.sum() // => 15
 /// Absolute sum
 x.sumOfAbsoluteValues() // => 15
 
-/// Transform
+/// Transform by 1-place math functions
 x.transform(by: .sin)
 x.transform(by: .tanh)
-x.transform(by: .ceiling)
+x.transform(by: .ceil)
 ```
 
 ### Real-time compilation
