@@ -22,14 +22,14 @@ public extension BLAS {
          commonDimension k: Int32, beta: Float,
          C: UnsafeMutableDevicePointer<T>, leadingDimension ldc: Int32) {
         var alpha = alpha, beta = beta
-        !!cublasSgemmEx(
-            handle,
-            transposeA.operation, transposeB.operation,
+        !!cublasGemmEx(
+            handle, transposeA.operation, transposeB.operation,
             m, n, k, &alpha,
             A.deviceAddress, T.cType, lda,
             B.deviceAddress, T.cType, ldb,
             &beta,
-            C.deviceAddress, T.cType, ldc
+            C.deviceAddress, T.cType, ldc,
+            T.cType, CUBLAS_GEMM_ALGO0
         )
     }
 
