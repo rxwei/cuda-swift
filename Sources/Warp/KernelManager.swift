@@ -33,8 +33,8 @@ final class KernelManager {
     struct ModuleCacheKey : Equatable, Hashable {
         let type: KernelDataType
         let source: StaticString
-        let functor: FloatingPointKernelFunctor?
-        let operation: BinaryKernelOperation?
+        let functor: DeviceUnaryTransformation?
+        let operation: DeviceBinaryOperation?
 
         static func ==(lhs: ModuleCacheKey, rhs: ModuleCacheKey) -> Bool {
             return lhs.type == rhs.type && lhs.source == rhs.source
@@ -46,8 +46,8 @@ final class KernelManager {
         }
 
         init(type: KernelDataType, source: StaticString,
-             functor: FloatingPointKernelFunctor? = nil,
-             operation: BinaryKernelOperation? = nil) {
+             functor: DeviceUnaryTransformation? = nil,
+             operation: DeviceBinaryOperation? = nil) {
             self.type = type
             self.source = source
             self.functor = functor
@@ -74,9 +74,9 @@ final class KernelManager {
     ///   - forType: type of each element
     /// - Returns: kernel function
     func kernel<T: KernelDataProtocol & FloatingPoint>(
-        _ source: FunctorialKernelSource, functor: FloatingPointKernelFunctor, forType: T.Type) -> Function {
+        _ source: FunctorialKernelSource, transformation: DeviceUnaryTransformation, forType: T.Type) -> Function {
         /// Get cached function
-        let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, functor: functor)
+        let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, functor: transformation)
         if let (_, function) = modules[key] {
             return function
         }
@@ -89,7 +89,7 @@ final class KernelManager {
                 .disableWarnings,
                 .defineMacro("KERNEL", as: String(describing: source)),
                 .defineMacro("TYPE", as: T.kernelDataType.rawValue),
-                .defineMacro("FUNC", as: functor.functionName(forType: T.self))
+                .defineMacro("FUNC", as: transformation.functionName(forType: T.self))
             ]
         )
         var function: Function!
@@ -110,7 +110,7 @@ final class KernelManager {
     ///   - forType: type of each element
     /// - Returns: kernel function
     func kernel<T: KernelDataProtocol>(
-        _ source: BinaryOperationKernelSource, operation: BinaryKernelOperation, forType: T.Type) -> Function {
+        _ source: BinaryOperationKernelSource, operation: DeviceBinaryOperation, forType: T.Type) -> Function {
         /// Get cached function
         let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, operation: operation)
         if let (_, function) = modules[key] {

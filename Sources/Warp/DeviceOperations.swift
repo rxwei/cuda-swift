@@ -20,6 +20,7 @@ extension DeviceArray {
 public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 
     public func dotProduct(with other: DeviceArray) -> Element {
+        precondition(count == other.count, "Array count mismatch");
         return withUnsafeDevicePointer { ptr in
             other.withUnsafeDevicePointer { otherPtr in
                 BLAS.global(on: self.device).dot(
@@ -32,8 +33,6 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 
     @inline(__always)
     public static func •(lhs: DeviceArray<Element>, rhs: DeviceArray<Element>) -> Element {
-        precondition(lhs.count == rhs.count,
-                     "Two arrays have different number of elements");
         return lhs.dotProduct(with: rhs)
     }
 
@@ -48,6 +47,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     ///   - alpha: multiplication factor to the other array before adding
     public mutating func formAddition(with other: DeviceArray<Element>,
                                       multipliedBy alpha: Element = 1) {
+        precondition(count == other.count, "Array count mismatch")
         let axpy = kernelManager.kernel(.axpy, forType: Element.self)
         let blockSize = Swift.min(128, count)
         let blockCount = (count+blockSize-1)/blockSize
@@ -76,8 +76,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
         }
     }
 
-    public mutating func formElementwise(_ operation: BinaryKernelOperation,
+    public mutating func formElementwise(_ operation: DeviceBinaryOperation,
                                          with other: DeviceArray<Element>) {
+        precondition(count == other.count, "Array count mismatch")
         let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
@@ -92,7 +93,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
     }
 
     public mutating func formElementwiseResult(
-        operation: BinaryKernelOperation, x: DeviceArray<Element>, y: DeviceArray<Element>) {
+        operation: DeviceBinaryOperation, x: DeviceArray<Element>, y: DeviceArray<Element>) {
+        precondition(count == x.count && count == y.count, "Array count mismatch")
         let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
@@ -150,8 +152,20 @@ public extension DeviceArray where Element : KernelDataProtocol {
 
 public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint {
 
-    public mutating func transform(by functor: FloatingPointKernelFunctor) {
-        let transformer = kernelManager.kernel(.transform, functor: functor, forType: Element.self)
+    public mutating func formTransformation(_ transformation: DeviceUnaryTransformation, from source: DeviceArray<Element>) {
+        precondition(count == source.count, "Array count mismatch")
+        let transformer = kernelManager.kernel(.transform, transformation: transformation, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! transformer<<<(blockCount, blockSize)>>>[
+                .constPointer(to: source), .pointer(to: &self), .longLong(Int64(count))
+            ]
+        }
+    }
+
+    public mutating func transform(by transformation: DeviceUnaryTransformation) {
+        let transformer = kernelManager.kernel(.transform, transformation: transformation, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
         device.sync {

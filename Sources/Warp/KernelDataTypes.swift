@@ -119,15 +119,25 @@ extension UInt64 : KernelDataProtocol {
     }
 }
 
-public enum FloatingPointKernelFunctor {
+public enum DeviceUnaryTransformation {
     case exp, log, cos, sin, tan, tanh, sinh, cosh, acos, asin, atan, floor, ceil
 }
 
-public enum BinaryKernelOperation {
+internal extension DeviceUnaryTransformation {
+    func functionName<T: FloatingPoint>(forType: T.Type) -> String {
+        let baseName = String(describing: self)
+        if T.self == Float.self {
+            return baseName + "f"
+        }
+        return baseName
+    }
+}
+
+public enum DeviceBinaryOperation {
     case addition, subtraction, multiplication, division
 }
 
-internal extension BinaryKernelOperation {
+internal extension DeviceBinaryOperation {
     var operatorSymbol: String {
         switch self {
         case .addition: return "+"
@@ -135,15 +145,5 @@ internal extension BinaryKernelOperation {
         case .multiplication: return "*"
         case .division: return "/"
         }
-    }
-}
-
-internal extension FloatingPointKernelFunctor {
-    func functionName<T: FloatingPoint>(forType: T.Type) -> String {
-        let baseName = String(describing: self)
-        if T.self == Float.self {
-            return baseName + "f"
-        }
-        return baseName
     }
 }
