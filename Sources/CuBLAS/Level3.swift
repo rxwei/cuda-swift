@@ -14,12 +14,12 @@ public extension BLAS {
     /// Matrix multiplication
     /// C = α transpose(A) transpose(B) + βC
     public func gemm<T: BLASDataProtocol>
-        (alpha: Float, 
+        (alpha: T,
          A: UnsafeDevicePointer<T>, rowCount m: Int32,
          transpose transposeA: Transpose, leadingDimension lda: Int32,
          B: UnsafeDevicePointer<T>, columnCount n: Int32,
          transpose transposeB: Transpose, leadingDimension ldb: Int32,
-         commonDimension k: Int32, beta: Float,
+         commonDimension k: Int32, beta: T,
          C: UnsafeMutableDevicePointer<T>, leadingDimension ldc: Int32) {
         var alpha = alpha, beta = beta
         !!cublasGemmEx(
@@ -29,7 +29,7 @@ public extension BLAS {
             B.deviceAddress, T.cType, ldb,
             &beta,
             C.deviceAddress, T.cType, ldc,
-            T.cType, CUBLAS_GEMM_ALGO0
+            T.cType, CUBLAS_GEMM_DFALT
         )
     }
 
