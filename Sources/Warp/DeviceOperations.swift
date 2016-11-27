@@ -77,6 +77,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     }
 
     public mutating func assign(_ sourceElements: DeviceArray<Element>, multipliedBy alpha: Element) {
+        let count = Swift.min(self.count, sourceElements.count)
         let scale = kernelManager.kernel(.scale, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
@@ -108,7 +109,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
 
     public mutating func assignElementwiseResult(of operation: DeviceBinaryOperation,
                                                  x: DeviceArray<Element>, y: DeviceArray<Element>) {
-        precondition(count == x.count && count == y.count, "Array count mismatch")
+        let count = Swift.min(self.count, x.count, y.count)
         let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
@@ -123,6 +124,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     }
 
     public mutating func assign(_ sourceElements: DeviceArray<Element>) {
+        let count = Swift.min(self.count, sourceElements.count)
         let copy = kernelManager.kernel(.copy, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
@@ -181,7 +183,7 @@ public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint 
 
     public mutating func assign(_ sourceElements: DeviceArray<Element>,
                                 transformedBy transformation: DeviceUnaryTransformation) {
-        precondition(count == sourceElements.count, "Array count mismatch")
+        let count = Swift.min(self.count, sourceElements.count)
         let transformer = kernelManager.kernel(.transform, transformation: transformation, forType: Element.self)
         let blockSize = Swift.min(512, count)
         let blockCount = (count+blockSize-1)/blockSize
