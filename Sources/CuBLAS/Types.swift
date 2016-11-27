@@ -14,6 +14,14 @@ public extension BLAS {
         case double = 1
         case half = 2
         case int8 = 3
+        case uint8 = 8
+        case int32 = 10
+        case uint32 = 12
+
+        public init?(_ dataType: cublasDataType_t) {
+            /// Complex data types are not yet supported
+            self.init(rawValue: dataType.rawValue)
+        }
     }
 }
 
