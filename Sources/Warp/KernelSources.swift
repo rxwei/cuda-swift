@@ -29,6 +29,7 @@ enum FunctorialKernelSource: StaticString, CompilableKernelSource {
 
 enum BinaryOperationKernelSource: StaticString, CompilableKernelSource {
     case elementwise = "extern \"C\" __global__ void KERNEL(const TYPE x[], const TYPE y[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = x[tid] OP y[tid]; } "
+    case scalarRight = "extern \"C\" __global__ void KERNEL(const TYPE x[], const TYPE rval, TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = x[tid] OP rval; } "
 }
 
 extension StaticString : Hashable {

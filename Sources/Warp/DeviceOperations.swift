@@ -21,14 +21,10 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 
     public func dotProduct(with other: DeviceArray) -> Element {
         precondition(count == other.count, "Array count mismatch");
-        return withUnsafeDevicePointer { ptr in
-            other.withUnsafeDevicePointer { otherPtr in
-                BLAS.global(on: self.device).dot(
-                    x: ptr, stride: 1, y: otherPtr, stride: 1,
-                    count: Int32(Swift.min(self.count, other.count))
-                )
-            }
-        }
+        return BLAS.global(on: self.device).dot(
+            x: self.unsafeDevicePointer, stride: 1, y: other.unsafeDevicePointer,
+            stride: 1, count: Int32(Swift.min(self.count, other.count))
+        )
     }
 
     @inline(__always)
@@ -76,6 +72,48 @@ public extension DeviceArray where Element : KernelDataProtocol {
         }
     }
 
+    public mutating func addElements(by x: Element) {
+        let scalarRight = kernelManager.kernel(.scalarRight, operation: .addition, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! scalarRight<<<(blockCount, blockSize)>>>[
+                .constPointer(to: self),
+                .value(x),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
+    public mutating func subtractElements(by x: Element) {
+        let scalarRight = kernelManager.kernel(.scalarRight, operation: .subtraction, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! scalarRight<<<(blockCount, blockSize)>>>[
+                .constPointer(to: self),
+                .value(x),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
+    public mutating func divideElements(by x: Element) {
+        let scalarRight = kernelManager.kernel(.scalarRight, operation: .division, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! scalarRight<<<(blockCount, blockSize)>>>[
+                .constPointer(to: self),
+                .value(x),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
     public mutating func assign(_ sourceElements: DeviceArray<Element>, multipliedBy alpha: Element) {
         let count = Swift.min(self.count, sourceElements.count)
         let scale = kernelManager.kernel(.scale, forType: Element.self)
@@ -101,6 +139,22 @@ public extension DeviceArray where Element : KernelDataProtocol {
             try! elementOp<<<(blockCount, blockSize)>>>[
                 .constPointer(to: self),
                 .constPointer(to: other),
+                .pointer(to: &self),
+                .longLong(Int64(count))
+            ]
+        }
+    }
+
+    public mutating func assignElementwiseResult(of operation: DeviceBinaryOperation,
+                                                 x: DeviceArray<Element>, y: Element) {
+        let count = Swift.min(self.count, x.count)
+        let elementOp = kernelManager.kernel(.scalarRight, operation: operation, forType: Element.self)
+        let blockSize = Swift.min(512, count)
+        let blockCount = (count+blockSize-1)/blockSize
+        device.sync {
+            try! elementOp<<<(blockCount, blockSize)>>>[
+                .constPointer(to: x),
+                .value(y),
                 .pointer(to: &self),
                 .longLong(Int64(count))
             ]

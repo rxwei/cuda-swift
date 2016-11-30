@@ -43,7 +43,7 @@ final class KernelManager {
 
         var hashValue: Int {
             return type.hashValue ^ source.hashValue &+
-                (functor?.hashValue ?? 0) ^ (operation?.hashValue ?? 0)
+                (functor?.hashValue ?? 0x00ff) ^ (operation?.hashValue ?? 0xff00)
         }
 
         init(type: KernelDataType, source: StaticString,
@@ -66,6 +66,9 @@ final class KernelManager {
         self.device = device
     }
 
+    /// Print log to stderr
+    ///
+    /// - Parameter contents: contents of log
     @inline(__always)
     private func log(_ contents: String) {
         contents.withCString { ptr -> () in
