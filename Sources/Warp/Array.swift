@@ -20,6 +20,7 @@ protocol DeviceArrayProtocol :
     init(_ buffer: Buffer)
 }
 
+/// Array value type with a contiguous storage on CUDA device
 public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
 
     public typealias Index = Int
@@ -46,20 +47,31 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         return buffer.device
     }
 
-    /// Creates an empty instance.
+    /// Create an array on the current CUDA device.
     public init() {
         buffer = DeviceArrayBuffer(device: Device.current, capacity: 0)
     }
 
-    /// Creates an empty instance.
+    /// Create an array on a specific CUDA device
+    ///
+    /// - Parameter device: CUDA device
     public init(device: Device) {
         buffer = DeviceArrayBuffer(device: device, capacity: 0)
     }
 
+    /// Create an array of specified capacity on specified CUDA device
+    ///
+    /// - Parameters:
+    ///   - device: CUDA device
+    ///   - capacity: capacity of the array
     public init(device: Device, capacity: Int) {
         buffer = DeviceArrayBuffer(device: device, capacity: capacity)
     }
 
+    /// Create an array of specified capacity on the current CUDA device
+    ///
+    /// - Parameters:
+    ///   - capacity: capacity of the array
     public init(capacity: Int) {
         buffer = DeviceArrayBuffer(device: Device.current, capacity: capacity)
     }
@@ -88,6 +100,11 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         buffer = DeviceArrayBuffer(elements, device: Device.current)
     }
 
+    /// Create an array from the other array without unnecessary copy
+    ///
+    /// - Parameter other: array to assign to self
+    /// - Note: This is necessary because we need to shadow the init<C: Collection> 
+    /// initializer to prevent unnecessary copy.
     public init(_ other: DeviceArray<Element>) {
         self = other
     }
@@ -177,21 +194,54 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         }
     }
 
+    /// Calls a closure with a mutable pointer to the array's contiguous storage.
+    ///
+    /// - Parameter body: body closure with a pointer made available
+    /// - Returns: whatever the closure returns
+    /// - Throws: whatever the closure throws
+    /// - Note: Do not return the pointer from the closure
     public mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result {
         var startAddress = mutatingBuffer.startAddress
         return try body(&startAddress)
     }
 
+    /// Calls a closure with a pointer to the array's contiguous storage.
+    ///
+    /// - Parameter body: body closure with a pointer made available
+    /// - Returns: whatever the closure returns
+    /// - Throws: whatever the closure throws
+    /// - Note: Do not return the pointer from the closure
     public func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result {
         return try body(UnsafeDevicePointer(buffer.startAddress))
+    }
+
+    /// Get the mutable device pointer to the start of the array.
+    /// - Note: This should **only** be used when the lifetime of the pointer is
+    /// shorter than the lifetime of the array. If you are not sure about the life
+    /// time of the array, use `.withUnsafeMutableDevicePointer(...)` instead!
+    public var unsafeMutableDevicePointer: UnsafeMutableDevicePointer<Element> {
+        mutating get {
+            return mutatingBuffer.startAddress
+        }
+    }
+
+    /// Get the device pointer to the start of the array.
+    /// - Note: This should **only** be used when the lifetime of the pointer is
+    /// shorter than the lifetime of the array. If you are not sure about the life
+    /// time of the array, use `.withUnsafeMutableDevicePointer(...)` instead!
+    public var unsafeDevicePointer: UnsafeDevicePointer<Element> {
+        return UnsafeDevicePointer(buffer.startAddress)
     }
 
 }
 
 public extension Array {
 
+    /// Initialize an array by copying an array from CUDA device
+    ///
+    /// - Parameter deviceElements: array on CUDA device
     public init(_ deviceElements: DeviceArray<Element>) {
         self = deviceElements.hostArray
     }
