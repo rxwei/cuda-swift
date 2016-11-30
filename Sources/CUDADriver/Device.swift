@@ -16,8 +16,8 @@ public struct Device : Equatable, CHandleCarrier {
 
     public static var main: Device = Device(atIndex: 0)!
 
-    public static var all: [Device] {
-        return (0..<count).map { Device(atIndex: $0)! }
+    public static var all: [Device] = (0..<count).map {
+        Device(atIndex: $0)!
     }
 
     let handle: CUdevice
