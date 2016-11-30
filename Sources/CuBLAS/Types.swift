@@ -52,3 +52,9 @@ extension Int8 : BLASDataProtocol {
         return .int8
     }
 }
+
+extension UInt8 : BLASDataProtocol {
+    public static var blasDataType: BLAS.DataType {
+        return .uint8
+    }
+}
