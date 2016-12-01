@@ -215,7 +215,7 @@ class WarpTests: XCTestCase {
 
     func testCollectionOperations() {
         let hostX: [Float] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(10000))
-        let hostXD: [Double] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(10000))
+        let hostXD: [Double] = Array(sequence(first: 1024.0, next: {$0+1}).prefix(100))
         let hostXI64: [Int] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI32: [Int32] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI8: [Int8] = Array(sequence(first: 0, next: {$0+1}).prefix(20))
@@ -224,9 +224,9 @@ class WarpTests: XCTestCase {
         let XI64 = DeviceArray(hostXI64)
         let XI32 = DeviceArray(hostXI32)
         let XI8 = DeviceArray(hostXI8)
-        var XD_axpy = XD
-        XD_axpy.formAddition(with: XD, multipliedBy: 100)
         var XD_scaled = XD
+        XD_scaled.multiplyElements(by: 8.8)
+        XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
         var XD_filled = XD
         XD_filled.fill(with: 100.0)
         XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in 100.0 })
@@ -235,9 +235,9 @@ class WarpTests: XCTestCase {
         var XD_multiplied = XD
         XD_multiplied.formElementwise(.division, with: XD_filled)
         XCTAssertEqual(XD_multiplied.hostArray, zip(XD.hostArray, XD_filled.hostArray).map{$0/$1})
-        XD_scaled.multiplyElements(by: 8.8)
+        var XD_axpy = XD
+        XD_axpy.formElementwise(.addition, with: XD, multipliedBy: 100)
         XCTAssertEqual(XD_axpy.hostArray, zip(hostXD, hostXD).map{$0+$1*100})
-        XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
         XCTAssertEqual(X.sum(), hostX.reduce(0, +))
         XCTAssertEqual(XD.sum(), hostXD.reduce(0, +))
         XCTAssertEqual(XI64.sum(), hostXI64.reduce(0, &+))
@@ -246,7 +246,7 @@ class WarpTests: XCTestCase {
         XCTAssertEqual(XI8.sum(), hostXI8.reduce(0, &+))
         measure {
             X.multiplyElements(by: 10.0)
-            X.formAddition(with: X, multipliedBy: 10.0)
+            X.formElementwise(.addition, with: X, multipliedBy: 10.0)
             _ = X.sum()
             _ = XD.sum()
             _ = XI64.sum()

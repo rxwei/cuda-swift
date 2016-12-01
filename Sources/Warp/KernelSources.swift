@@ -17,9 +17,6 @@ protocol CompilableKernelSource : RawRepresentable, Equatable, Hashable { }
 enum KernelSource: StaticString, CompilableKernelSource {
     case sum = "extern \"C\" __global__ void KERNEL(const TYPE vector[], long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
     case asum = "extern \"C\" __global__ void KERNEL(const TYPE vector[], long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
-    case axpy = "extern \"C\" __global__ void KERNEL(TYPE a, const TYPE x[], const TYPE y[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = a * x[tid] + y[tid]; }"
-    case scale = "extern \"C\" __global__ void KERNEL(TYPE alpha, const TYPE vector[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = vector[tid] * alpha; }"
-    case copy = "extern \"C\" __global__ void KERNEL(const TYPE src[], TYPE dest[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) dest[tid] = src[tid]; }"
     case fill = "extern \"C\" __global__ void KERNEL(TYPE vector[], TYPE x, long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] = x; } "
 }
 
@@ -28,8 +25,8 @@ enum FunctorialKernelSource: StaticString, CompilableKernelSource {
 }
 
 enum BinaryOperationKernelSource: StaticString, CompilableKernelSource {
-    case elementwise = "extern \"C\" __global__ void KERNEL(const TYPE x[], const TYPE y[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = x[tid] OP y[tid]; } "
-    case scalarRight = "extern \"C\" __global__ void KERNEL(const TYPE x[], const TYPE rval, TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = x[tid] OP rval; } "
+    case elementwise = "extern \"C\" __global__ void KERNEL(const TYPE a, const TYPE x[], const TYPE b, const TYPE y[], TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = OP(a * x[tid], b * y[tid]); } "
+    case scalarRight = "extern \"C\" __global__ void KERNEL(const TYPE a, const TYPE x[], const TYPE rval, TYPE result[], long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = OP(a * x[tid], rval); } "
 }
 
 extension StaticString : Hashable {

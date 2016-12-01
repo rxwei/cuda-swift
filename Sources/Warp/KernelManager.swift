@@ -92,7 +92,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
-        log("Loading CUDA kernel \(source) for \(T.self)...\n")
+        log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
@@ -129,7 +129,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
-        log("Loading CUDA kernel \(source) for \(T.self)...\n")
+        log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
@@ -138,7 +138,7 @@ final class KernelManager {
                 .disableWarnings,
                 .defineMacro("KERNEL", as: String(describing: source)),
                 .defineMacro("TYPE", as: T.kernelDataType.rawValue),
-                .defineMacro("OP", as: operation.operatorSymbol)
+                .defineMacro("OP(_x_, _y_)", as: operation.macro)
             ]
         )
         var function: Function!
@@ -163,7 +163,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
-        log("Loading CUDA kernel \(source) for \(T.self)...\n")
+        log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [

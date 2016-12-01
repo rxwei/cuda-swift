@@ -31,16 +31,16 @@ public extension KernelArgument {
 }
 
 public enum KernelDataType : String {
-    case float            = "float"
-    case double           = "double"
-    case char             = "char"
-    case short            = "short"
-    case int              = "int"
-    case longLong         = "long long"
-    case unsignedChar     = "unsigned char"
-    case unsignedShort    = "unsigned short"
-    case unsignedInt      = "unsigned int"
-    case unsignedLongLong = "unsigned long long"
+    case float            = "float"              // 32
+    case double           = "double"             // 64
+    case char             = "char"               // 8
+    case short            = "short"              // 16
+    case int              = "int"                // 32
+    case longLong         = "long long"          // 64
+    case unsignedChar     = "unsigned char"      // 8
+    case unsignedShort    = "unsigned short"     // 16
+    case unsignedInt      = "unsigned int"       // 32
+    case unsignedLongLong = "unsigned long long" // 64
 }
 
 public protocol KernelDataProtocol : ExpressibleByIntegerLiteral {
@@ -138,12 +138,12 @@ public enum DeviceBinaryOperation {
 }
 
 internal extension DeviceBinaryOperation {
-    var operatorSymbol: String {
+    var macro: String {
         switch self {
-        case .addition: return "+"
-        case .subtraction: return "-"
-        case .multiplication: return "*"
-        case .division: return "/"
+        case .addition: return "((_x_) + (_y_))"
+        case .subtraction: return "((_x_) - (_y_))"
+        case .multiplication: return "((_x_) * (_y_))"
+        case .division: return "((_x_) / (_y_))"
         }
     }
 }
