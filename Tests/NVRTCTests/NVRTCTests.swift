@@ -29,8 +29,8 @@ class NVRTCTests: XCTestCase {
             let ptx = try Compiler.compile(program)
             XCTAssertEqual(ptx.name, "test")
         }
-        catch _ as CompilerError {
-            guard let log = program.compilationLog else { XCTFail("Log unavailable"); return }
+        catch let error as CompilerError {
+            guard let log = error.log else { XCTFail("Log unavailable"); return }
             XCTAssertTrue(log.contains("error: identifier \"elta\" is undefined\n\nAt end of source: error: expected a \"}\"\n\n2 errors detected in the compilation of"))
         }
     }

@@ -66,12 +66,12 @@ open class Program {
     public convenience init(source: String, name: String? = nil,
                             headers: [(name: String, header: String)] = []) throws {
         guard let data = source.data(using: .utf8, allowLossyConversion: true) else {
-            throw CompilerError.invalidEncoding
+            throw CompilerError(kind: .invalidEncoding)
         }
         let headerData = try headers.map {
             (name: String, header: String) -> (name: String, header: Data) in
             guard let data = header.data(using: .utf8, allowLossyConversion: true) else {
-                throw CompilerError.invalidEncoding
+                throw CompilerError(kind: .invalidEncoding)
             }
             return (name, data)
         }
@@ -146,7 +146,10 @@ open class Compiler {
     }
 
     open class func compile(_ program: Program) throws -> PTX {
-        try ensureSuccess(nvrtcCompileProgram(program.handle, 0, nil))
+        let result = nvrtcCompileProgram(program.handle, 0, nil)
+        guard result == NVRTC_SUCCESS else {
+            throw CompilerError(result: result, log: program.compilationLog)
+        }
         return try program.retrievePTX()
     }
 
@@ -159,9 +162,10 @@ open class Compiler {
                     cArgPtrs.append(buf.baseAddress)
                 }
             }
-            try ensureSuccess(
-                nvrtcCompileProgram(program.handle, Int32(ptr.count), &cArgPtrs)
-            )
+            let result = nvrtcCompileProgram(program.handle, Int32(ptr.count), &cArgPtrs)
+            guard result == NVRTC_SUCCESS else {
+                throw CompilerError(result: result, log: program.compilationLog)
+            }
             return try program.retrievePTX()
         }
     }
