@@ -100,13 +100,11 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         buffer = DeviceArrayBuffer(elements, device: Device.current)
     }
 
-    /// Create an array from the other array without unnecessary copy
+    /// Create an array by copying from the other array
     ///
     /// - Parameter other: array to assign to self
-    /// - Note: This is necessary because we need to shadow the init<C: Collection> 
-    /// initializer to prevent unnecessary copy.
     public init(_ other: DeviceArray<Element>) {
-        self = other
+        buffer = DeviceArrayBuffer(other.buffer)
     }
 
     private init(viewing buffer: DeviceArrayBuffer<Element>, range: Range<Int>) {

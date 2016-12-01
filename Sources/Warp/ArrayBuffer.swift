@@ -51,6 +51,13 @@ extension DeviceArrayBufferProtocol {
     }
 }
 
+class LifetimeKeeper<Kept> {
+    let retainee: Kept
+    init(keeping retainee: Kept) {
+        self.retainee = retainee
+    }
+}
+
 final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
 
     typealias SubSequence = DeviceArrayBuffer<Element>
@@ -60,7 +67,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
     let capacity: Int
     let startIndex: Int, endIndex: Int
     var owner: AnyObject?
-    private var retainees: [Element]?
+    private var lifetimeKeeper: LifetimeKeeper<[Element]>?
     private var valueRetainees: [DeviceValueBuffer<Element>?]
 
 
@@ -96,7 +103,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         startIndex = other.startIndex
         endIndex = other.endIndex
         owner = other
-        retainees = other.retainees
+        lifetimeKeeper = other.lifetimeKeeper
         valueRetainees = other.valueRetainees
     }
 
@@ -109,7 +116,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         startIndex = range.lowerBound
         endIndex = range.upperBound
         owner = other
-        retainees = other.retainees
+        lifetimeKeeper = other.lifetimeKeeper
         valueRetainees = other.valueRetainees
     }
 
@@ -119,7 +126,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
         self.init(device: device, capacity: elements.count)
         var elements = Array(elements)
         baseAddress.assign(fromHost: &elements, count: elements.count)
-        retainees = elements
+        lifetimeKeeper = LifetimeKeeper<[Element]>(keeping: elements)
     }
 
     convenience init(repeating repeatedValue: Element, count: Int, device: Device) {
@@ -129,7 +136,7 @@ final class DeviceArrayBuffer<Element> : DeviceArrayBufferProtocol {
 
     convenience init(_ other: DeviceArrayBuffer<Element>) {
         self.init(device: other.device, capacity: other.count)
-        retainees = other.retainees
+        lifetimeKeeper = other.lifetimeKeeper
         baseAddress.assign(from: other.startAddress, count: other.count)
     }
     

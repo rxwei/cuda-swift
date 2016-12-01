@@ -27,7 +27,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
     let device: Device
     let baseAddress: UnsafeMutableDevicePointer<Element>
     let owner: AnyObject?
-    private var retainee: Element?
+    private var lifetimeKeeper: LifetimeKeeper<Element>?
 
     init() {
         device = Device.current
@@ -49,7 +49,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
     convenience init(_ other: DeviceValueBuffer<Element>) {
         self.init(device: other.device)
         baseAddress.assign(from: other.baseAddress)
-        retainee = other.retainee
+        lifetimeKeeper = other.lifetimeKeeper
     }
 
     init(viewing other: DeviceValueBuffer<Element>) {
@@ -71,7 +71,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
             return baseAddress.load()
         }
         set {
-            retainee = newValue
+            lifetimeKeeper = LifetimeKeeper(keeping: newValue)
             baseAddress.assign(newValue)
         }
     }
