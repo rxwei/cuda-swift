@@ -28,11 +28,12 @@ import Warp
 var x: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 let y: DeviceArray<Float> = [1.0, 2.0, 3.0, 4.0, 5.0]
 
-/// Scalar multiplication
+/// Scalar map operations
+x.incrementElements(by: 2) // x => [2.0, 3.0, 4.0, 5.0, 6.0] on device
 x.multiplyElements(by: 2) // x => [2.0, 4.0, 6.0, 8.0, 10.0] on device
 
 /// Addition
-x.formAddition(with: y) // x => [3.0, 6.0, 9.0, 12.0, 15.0] on device
+x.formElementwise(.addition, with: y) // x => [3.0, 6.0, 9.0, 12.0, 15.0] on device
 
 /// Dot product
 x • y // => 165.0
@@ -55,7 +56,11 @@ x.formElementwise(.multiplication, with: y)
 x.formElementwise(.division, with: y)
 
 /// Fill with the same value
-x.fill(with: 10.0)
+var z = y
+z.fill(with: 10.0)
+
+/// Composite assignment
+x.assign(from: .subtraction, left: y, multipliedBy: 100.0, right: z)
 ```
 
 ### Real-time compilation
@@ -123,10 +128,10 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib64
     - [x] `PTX`
     - [x] `Module`
     - [x] `Stream`
-    - [x] `UnsafeMutableDevicePointer<T>`
+    - [x] `Unsafe(Mutable)DevicePointer<T>`
     - [x] `DriverError` (all error codes from CUDA C API)
 - [x] CUDARuntime - CUDA Runtime API
-    - [x] `UnsafeDevicePointer<T>` and `UnsafeMutableDevicePointer<T>`
+    - [x] `Unsafe(Mutable)DevicePointer<T>`
     - [x] `Device`
     - [x] `Stream`
     - [x] `RuntimeError` (all error codes from CUDA C API)
@@ -140,7 +145,7 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib64
     - [x] `DeviceArray<T>` (generic array in device memory)
     - [x] `DeviceValue<T>` (generic value in device memory)
     - [x] Acclerated vector operations
-    - [x] Type-safe kernel argument helpers
+    - [x] Type-safe kernel argument helpers
 
 ### Optional
 
