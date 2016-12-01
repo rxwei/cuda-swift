@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2989D0671DCD737400ED8CE2 /* ValueBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D0661DCD737400ED8CE2 /* ValueBuffer.swift */; };
-		2989D06A1DCE720600ED8CE2 /* DeviceOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */; };
+		2989D06A1DCE720600ED8CE2 /* CollectionOperations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D0691DCE720600ED8CE2 /* CollectionOperations.swift */; };
 		2989D06C1DCE763200ED8CE2 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2989D06B1DCE763200ED8CE2 /* Types.swift */; };
 		29B5897C1DD65FA10069D423 /* Level3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B5897B1DD65FA10069D423 /* Level3.swift */; };
 		OBJ_105 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* Device.swift */; };
@@ -204,7 +204,7 @@
 
 /* Begin PBXFileReference section */
 		2989D0661DCD737400ED8CE2 /* ValueBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueBuffer.swift; sourceTree = "<group>"; };
-		2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceOperations.swift; sourceTree = "<group>"; };
+		2989D0691DCE720600ED8CE2 /* CollectionOperations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionOperations.swift; sourceTree = "<group>"; };
 		2989D06B1DCE763200ED8CE2 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		29B5897B1DD65FA10069D423 /* Level3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Level3.swift; sourceTree = "<group>"; };
 		OBJ_10 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
@@ -408,7 +408,7 @@
 			isa = PBXGroup;
 			children = (
 				2989D0681DCD740900ED8CE2 /* DeviceTypes */,
-				2989D0691DCE720600ED8CE2 /* DeviceOperations.swift */,
+				2989D0691DCE720600ED8CE2 /* CollectionOperations.swift */,
 				OBJ_40 /* KernelDataTypes.swift */,
 				OBJ_41 /* KernelManager.swift */,
 				OBJ_42 /* KernelSources.swift */,
@@ -779,7 +779,7 @@
 				2989D0671DCD737400ED8CE2 /* ValueBuffer.swift in Sources */,
 				OBJ_134 /* KernelDataTypes.swift in Sources */,
 				OBJ_135 /* KernelManager.swift in Sources */,
-				2989D06A1DCE720600ED8CE2 /* DeviceOperations.swift in Sources */,
+				2989D06A1DCE720600ED8CE2 /* CollectionOperations.swift in Sources */,
 				OBJ_136 /* KernelSources.swift in Sources */,
 				OBJ_137 /* Value.swift in Sources */,
 			);

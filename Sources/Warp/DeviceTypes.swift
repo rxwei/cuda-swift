@@ -16,6 +16,8 @@ public protocol DeviceAddressable {
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
     mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result
+    var unsafeMutableDevicePointer: UnsafeMutableDevicePointer<Element> { mutating get }
+    var unsafeDevicePointer: UnsafeDevicePointer<Element> { get }
 }
 
 public protocol DeviceCollection : DeviceAddressable, RandomAccessCollection {

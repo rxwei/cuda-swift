@@ -13,15 +13,11 @@ import CUDARuntime
 public extension KernelArgument {
 
     public static func pointer<T: DeviceAddressable>(to value: inout T) -> KernelArgument {
-        return value.withUnsafeMutableDevicePointer { ptr in
-            self.init(ptr.deviceAddress)
-        }
+        return self.init(value.unsafeMutableDevicePointer.deviceAddress)
     }
 
     public static func constPointer<T: DeviceAddressable>(to value: T) -> KernelArgument {
-        return value.withUnsafeDevicePointer { ptr in
-            self.init(ptr.deviceAddress)
-        }
+        return self.init(value.unsafeDevicePointer.deviceAddress)
     }
 
     public static func value<T: KernelDataProtocol>(_ value: T) -> KernelArgument {
@@ -116,34 +112,5 @@ extension UInt32 : KernelDataProtocol {
 extension UInt64 : KernelDataProtocol {
     public static var kernelDataType: KernelDataType {
         return .unsignedLongLong
-    }
-}
-
-public enum UnaryOperation {
-    case exp, log, cos, sin, tan, tanh, sinh, cosh, acos, asin, atan, floor, ceil
-}
-
-internal extension UnaryOperation {
-    func functionName<T: FloatingPoint>(forType: T.Type) -> String {
-        let baseName = String(describing: self)
-        if T.self == Float.self {
-            return baseName + "f"
-        }
-        return baseName
-    }
-}
-
-public enum BinaryOperation {
-    case addition, subtraction, multiplication, division
-}
-
-internal extension BinaryOperation {
-    var macro: String {
-        switch self {
-        case .addition: return "((_x_) + (_y_))"
-        case .subtraction: return "((_x_) - (_y_))"
-        case .multiplication: return "((_x_) * (_y_))"
-        case .division: return "((_x_) / (_y_))"
-        }
     }
 }

@@ -66,16 +66,6 @@ final class KernelManager {
         self.device = device
     }
 
-    /// Print log to stderr
-    ///
-    /// - Parameter contents: contents of log
-    @inline(__always)
-    private func log(_ contents: String) {
-        contents.withCString { ptr -> () in
-            fputs(ptr, stderr)
-        }
-    }
-
     /// Get a compiled functorial kernel, a.k.a. kernel with a transformation functor
     /// such as `log` and `tanh`.
     ///
@@ -101,7 +91,7 @@ final class KernelManager {
                 .disableWarnings,
                 .defineMacro("KERNEL", as: String(describing: source)),
                 .defineMacro("TYPE", as: T.kernelDataType.rawValue),
-                .defineMacro("FUNC", as: transformation.functionName(forType: T.self))
+                .defineMacro("FUNC", as: transformation.source(forType: T.self))
             ]
         )
         var function: Function!
@@ -138,7 +128,7 @@ final class KernelManager {
                 .disableWarnings,
                 .defineMacro("KERNEL", as: String(describing: source)),
                 .defineMacro("TYPE", as: T.kernelDataType.rawValue),
-                .defineMacro("OP(_x_, _y_)", as: operation.macro)
+                .defineMacro("OP(_x_, _y_)", as: operation.source)
             ]
         )
         var function: Function!
@@ -183,4 +173,13 @@ final class KernelManager {
         return function
     }
 
+}
+
+/// Print log to stderr
+///
+/// - Parameter contents: contents of log
+func log(_ contents: String) {
+    contents.withCString { ptr -> () in
+        fputs(ptr, stderr)
+    }
 }
