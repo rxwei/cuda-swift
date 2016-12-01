@@ -119,11 +119,11 @@ extension UInt64 : KernelDataProtocol {
     }
 }
 
-public enum DeviceUnaryTransformation {
+public enum UnaryOperation {
     case exp, log, cos, sin, tan, tanh, sinh, cosh, acos, asin, atan, floor, ceil
 }
 
-internal extension DeviceUnaryTransformation {
+internal extension UnaryOperation {
     func functionName<T: FloatingPoint>(forType: T.Type) -> String {
         let baseName = String(describing: self)
         if T.self == Float.self {
@@ -133,11 +133,11 @@ internal extension DeviceUnaryTransformation {
     }
 }
 
-public enum DeviceBinaryOperation {
+public enum BinaryOperation {
     case addition, subtraction, multiplication, division
 }
 
-internal extension DeviceBinaryOperation {
+internal extension BinaryOperation {
     var macro: String {
         switch self {
         case .addition: return "((_x_) + (_y_))"

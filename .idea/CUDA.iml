@@ -2,39 +2,39 @@
 <module type="CIDR_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Function.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Device.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Error.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Stream.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Memory.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/Array.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/ArrayBuffer.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/ValueBuffer.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/KernelSources.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/KernelManager.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/KernelDataTypes.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/DeviceOperations.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/DeviceTypes.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/Value.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Function.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Memory.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Error.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/PTX.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Device.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/CHandleCarrier.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Driver.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Stream.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/PTX.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Context.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CUDADriver/Module.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Function.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Device.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Memory.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Stream.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/CUDARuntime/Error.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/Array.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/ArrayBuffer.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/DeviceTypes.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/KernelSources.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/KernelManager.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/KernelDataTypes.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/ValueBuffer.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/DeviceOperations.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/Warp/Value.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/NVRTC/Compiler.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/NVRTC/Option.swift" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Sources/NVRTC/Error.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CuBLAS/Level2.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CuBLAS/Level3.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CuBLAS/Error.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CuBLAS/Level1.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CuBLAS/Types.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sources/CuBLAS/BLAS.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/NVRTC/Compiler.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/NVRTC/Option.swift" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Sources/NVRTC/Error.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tests/WarpTests/WarpTests.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tests/CUDADriverTests/CUDADriverTests.swift" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tests/CUDARuntimeTests/CUDARuntimeTests.swift" isTestSource="false" />

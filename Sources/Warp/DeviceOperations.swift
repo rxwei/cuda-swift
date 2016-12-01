@@ -36,7 +36,7 @@ public extension DeviceArray where Element : BLASDataProtocol & FloatingPoint {
 
 public extension DeviceArray where Element : KernelDataProtocol {
 
-    public mutating func addElements(by x: Element) {
+    public mutating func incrementElements(by x: Element) {
         let scalarRight = kernelManager.kernel(.scalarRight,
                                                operation: .addition,
                                                forType: Element.self)
@@ -53,7 +53,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
         }
     }
 
-    public mutating func subtractFromElements(_ x: Element) {
+    public mutating func decrementElements(by x: Element) {
         let scalarRight = kernelManager.kernel(.scalarRight,
                                                operation: .subtraction,
                                                forType: Element.self)
@@ -133,7 +133,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
     /// - Parameters:
     ///   - operation: binary operation to perform on self and other
     ///   - other: the other array
-    public mutating func formElementwise(_ operation: DeviceBinaryOperation,
+    public mutating func formElementwise(_ operation: BinaryOperation,
                                          with other: DeviceArray<Element>,
                                          multipliedBy alpha: Element = 1) {
         precondition(count == other.count, "Array count mismatch")
@@ -160,10 +160,10 @@ public extension DeviceArray where Element : KernelDataProtocol {
     ///   - operation: binary operation to perform on x and y
     ///   - x: arary x
     ///   - y: array y
-    public mutating func assignResult(of operation: DeviceBinaryOperation,
-                                      left: DeviceArray<Element>,
-                                      multipliedBy alpha: Element,
-                                      right: Element) {
+    public mutating func assign(from operation: BinaryOperation,
+                                left: DeviceArray<Element>,
+                                multipliedBy alpha: Element,
+                                right: Element) {
         let count = Swift.min(self.count, left.count)
         let elementOp = kernelManager.kernel(.scalarRight,
                                              operation: operation,
@@ -189,9 +189,9 @@ public extension DeviceArray where Element : KernelDataProtocol {
     ///   - alpha: constant to multiply the left-hand side by
     ///   - y: right-hand side array
     ///   - beta: constant to multiply the right-hand side by
-    public mutating func assignElementwiseResult(of operation: DeviceBinaryOperation,
-                                                 left: DeviceArray<Element>, multipliedBy alpha: Element = 1,
-                                                 right: DeviceArray<Element>, multipliedBy beta: Element = 1) {
+    public mutating func assign(from operation: BinaryOperation,
+                                left: DeviceArray<Element>, multipliedBy alpha: Element = 1,
+                                right: DeviceArray<Element>, multipliedBy beta: Element = 1) {
         let count = Swift.min(self.count, left.count, right.count)
         let elementOp = kernelManager.kernel(.elementwise, operation: operation, forType: Element.self)
         let blockSize = Swift.min(512, count)
@@ -260,7 +260,7 @@ public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint 
     ///   - other: other array to transform and subsequently to assign from
     ///   - transformation: transformation to apply to the other array
     public mutating func assign(from other: DeviceArray<Element>,
-                                transformedBy transformation: DeviceUnaryTransformation) {
+                                transformedBy transformation: UnaryOperation) {
         let count = Swift.min(self.count, other.count)
         let transformer = kernelManager.kernel(.transform,
                                                transformation: transformation,
@@ -277,7 +277,7 @@ public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint 
     /// Transform self in place
     ///
     /// - Parameter transformation: transformation to apply
-    public mutating func transform(by transformation: DeviceUnaryTransformation) {
+    public mutating func transform(by transformation: UnaryOperation) {
         let transformer = kernelManager.kernel(.transform, 
                                                transformation: transformation,
                                                forType: Element.self)

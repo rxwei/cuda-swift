@@ -34,8 +34,8 @@ final class KernelManager {
     struct ModuleCacheKey : Equatable, Hashable {
         let type: KernelDataType
         let source: StaticString
-        let functor: DeviceUnaryTransformation?
-        let operation: DeviceBinaryOperation?
+        let functor: UnaryOperation?
+        let operation: BinaryOperation?
 
         static func ==(lhs: ModuleCacheKey, rhs: ModuleCacheKey) -> Bool {
             return lhs.type == rhs.type && lhs.source == rhs.source
@@ -47,8 +47,8 @@ final class KernelManager {
         }
 
         init(type: KernelDataType, source: StaticString,
-             functor: DeviceUnaryTransformation? = nil,
-             operation: DeviceBinaryOperation? = nil) {
+             functor: UnaryOperation? = nil,
+             operation: BinaryOperation? = nil) {
             self.type = type
             self.source = source
             self.functor = functor
@@ -85,7 +85,7 @@ final class KernelManager {
     ///   - forType: type of each element
     /// - Returns: kernel function
     func kernel<T: KernelDataProtocol & FloatingPoint>(
-        _ source: FunctorialKernelSource, transformation: DeviceUnaryTransformation, forType: T.Type) -> Function {
+            _ source: FunctorialKernelSource, transformation: UnaryOperation, forType: T.Type) -> Function {
         /// Get cached function
         let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, functor: transformation)
         if let (_, function) = modules[key] {
@@ -122,7 +122,7 @@ final class KernelManager {
     ///   - forType: type of each element
     /// - Returns: kernel function
     func kernel<T: KernelDataProtocol>(
-        _ source: BinaryOperationKernelSource, operation: DeviceBinaryOperation, forType: T.Type) -> Function {
+            _ source: BinaryOperationKernelSource, operation: BinaryOperation, forType: T.Type) -> Function {
         /// Get cached function
         let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, operation: operation)
         if let (_, function) = modules[key] {
