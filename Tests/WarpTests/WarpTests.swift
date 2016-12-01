@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Foundation
 @testable import Warp
 @testable import CUDARuntime
 @testable import CUDADriver
@@ -215,7 +216,7 @@ class WarpTests: XCTestCase {
 
     func testCollectionOperations() {
         let hostX: [Float] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(10000))
-        let hostXD: [Double] = Array(sequence(first: 1024.0, next: {$0+1}).prefix(100))
+        let hostXD: [Double] = Array(sequence(first: 1024.0, next: {$0+1}).prefix(50000))
         let hostXI64: [Int] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI32: [Int32] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI8: [Int8] = Array(sequence(first: 0, next: {$0+1}).prefix(20))
@@ -224,34 +225,39 @@ class WarpTests: XCTestCase {
         let XI64 = DeviceArray(hostXI64)
         let XI32 = DeviceArray(hostXI32)
         let XI8 = DeviceArray(hostXI8)
-        var XD_scaled = XD
-        XD_scaled.multiplyElements(by: 8.8)
-        XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
-        var XD_filled = XD
-        XD_filled.fill(with: 100.0)
-        XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in 100.0 })
-        XD_filled.transform(by: .log)
-        XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in log(100.0) })
-        var XD_multiplied = XD
-        XD_multiplied.formElementwise(.division, with: XD_filled)
-        XCTAssertEqual(XD_multiplied.hostArray, zip(XD.hostArray, XD_filled.hostArray).map{$0/$1})
-        var XD_axpy = XD
-        XD_axpy.formElementwise(.addition, with: XD, multipliedBy: 100)
-        XCTAssertEqual(XD_axpy.hostArray, zip(hostXD, hostXD).map{$0+$1*100})
+
         XCTAssertEqual(X.sum(), hostX.reduce(0, +))
         XCTAssertEqual(XD.sum(), hostXD.reduce(0, +))
         XCTAssertEqual(XI64.sum(), hostXI64.reduce(0, &+))
         XCTAssertEqual(XI64.sumOfAbsoluteValues(), hostXI64.reduce(0, {$0+abs($1)}))
         XCTAssertEqual(XI32.sum(), hostXI32.reduce(0, &+))
         XCTAssertEqual(XI8.sum(), hostXI8.reduce(0, &+))
+
+        var XD_scaled = XD
+        XD_scaled.multiplyElements(by: 8.8)
+        XCTAssertEqual(XD_scaled.hostArray, hostXD.map{$0*8.8})
+        var XD_multiplied = XD
+        XD_multiplied.formElementwise(.division, with: XD)
+        XCTAssertEqual(XD_multiplied.hostArray, zip(hostXD, hostXD).map{$0/$1})
+        var XD_axpy = XD
+        XD_axpy.formElementwise(.addition, with: XD, multipliedBy: 100)
+        XCTAssertEqual(XD_axpy.hostArray, zip(hostXD, hostXD).map{$0+$1*100})
+        var XD_filled = XD
+        XD_filled.fill(with: 100.0)
+        XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in 100.0 })
+        XD_filled.transform(by: .log)
+        XCTAssertEqual(XD_filled.hostArray, (0..<XD_filled.count).map { _ in log(100.0) })
+
+        /// Now let's measure some map operations
+        /// Create two new arrays by copying to ensure that we get a reasonable
+        /// standard deviation
+        let X_add = DeviceArray(X)
+        /// Do operations once to load kernels
+        X.multiplyElements(by: 10.0)
+        X.formElementwise(.addition, with: X_add, multipliedBy: 10.0)
         measure {
             X.multiplyElements(by: 10.0)
-            X.formElementwise(.addition, with: X, multipliedBy: 10.0)
-            _ = X.sum()
-            _ = XD.sum()
-            _ = XI64.sum()
-            _ = XI32.sum()
-            _ = XI8.sum()
+            X.formElementwise(.addition, with: X_add, multipliedBy: 10.0)
             XD_filled.fill(with: 200.0)
         }
     }
