@@ -43,7 +43,7 @@ final class KernelManager {
 
         var hashValue: Int {
             return type.hashValue ^ source.hashValue &+
-                (functor?.hashValue ?? 0x00ff) ^ (operation?.hashValue ?? 0xff00)
+                (functor?.hashValue ?? 0) &+ (operation?.hashValue ?? 0)
         }
 
         init(type: KernelDataType, source: StaticString,
@@ -92,7 +92,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
-        log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
+        log("Loading CUDA kernel \'\(source) \(transformation)\' for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
@@ -129,7 +129,7 @@ final class KernelManager {
             return function
         }
         /// If not cached, compile using NVRTC
-        log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
+        log("Loading CUDA kernel \'\(source) \(operation)\' for \(T.self)...\n")
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: [
