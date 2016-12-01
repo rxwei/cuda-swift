@@ -53,7 +53,7 @@ public extension DeviceArray where Element : KernelDataProtocol {
         }
     }
 
-    public mutating func subtractElements(by x: Element) {
+    public mutating func subtractFromElements(_ x: Element) {
         let scalarRight = kernelManager.kernel(.scalarRight,
                                                operation: .subtraction,
                                                forType: Element.self)
