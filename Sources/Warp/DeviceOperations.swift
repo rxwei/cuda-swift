@@ -47,8 +47,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .value(1 as Element),
                 .constPointer(to: self),
                 .value(x),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -64,8 +64,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .value(1 as Element),
                 .constPointer(to: self),
                 .value(x),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -81,8 +81,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .value(1 as Element),
                 .constPointer(to: self),
                 .value(x),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -98,8 +98,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .value(1 as Element),
                 .constPointer(to: self),
                 .value(x),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -122,8 +122,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .value(1 as Element),
                 .constPointer(to: self),
                 .value(alpha),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -148,8 +148,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .constPointer(to: self),
                 .value(alpha),
                 .constPointer(to: other),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -175,8 +175,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .value(alpha),
                 .constPointer(to: left),
                 .value(right),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -202,8 +202,8 @@ public extension DeviceArray where Element : KernelDataProtocol {
                 .constPointer(to: left),
                 .value(beta),
                 .constPointer(to: right),
-                .pointer(to: &self),
-                .longLong(Int64(count))
+                .longLong(Int64(count)),
+                .pointer(to: &self)
             ]
         }
     }
@@ -269,7 +269,7 @@ public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint 
         let blockCount = (count+blockSize-1)/blockSize
         device.sync {
             try! transformer<<<(blockCount, blockSize)>>>[
-                .constPointer(to: other), .pointer(to: &self), .longLong(Int64(count))
+                .constPointer(to: other), .longLong(Int64(count)), .pointer(to: &self)
             ]
         }
     }
@@ -285,7 +285,7 @@ public extension DeviceArray where Element : KernelDataProtocol & FloatingPoint 
         let blockCount = (count+blockSize-1)/blockSize
         device.sync {
             try! transformer<<<(blockCount, blockSize)>>>[
-                .constPointer(to: self), .pointer(to: &self), .longLong(Int64(count))
+                .constPointer(to: self), .longLong(Int64(count)), .pointer(to: &self)
             ]
         }
     }
