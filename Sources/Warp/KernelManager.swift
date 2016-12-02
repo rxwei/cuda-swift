@@ -28,6 +28,7 @@ final class KernelManager {
         return manager
     }
 
+    /// Current CUDA device
     let device: Device
 
     /// Unique hash key for each module
@@ -57,7 +58,7 @@ final class KernelManager {
     }
 
     /// Cached (compiled and loaded) modules
-    fileprivate var modules: [ModuleCacheKey : (Module, Function)] = Dictionary(minimumCapacity: 32)
+    fileprivate var modules: [ModuleCacheKey : (Module, Function)] = Dictionary(minimumCapacity: 128)
 
     /// Initialize an instance on device
     ///
@@ -66,40 +67,38 @@ final class KernelManager {
         self.device = device
     }
 
+    /// Common compile options
+    private lazy var commonCompileOptions: [CompileOption] = [
+        .computeCapability(self.device.computeCapability),
+        .useFastMath,
+        .disableWarnings,
+    ]
+
     /// Get a compiled functorial kernel, a.k.a. kernel with a transformation functor
     /// such as `log` and `tanh`.
+    /// - Note: This supports only floating point types, because unary math functions
+    /// such as `sin` and `cos` are available only for floating point.
     ///
     /// - Parameters:
     ///   - source: kernel source to be compiled (if not cached) and loaded
     ///   - functor: 1-place functor for element transformation
     ///   - forType: type of each element
     /// - Returns: kernel function
-    func kernel<T: KernelDataProtocol & FloatingPoint>(
-            _ source: FunctorialKernelSource, transformation: UnaryOperation, forType: T.Type) -> Function {
+    func kernel<T: KernelDataProtocol & FloatingPoint>(_ source: FunctorialKernelSource,
+                                                       transformation: UnaryOperation,
+                                                       forType: T.Type) -> Function {
         /// Get cached function
         let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, functor: transformation)
         if let (_, function) = modules[key] {
             return function
         }
         /// If not cached, compile using NVRTC
-        log("Loading CUDA kernel \'\(source) \(transformation)\' for \(T.self)...\n")
-        let ptx = try! Compiler.compile(
-            source.rawValue,
-            options: [
-                .computeCapability(device.computeCapability),
-                .useFastMath,
-                .disableWarnings,
-                .defineMacro("KERNEL", as: String(describing: source)),
-                .defineMacro("TYPE", as: T.kernelDataType.rawValue),
-                .defineMacro("FUNC", as: transformation.source(forType: T.self))
-            ]
-        )
-        var function: Function!
-        device.sync {
-            let module = try! Module(ptx: ptx)
-            function = module.function(named: String(describing: source))!
-            modules[key] = (module, function)
-        }
+        let (module, function) = makeKernel(source, extraOptions: [
+            .defineMacro("KERNEL", as: String(describing: source)),
+            .defineMacro("TYPE", as: T.kernelDataType.rawValue),
+            .defineMacro("FUNC", as: transformation.source(forType: T.self))
+        ])
+        modules[key] = (module, function)
         return function
     }
 
@@ -111,8 +110,9 @@ final class KernelManager {
     ///   - functor: 1-place functor for element transformation
     ///   - forType: type of each element
     /// - Returns: kernel function
-    func kernel<T: KernelDataProtocol>(
-            _ source: BinaryOperationKernelSource, operation: BinaryOperation, forType: T.Type) -> Function {
+    func kernel<T: KernelDataProtocol>(_ source: BinaryOperationKernelSource,
+                                       operation: BinaryOperation,
+                                       forType: T.Type) -> Function {
         /// Get cached function
         let key = ModuleCacheKey(type: T.kernelDataType, source: source.rawValue, operation: operation)
         if let (_, function) = modules[key] {
@@ -120,23 +120,12 @@ final class KernelManager {
         }
         /// If not cached, compile using NVRTC
         log("Loading CUDA kernel \'\(source) \(operation)\' for \(T.self)...\n")
-        let ptx = try! Compiler.compile(
-            source.rawValue,
-            options: [
-                .computeCapability(device.computeCapability),
-                .useFastMath,
-                .disableWarnings,
-                .defineMacro("KERNEL", as: String(describing: source)),
-                .defineMacro("TYPE", as: T.kernelDataType.rawValue),
-                .defineMacro("OP(_x_, _y_)", as: operation.source)
-            ]
-        )
-        var function: Function!
-        device.sync {
-            let module = try! Module(ptx: ptx)
-            function = module.function(named: String(describing: source))!
-            modules[key] = (module, function)
-        }
+        let (module, function) = makeKernel(source, extraOptions: [
+            .defineMacro("KERNEL", as: String(describing: source)),
+            .defineMacro("TYPE", as: T.kernelDataType.rawValue),
+            .defineMacro("OP(_x_, _y_)", as: operation.source)
+        ])
+        modules[key] = (module, function)
         return function
     }
 
@@ -154,23 +143,35 @@ final class KernelManager {
         }
         /// If not cached, compile using NVRTC
         log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
+        let (module, function) = makeKernel(source, extraOptions: [
+            .defineMacro("KERNEL", as: String(describing: source)),
+            .defineMacro("TYPE", as: T.kernelDataType.rawValue)
+        ])
+        modules[key] = (module, function)
+        return function
+    }
+
+    /// Compile kernel source and load as a module
+    ///
+    /// - Parameters:
+    ///   - source: source to compile
+    ///   - extraOptions: options other than `commonCompileOptions` 
+    ///     e.g. type macro definitions
+    /// - Returns: loaded module and function reference
+    func makeKernel<Source : SourceHashable>(_ source: Source,
+                                             extraOptions: [CompileOption]) -> (Module, Function)
+        where Source : RawRepresentable, Source.RawValue == StaticString {
         let ptx = try! Compiler.compile(
             source.rawValue,
-            options: [
-                .computeCapability(device.computeCapability),
-                .useFastMath,
-                .disableWarnings,
-                .defineMacro("KERNEL", as: String(describing: source)),
-                .defineMacro("TYPE", as: T.kernelDataType.rawValue)
-            ]
+            options: commonCompileOptions + extraOptions
         )
+        var module: Module!
         var function: Function!
         device.sync {
-            let module = try! Module(ptx: ptx)
+            module = try! Module(ptx: ptx)
             function = module.function(named: String(describing: source))!
-            modules[key] = (module, function)
         }
-        return function
+        return (module, function)
     }
 
 }
