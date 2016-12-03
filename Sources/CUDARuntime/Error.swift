@@ -611,12 +611,14 @@ public enum RuntimeError : UInt32, Error {
 
 }
 
+@inline(__always)
 func ensureSuccess(_ result: cudaError) throws {
     guard result == cudaSuccess else {
         throw RuntimeError(result)
     }
 }
 
+@inline(__always)
 func forceSuccess(_ result: cudaError) {
     guard result == cudaSuccess else {
         fatalError(String(describing: RuntimeError(result)))

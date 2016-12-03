@@ -24,6 +24,7 @@ public enum BLASError : UInt32, Error {
     }
 }
 
+@inline(__always)
 func ensureSuccess(_ result: cublasStatus_t) throws {
     guard result == CUBLAS_STATUS_SUCCESS else {
         throw BLASError(result)
@@ -32,6 +33,7 @@ func ensureSuccess(_ result: cublasStatus_t) throws {
 
 prefix operator !!
 
+@inline(__always)
 func forceSuccess(_ result: cublasStatus_t) {
     guard result == CUBLAS_STATUS_SUCCESS else {
         fatalError(String(describing: BLASError(result)))

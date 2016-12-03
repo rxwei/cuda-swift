@@ -55,6 +55,7 @@ extension CompilerError : CustomStringConvertible {
 
 }
 
+@inline(__always)
 func ensureSuccess(_ result: nvrtcResult) throws {
     guard result == NVRTC_SUCCESS else {
         throw CompilerError(kind: .init(result))
@@ -62,6 +63,7 @@ func ensureSuccess(_ result: nvrtcResult) throws {
 }
 
 
+@inline(__always)
 func forceSuccess(_ result: nvrtcResult) {
     guard result == NVRTC_SUCCESS else {
         fatalError(String(describing: CompilerError(kind: .init(result))))

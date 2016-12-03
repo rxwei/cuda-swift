@@ -408,6 +408,7 @@ public enum DriverError : UInt32, Error {
     
 }
 
+@inline(__always)
 func ensureSuccess(_ result: CUresult) throws {
     guard result == CUDA_SUCCESS else {
         throw DriverError(result)
@@ -415,6 +416,7 @@ func ensureSuccess(_ result: CUresult) throws {
 }
 
 
+@inline(__always)
 func forceSuccess(_ result: CUresult) {
     guard result == CUDA_SUCCESS else {
         fatalError(String(describing: DriverError(result)))
