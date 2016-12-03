@@ -50,8 +50,8 @@ public extension BLAS {
                          y.deviceAddress, strideY)
     }
 
-    public func scale<T: BLASDataProtocol>(
-        _ x: UnsafeMutableDevicePointer<T>, stride: Int32, count: Int32, by alpha: T) {
+    public func scal<T: BLASDataProtocol>(
+        _ x: UnsafeMutableDevicePointer<T>, stride: Int32, count: Int32, alpha: T) {
         var alpha = alpha
         !!cublasScalEx(handle, count, &alpha, T.cType, x.deviceAddress, T.cType, stride, T.cType)
     }
