@@ -27,32 +27,32 @@ extension SourceHashable where Self : RawRepresentable, Self.RawValue == StaticS
 
 /// Kernel source with generic TYPE
 ///
-/// - sum: void sum(const T*, const long long, T*)
-/// - asum: void asum(const T*, const long long, T*)
-/// - fill: void fill(T*, const long long)
+/// - sum: void sum(T*, long long, T*)
+/// - asum: void asum(T*, long long, T*)
+/// - fill: void fill(T*, long long)
 enum KernelSource: StaticString, SourceHashable {
-    case sum = "extern \"C\" __global__ void KERNEL(const TYPE vector[], const long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += vector[i]; }"
-    case asum = "extern \"C\" __global__ void KERNEL(const TYPE vector[], const long long count, TYPE *result) { *result = 0; for (long i = 0; i < count; i++) *result += abs(vector[i]); }"
-    case fill = "extern \"C\" __global__ void KERNEL(TYPE vector[], TYPE x, const long long count) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) vector[tid] = x; } "
+    case sum = "extern \"C\" __global__ void KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=v[i];}"
+    case asum = "extern \"C\" __global__ void KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=abs(v[i]);}"
+    case fill = "extern \"C\" __global__ void KERNEL(TYPE *v,TYPE x,long long c){long long i=blockIdx.x*blockDim.x + threadIdx.x; if (i<c) v[i]=x;}"
 }
 
 /// Kernel source with generic TYPE and 1-place transformation function FUNC (eg. tan, sin)
 ///
-/// - transform: void transform(const T*, const long long, T*)
+/// - transform: void transform(T*, long long, T*)
 enum FunctorialKernelSource: StaticString, SourceHashable {
-    case transform = "extern \"C\" __global__ void KERNEL(const TYPE vector[], const long long count, TYPE result[]) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = FUNC(vector[tid]); } "
+    case transform = "extern \"C\" __global__ void KERNEL(TYPE *v,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=FUNC(v[i]);}"
 }
 
 
 /// Kernel source with generic TYPE and binary operation OP
 ///
-/// - elementwise: void elementwise(const T, const T*, const T, const T*, const long long, T*)
-/// - scalarRight: void scalarRight(const T, const T*, const T, const long long, T*)
-/// - scalarLeft: void scalarRight(const T, const T, const T*, const long long, T*)
+/// - elementwise: void elementwise(T, T*, T, T*, long long, T*)
+/// - scalarRight: void scalarRight(T, T*, T, long long, T*)
+/// - scalarLeft: void scalarRight(T, T, T*, long long, T*)
 enum BinaryOperationKernelSource: StaticString, SourceHashable {
-    case elementwise = "extern \"C\" __global__ void KERNEL(const TYPE a, const TYPE x[], const TYPE b, const TYPE y[], const long long count, TYPE result[]) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = OP(a * x[tid], b * y[tid]); } "
-    case scalarRight = "extern \"C\" __global__ void KERNEL(const TYPE a, const TYPE x[], const TYPE rval, const long long count, TYPE result[]) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = OP(a * x[tid], rval); } "
-    case scalarLeft = "extern \"C\" __global__ void KERNEL(const TYPE lval, const TYPE a, const TYPE x[], const long long count, TYPE result[]) { size_t tid = blockIdx.x * blockDim.x + threadIdx.x; if (tid < count) result[tid] = OP(lval, a * x[tid]); } "
+    case elementwise = "extern \"C\" __global__ void KERNEL(TYPE a,TYPE *x,TYPE b,TYPE *y,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=OP(a*x[i],b*y[i]);}"
+    case scalarRight = "extern \"C\" __global__ void KERNEL(TYPE a,TYPE *x,TYPE rval,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=OP(a*x[i],rval);}"
+    case scalarLeft = "extern \"C\" __global__ void KERNEL(TYPE lval,TYPE a,TYPE *x,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=OP(lval,a*x[i]);}"
 }
 
 extension StaticString : Hashable {
