@@ -9,10 +9,11 @@
 import CUDARuntime
 
 /// Value view on CUDA device
-public struct DeviceValue<Element> : DeviceAddressable {
+public struct DeviceValue<Element> : MutableDeviceAddressable {
 
     var buffer: DeviceValueBuffer<Element>
 
+    /// Copy on write
     var mutatingBuffer: DeviceValueBuffer<Element> {
         mutating get {
             if !isKnownUniquelyReferenced(&buffer) || buffer.owner != nil {
@@ -26,10 +27,12 @@ public struct DeviceValue<Element> : DeviceAddressable {
         self.buffer = buffer
     }
 
+    /// Device on which the value is allocated
     public var device: Device {
         return buffer.device
     }
 
+    /// Dereferenced value, copied from device
     public var value: Element {
         get {
             return buffer.value
@@ -39,6 +42,10 @@ public struct DeviceValue<Element> : DeviceAddressable {
         }
     }
 
+    /// Initialize a value on device memory
+    ///
+    /// - Parameter initialValue: initial value, or arbitrary unsafe value if
+    /// not specified
     public init(_ initialValue: Element? = nil) {
         buffer = DeviceValueBuffer()
         if let initialValue = initialValue {
@@ -46,6 +53,12 @@ public struct DeviceValue<Element> : DeviceAddressable {
         }
     }
 
+    /// Initialize a value on device memory
+    ///
+    /// - Parameters:
+    ///   - initialValue: initial value, or arbitrary unsafe
+    ///   - device: device to allocate memory on
+    /// value if not specified
     public init(_ initialValue: Element? = nil, device: Device) {
         buffer = DeviceValueBuffer(device: device)
         if let initialValue = initialValue {
@@ -96,6 +109,7 @@ public struct DeviceValue<Element> : DeviceAddressable {
 
 }
 
+// MARK: - Underlying mutable device collection
 extension DeviceValue where Element : MutableDeviceCollection {
 
     /// Get or set the i-th element of the underlying array when the value 
@@ -113,6 +127,7 @@ extension DeviceValue where Element : MutableDeviceCollection {
 
 }
 
+// MARK: - Underlying device collection
 extension DeviceValue where Element : DeviceCollection {
 
     /// Get an array on host memory by copying from CUDA device
@@ -122,6 +137,7 @@ extension DeviceValue where Element : DeviceCollection {
     
 }
 
+// MARK: - Underlying device collection whose element type is also device collection
 extension DeviceValue where Element : DeviceCollection, Element.Element : DeviceCollection {
 
     /// Get an array on host memory by copying from CUDA device

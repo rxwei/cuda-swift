@@ -21,7 +21,7 @@ protocol DeviceArrayProtocol :
 }
 
 /// Array value type with a contiguous storage on CUDA device
-public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
+public struct DeviceArray<Element> : MutableDeviceCollection, DeviceArrayProtocol {
 
     public typealias Index = Int
     public typealias IndexDistance = Int
@@ -43,6 +43,7 @@ public struct DeviceArray<Element> : DeviceCollection, DeviceArrayProtocol {
         self.buffer = buffer
     }
 
+    /// Device on which the value is allocated
     public var device: Device {
         return buffer.device
     }

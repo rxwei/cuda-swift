@@ -12,16 +12,12 @@ import CUDARuntime
 
 public extension KernelArgument {
 
-    public static func pointer<T: DeviceAddressable>(to value: inout T) -> KernelArgument {
+    public static func pointer<T: MutableDeviceAddressable>(to value: inout T) -> KernelArgument {
         return self.init(value.unsafeMutableDevicePointer.deviceAddress)
     }
 
     public static func constPointer<T: DeviceAddressable>(to value: T) -> KernelArgument {
         return self.init(value.unsafeDevicePointer.deviceAddress)
-    }
-
-    public static func value<T: KernelDataProtocol>(_ value: T) -> KernelArgument {
-        return self.init(value)
     }
 
 }

@@ -14,10 +14,13 @@ public protocol DeviceAddressable {
     var device: Device { get }
     func withUnsafeDevicePointer<Result>
         (_ body: (UnsafeDevicePointer<Element>) throws -> Result) rethrows -> Result
+    var unsafeDevicePointer: UnsafeDevicePointer<Element> { get }
+}
+
+public protocol MutableDeviceAddressable : DeviceAddressable {
     mutating func withUnsafeMutableDevicePointer<Result>
         (_ body: (inout UnsafeMutableDevicePointer<Element>) throws -> Result) rethrows -> Result
     var unsafeMutableDevicePointer: UnsafeMutableDevicePointer<Element> { mutating get }
-    var unsafeDevicePointer: UnsafeDevicePointer<Element> { get }
 }
 
 public protocol DeviceCollection : DeviceAddressable, RandomAccessCollection {
@@ -29,6 +32,6 @@ public protocol DeviceCollection : DeviceAddressable, RandomAccessCollection {
     subscript(index: Int) -> Iterator.Element { get }
 }
 
-public protocol MutableDeviceCollection : DeviceCollection {
+public protocol MutableDeviceCollection : DeviceCollection, MutableDeviceAddressable {
     subscript(index: Int) -> Iterator.Element { get set }
 }

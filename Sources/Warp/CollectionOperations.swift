@@ -88,7 +88,7 @@ public extension DeviceCollection where Element : BLASDataProtocol & FloatingPoi
 
 }
 
-public extension DeviceCollection where Element : KernelDataProtocol {
+public extension MutableDeviceCollection where Element : KernelDataProtocol {
 
     public mutating func incrementElements(by x: Element) {
         let scalarRight = kernelManager.kernel(.scalarRight,
@@ -321,7 +321,7 @@ public extension DeviceCollection where Element : KernelDataProtocol {
 
 }
 
-public extension DeviceCollection where Element : KernelDataProtocol & FloatingPoint {
+public extension MutableDeviceCollection where Element : KernelDataProtocol & FloatingPoint {
 
     /// Assign the other array with transformation to self
     ///
