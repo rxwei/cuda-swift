@@ -14,8 +14,10 @@ public struct Device : Equatable, CHandleCarrier {
 
     public typealias Properties = CUdevprop
 
+    /// First device
     public static var main: Device = Device(atIndex: 0)!
 
+    /// All available devices
     public static var all: [Device] = (0..<count).map {
         Device(atIndex: $0)!
     }
@@ -66,16 +68,17 @@ public struct Device : Equatable, CHandleCarrier {
 
     /// Create a context and execute the body synchronously.
     /// The lifetime of the context = the lifetype of the body
-    /// - parameter body: closure with the new context
-    /// - returns: result of the body
-    @discardableResult
-    public func withContext<Result>
-        (_ execute: (Context) throws -> Result) rethrows -> Result {
+    /// - Parameter execute: closure with the new context
+    /// - Throws: whatever the closure throws
+    public func sync(_ execute: (Context) throws -> ()) rethrows {
         var context = Context.begin(on: self)
-        let result = try execute(context)
+        try execute(context)
         Context.synchronize()
         context.end()
-        return result
+    }
+
+    public func makeContext() -> Context {
+        return Context.begin(on: self)
     }
 
     public init?(atIndex index: Int) {
