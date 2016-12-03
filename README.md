@@ -145,7 +145,7 @@ swift build -Xcc -I/usr/local/cuda/include -Xlinker -L/usr/local/cuda/lib64
     - [x] `DeviceArray<T>` (generic array in device memory)
     - [x] `DeviceValue<T>` (generic value in device memory)
     - [x] Acclerated vector operations
-    - [x] Type-safe kernel argument helpers
+    - [x] Type-safe kernel argument helpers
 
 ### Optional
 
