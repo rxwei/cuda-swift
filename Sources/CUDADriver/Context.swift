@@ -48,6 +48,7 @@ public struct Context : CHandleCarrier {
     }
 
     public mutating func end() {
+        precondition(handle != nil, "Context already ended")
         !!cuCtxDestroy_v2(handle)
         handle = nil
     }
