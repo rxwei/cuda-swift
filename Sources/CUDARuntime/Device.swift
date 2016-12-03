@@ -60,6 +60,10 @@ public struct Device : Equatable {
         }
     }
 
+    /// Execute a closure synchronously with respect to the device
+    ///
+    /// - Parameter execute: closure to execute
+    /// - Throws: whatever the closure throws
     public func sync(_ execute: () throws -> ()) rethrows {
         let contexualDevice = Device.current
         /// Synchronously execute directly if it's the same device
@@ -74,6 +78,22 @@ public struct Device : Equatable {
             Device.synchronize()
             try execute()
             Device.synchronize()
+            Device.current = contexualDevice
+        }
+    }
+
+    /// Execute a closure asynchronously with respect to the device
+    ///
+    /// - Parameter execute: closure to execute
+    /// - Throws: whatever the closure throws
+    public func async(_ execute: () throws -> ()) rethrows {
+        let contexualDevice = Device.current
+        if self == contexualDevice {
+            try execute()
+        }
+        else {
+            Device.current = self
+            try execute()
             Device.current = contexualDevice
         }
     }

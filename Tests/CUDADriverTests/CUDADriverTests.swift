@@ -43,7 +43,7 @@ class CUDADriverTests: XCTestCase {
 
         let program = try Program(source: source, name: "test")
         let ptx = try Compiler.compile(program)
-        try Device.main.withContext { context in
+        try Device.main.sync { context in
             let module = try Module(ptx: ptx)
             _ = module.function(named: "gIncr")
             _ = module.function(named: "gSum")
