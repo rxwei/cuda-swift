@@ -40,73 +40,49 @@ public protocol KernelDataProtocol : ExpressibleByIntegerLiteral {
 }
 
 extension Int : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .longLong
-    }
+    public static let kernelDataType: KernelDataType = .longLong
 }
 
 extension UInt : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .unsignedLongLong
-    }
+    public static let kernelDataType: KernelDataType = .unsignedLongLong
 }
 
 extension Float : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .float
-    }
+    public static let kernelDataType: KernelDataType = .float
 }
 
 extension Double : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .double
-    }
+    public static let kernelDataType: KernelDataType = .double
 }
 
 extension Int8 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .char
-    }
+    public static let kernelDataType: KernelDataType = .char
 }
 
 extension Int16 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .short
-    }
+    public static let kernelDataType: KernelDataType = .short
 }
 
 extension Int32 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .int
-    }
+    public static let kernelDataType: KernelDataType = .int
 }
 
 extension Int64 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .longLong
-    }
+    public static let kernelDataType: KernelDataType = .longLong
 }
 
 extension UInt8 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .unsignedChar
-    }
+    public static let kernelDataType: KernelDataType = .unsignedChar
 }
 
 extension UInt16 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .unsignedShort
-    }
+    public static let kernelDataType: KernelDataType = .unsignedShort
 }
 
 extension UInt32 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .unsignedInt
-    }
+    public static let kernelDataType: KernelDataType = .unsignedInt
 }
 
 extension UInt64 : KernelDataProtocol {
-    public static var kernelDataType: KernelDataType {
-        return .unsignedLongLong
-    }
+    public static let kernelDataType: KernelDataType = .unsignedLongLong
 }

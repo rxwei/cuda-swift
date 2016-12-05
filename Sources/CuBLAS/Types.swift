@@ -18,7 +18,7 @@ public extension BLAS {
         case int32 = 10
         case uint32 = 12
 
-        public init?(_ dataType: cublasDataType_t) {
+        init?(_ dataType: cublasDataType_t) {
             /// Complex data types are not yet supported
             self.init(rawValue: dataType.rawValue)
         }
@@ -36,25 +36,17 @@ extension BLASDataProtocol {
 }
 
 extension Float : BLASDataProtocol {
-    public static var blasDataType: BLAS.DataType {
-        return .float
-    }
+    public static let blasDataType: BLAS.DataType = .float
 }
 
 extension Double : BLASDataProtocol {
-    public static var blasDataType: BLAS.DataType {
-        return .double
-    }
+    public static let blasDataType: BLAS.DataType = .double
 }
 
 extension Int8 : BLASDataProtocol {
-    public static var blasDataType: BLAS.DataType {
-        return .int8
-    }
+    public static let blasDataType: BLAS.DataType = .int8
 }
 
 extension UInt8 : BLASDataProtocol {
-    public static var blasDataType: BLAS.DataType {
-        return .uint8
-    }
+    public static let blasDataType: BLAS.DataType = .uint8
 }
