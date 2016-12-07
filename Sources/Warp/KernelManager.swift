@@ -72,6 +72,7 @@ final class KernelManager {
         .computeCapability(self.device.computeCapability),
         .useFastMath,
         .disableWarnings,
+        .defineMacro("IDX(_X_)", as: "long long (_X_)=blockIdx.x*blockDim.x+threadIdx.x")
     ]
 
     /// Get a compiled functorial kernel, a.k.a. kernel with a transformation functor
@@ -94,7 +95,6 @@ final class KernelManager {
         }
         /// If not cached, compile using NVRTC
         let (module, function) = makeKernel(source, extraOptions: [
-            .defineMacro("KERNEL", as: String(describing: source)),
             .defineMacro("TYPE", as: T.kernelDataType.rawValue),
             .defineMacro("FUNC", as: transformation.source(forType: T.self))
         ])
@@ -121,7 +121,6 @@ final class KernelManager {
         /// If not cached, compile using NVRTC
         log("Loading CUDA kernel \'\(source) \(operation)\' for \(T.self)...\n")
         let (module, function) = makeKernel(source, extraOptions: [
-            .defineMacro("KERNEL", as: String(describing: source)),
             .defineMacro("TYPE", as: T.kernelDataType.rawValue),
             .defineMacro("OP(_x_, _y_)", as: operation.source)
         ])
@@ -144,7 +143,6 @@ final class KernelManager {
         /// If not cached, compile using NVRTC
         log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
         let (module, function) = makeKernel(source, extraOptions: [
-            .defineMacro("KERNEL", as: String(describing: source)),
             .defineMacro("TYPE", as: T.kernelDataType.rawValue)
         ])
         modules[key] = (module, function)
@@ -163,7 +161,9 @@ final class KernelManager {
         where Source : RawRepresentable, Source.RawValue == StaticString {
         let ptx = try! Compiler.compile(
             source.rawValue,
-            options: commonCompileOptions + extraOptions
+            options: commonCompileOptions +
+                [ .defineMacro("KERNEL", as: "extern \"C\" __global__ void \(source)") ] +
+                extraOptions
         )
         var module: Module!
         var function: Function!

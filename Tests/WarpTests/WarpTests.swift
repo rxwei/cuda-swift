@@ -216,7 +216,7 @@ class WarpTests: XCTestCase {
 
     func testCollectionOperations() {
         let hostX: [Float] = Array(sequence(first: -1024.0, next: {$0+1}).prefix(10000))
-        let hostXD: [Double] = Array(sequence(first: 1024.0, next: {$0+1}).prefix(50000))
+        let hostXD: [Double] = Array(sequence(first: 1024.0, next: {$0+1}).prefix(10000))
         let hostXI64: [Int] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI32: [Int32] = Array(sequence(first: -1024, next: {$0+1}).prefix(10000))
         let hostXI8: [Int8] = Array(sequence(first: 0, next: {$0+1}).prefix(20))

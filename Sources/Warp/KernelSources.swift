@@ -31,16 +31,16 @@ extension SourceHashable where Self : RawRepresentable, Self.RawValue == StaticS
 /// - asum: void asum(T*, long long, T*)
 /// - fill: void fill(T*, long long)
 enum KernelSource: StaticString, SourceHashable {
-    case sum = "extern \"C\" __global__ void KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=v[i];}"
-    case asum = "extern \"C\" __global__ void KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=abs(v[i]);}"
-    case fill = "extern \"C\" __global__ void KERNEL(TYPE *v,TYPE x,long long c){long long i=blockIdx.x*blockDim.x + threadIdx.x; if (i<c) v[i]=x;}"
+    case sum = "KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=v[i];}"
+    case asum = "KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=abs(v[i]);}"
+    case fill = "KERNEL(TYPE *v,TYPE x,long long c){IDX(i); if (i<c) v[i]=x;}"
 }
 
 /// Kernel source with generic TYPE and 1-place transformation function FUNC (eg. tan, sin)
 ///
 /// - transform: void transform(T*, long long, T*)
 enum FunctorialKernelSource: StaticString, SourceHashable {
-    case transform = "extern \"C\" __global__ void KERNEL(TYPE *v,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=FUNC(v[i]);}"
+    case transform = "KERNEL(TYPE *v,long long c,TYPE *res){IDX(i); if (i<c) res[i]=FUNC(v[i]);}"
 }
 
 
@@ -50,9 +50,9 @@ enum FunctorialKernelSource: StaticString, SourceHashable {
 /// - scalarRight: void scalarRight(T, T*, T, long long, T*)
 /// - scalarLeft: void scalarRight(T, T, T*, long long, T*)
 enum BinaryOperationKernelSource: StaticString, SourceHashable {
-    case elementwise = "extern \"C\" __global__ void KERNEL(TYPE a,TYPE *x,TYPE b,TYPE *y,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=OP(a*x[i],b*y[i]);}"
-    case scalarRight = "extern \"C\" __global__ void KERNEL(TYPE a,TYPE *x,TYPE rval,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=OP(a*x[i],rval);}"
-    case scalarLeft = "extern \"C\" __global__ void KERNEL(TYPE lval,TYPE a,TYPE *x,long long c,TYPE *res){long long i=blockIdx.x*blockDim.x+threadIdx.x; if (i<c) res[i]=OP(lval,a*x[i]);}"
+    case elementwise = "KERNEL(TYPE a,TYPE *x,TYPE b,TYPE *y,long long c,TYPE *res){IDX(i); if (i<c) res[i]=OP(a*x[i],b*y[i]);}"
+    case scalarRight = "KERNEL(TYPE a,TYPE *x,TYPE rval,long long c,TYPE *res){IDX(i); if (i<c) res[i]=OP(a*x[i],rval);}"
+    case scalarLeft = "KERNEL(TYPE lval,TYPE a,TYPE *x,long long c,TYPE *res){IDX(i); if (i<c) res[i]=OP(lval,a*x[i]);}"
 }
 
 extension StaticString : Hashable {
