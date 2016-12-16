@@ -11,6 +11,13 @@ CFLAGS=-I$(INCDIR)
 LDFLAGS=-L$(LIBDIR)
 SFLAGS=-Xcc $(CFLAGS) -Xlinker $(LDFLAGS)
 
+DOCDIR=Documentation
+gendoc=jazzy \
+  --clean \
+  --xcodebuild-arguments -scheme,CUDA \
+  --module $(1) \
+  --output $(DOCDIR)/$(1)
+
 all:
 	swift build $(SFLAGS)
 
@@ -29,6 +36,12 @@ xcodeproj:
      '\nLIBRARY_SEARCH_PATHS = $(LIBDIR)'\
      '\nLD_RUNPATH_SEARCH_PATHS = $(LIBDIR)'\
     >> $(wildcard *.xcodeproj)/Configs/Project.xcconfig
+
+doc:
+	$(call gendoc,CUDADriver)
+	$(call gendoc,CUDARuntime)
+	$(call gendoc,NVRTC)
+	$(call gendoc,CuBLAS)
 
 clean:
 	swift build --clean

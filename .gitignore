@@ -3,6 +3,7 @@
 /Packages
 /Build
 /build
+/Documentation
 
 *.o
 *.d
