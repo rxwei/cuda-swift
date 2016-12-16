@@ -27,32 +27,32 @@ extension SourceHashable where Self : RawRepresentable, Self.RawValue == StaticS
 
 /// Kernel source with generic TYPE
 ///
-/// - sum: void sum(T*, long long, T*)
-/// - asum: void asum(T*, long long, T*)
-/// - fill: void fill(T*, long long)
+/// - sum: void sum(T*, SIZE, T*)
+/// - asum: void asum(T*, SIZE, T*)
+/// - fill: void fill(T*, SIZE)
 enum KernelSource: StaticString, SourceHashable {
-    case sum = "KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=v[i];}"
-    case asum = "KERNEL(TYPE *v,long long c,TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=abs(v[i]);}"
-    case fill = "KERNEL(TYPE *v,TYPE x,long long c){IDX(i); if (i<c) v[i]=x;}"
+    case sum = "KN(TYPE *v, SIZE c, TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=v[i];}" // TODO: parallelism
+    case asum = "KN(TYPE *v, SIZE c, TYPE *res){*res=0; for (long i=0; i<c; i++) *res+=abs(v[i]);}" // TODO: parallelism
+    case fill = "KN(TYPE *v, TYPE x, SIZE c){ID(i); if (i<c) v[i]=x;}"
 }
 
-/// Kernel source with generic TYPE and 1-place transformation function FUNC (eg. tan, sin)
+/// Kernel source with generic T and 1-place transformation function FUNC (eg. tan, sin)
 ///
-/// - transform: void transform(T*, long long, T*)
+/// - transform: void transform(T*, SIZE, T*)
 enum FunctorialKernelSource: StaticString, SourceHashable {
-    case transform = "KERNEL(TYPE *v,long long c,TYPE *res){IDX(i); if (i<c) res[i]=FUNC(v[i]);}"
+    case transform = "KN(TYPE *v, SIZE c, TYPE *res){ID(i); if (i<c) res[i]=FUNC(v[i]);}"
 }
 
 
 /// Kernel source with generic TYPE and binary operation OP
 ///
-/// - elementwise: void elementwise(T, T*, T, T*, long long, T*)
-/// - scalarRight: void scalarRight(T, T*, T, long long, T*)
-/// - scalarLeft: void scalarRight(T, T, T*, long long, T*)
+/// - elementwise: void elementwise(T, T*, T, T*, SIZE, T*)
+/// - scalarRight: void scalarRight(T, T*, T, SIZE, T*)
+/// - scalarLeft: void scalarRight(T, T, T*, SIZE, T*)
 enum BinaryOperationKernelSource: StaticString, SourceHashable {
-    case elementwise = "KERNEL(TYPE a,TYPE *x,TYPE b,TYPE *y,long long c,TYPE *res){IDX(i); if (i<c) res[i]=OP(a*x[i],b*y[i]);}"
-    case scalarRight = "KERNEL(TYPE a,TYPE *x,TYPE rval,long long c,TYPE *res){IDX(i); if (i<c) res[i]=OP(a*x[i],rval);}"
-    case scalarLeft = "KERNEL(TYPE lval,TYPE a,TYPE *x,long long c,TYPE *res){IDX(i); if (i<c) res[i]=OP(lval,a*x[i]);}"
+    case elementwise = "KN(TYPE a, TYPE *x, TYPE b, TYPE *y, SIZE c, TYPE *res) {ID(i); if (i<c) res[i] = OP(a*x[i],b*y[i]);}"
+    case scalarRight = "KN(TYPE a, TYPE *x, TYPE rval, SIZE c, TYPE *res) {ID(i); if (i<c) res[i] = OP(a*x[i],rval);}"
+    case scalarLeft = "KN(TYPE lval, TYPE a, TYPE *x, SIZE c, TYPE *res) {ID(i); if (i<c) res[i] = OP(lval,a*x[i]);}"
 }
 
 extension StaticString : Hashable {

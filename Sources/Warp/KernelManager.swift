@@ -72,7 +72,8 @@ final class KernelManager {
         .computeCapability(self.device.computeCapability),
         .useFastMath,
         .disableWarnings,
-        .defineMacro("IDX(_X_)", as: "long long (_X_)=blockIdx.x*blockDim.x+threadIdx.x")
+        .defineMacro("ID(_X_)", as: "long long (_X_)=blockIdx.x*blockDim.x+threadIdx.x"),
+        .defineMacro("SIZE", as: "long long")
     ]
 
     /// Get a compiled functorial kernel, a.k.a. kernel with a transformation functor
@@ -162,7 +163,7 @@ final class KernelManager {
         let ptx = try! Compiler.compile(
             source.rawValue,
             options: commonCompileOptions +
-                [ .defineMacro("KERNEL", as: "extern \"C\" __global__ void \(source)") ] +
+                [ .defineMacro("KN", as: "extern \"C\" __global__ void \(source)") ] +
                 extraOptions
         )
         var module: Module!
