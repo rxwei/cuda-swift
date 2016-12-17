@@ -268,4 +268,8 @@ public struct KernelArgument {
         return self.init(pointer.deviceAddress)
     }
 
+    public static func value<T>(_ value: T) -> KernelArgument {
+        return self.init(value)
+    }
+
 }

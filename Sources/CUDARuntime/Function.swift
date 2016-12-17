@@ -131,7 +131,13 @@ public func >>>(lhs: (Int, Int, Int, Stream?), rhs: [KernelArgument]) -> (CUDARu
 }
 
 public extension KernelArgument {
+
     public static func pointer<T>(_ pointer: UnsafeMutableDevicePointer<T>) -> KernelArgument {
         return self.init(pointer.deviceAddress)
     }
+
+    public static func pointer<T>(_ pointer: UnsafeDevicePointer<T>) -> KernelArgument {
+        return self.init(pointer.deviceAddress)
+    }
+
 }
