@@ -14,7 +14,8 @@ let package = Package(
     ]
 )
 
-#if os(Linux) || os(macOS)
+/// Product specification works differently (more formally) in Swift 3.1+
+#if (os(Linux) || os(macOS)) && !swift(>=3.1)
 
 let dylib = Product(
     name: "CUDA",
