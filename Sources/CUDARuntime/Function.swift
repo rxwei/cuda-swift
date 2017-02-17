@@ -20,11 +20,15 @@ public struct Function {
 
     fileprivate let attributes: cudaFuncAttributes
 
-    public init(_ driverFunction: CUDADriver.Function) {
-        address = UnsafeRawPointer(driverFunction.withUnsafeHandle{$0})
+    public init!(unsafeAddress: UnsafeRawPointer!) {
+        self.address = unsafeAddress
         var attr = cudaFuncAttributes()
         !!cudaFuncGetAttributes(&attr, address)
         attributes = attr
+    }
+
+    public init(_ driverFunction: CUDADriver.Function) {
+        self.init(unsafeAddress: UnsafeRawPointer(driverFunction.withUnsafeHandle{$0}))
     }
 
     public var cachePreference: CachePreference = .none {

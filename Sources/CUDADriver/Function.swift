@@ -34,7 +34,11 @@ public struct Function : CHandleCarrier {
     init(_ handle: CUfunction) {
         self.handle = handle
     }
-    
+
+    public init!(unsafeAddress: UnsafeRawPointer!) {
+        self.init(CUfunction(unsafeAddress))
+    }
+
     public func withUnsafeHandle<Result>(_ body: (Handle) throws -> Result) rethrows -> Result {
         return try body(handle)
     }
