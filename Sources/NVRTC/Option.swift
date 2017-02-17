@@ -19,8 +19,10 @@ public enum CompileOption {
     case preciseSquareRoot(Bool)
     case preciseDivision(Bool)
     case contractIntoFMAD(Bool)
+    case defineStaticMacro(StaticString, as: StaticString?)
     case defineMacro(String, as: String?)
     case undefineMacro(String)
+    case undefineStaticMacro(StaticString)
     case includePath(String)
     case preincludeHeader(String)
     case cpp11
@@ -52,10 +54,17 @@ public enum CompileOption {
             return "--prec-div=\(prec)"
         case let .contractIntoFMAD(fmad):
             return "--fmad=\(fmad)"
-        case let .defineMacro(macro, as: x):
-            return x == nil ? "--define-macro=\(macro)"
-                            : "--define-macro=\(macro)=\(x!)"
+        case let .defineMacro(macro, as: nil):
+            return "--define-macro=\(macro)"
+        case let .defineMacro(macro, as: x?):
+            return "--define-macro=\(macro)=\(x)"
+        case let .defineStaticMacro(macro, as: nil):
+            return "--define-macro=\(macro)"
+        case let .defineStaticMacro(macro, as: x?):
+            return "--define-macro=\(macro)=\(x)"
         case let .undefineMacro(macro):
+            return "--undefine-macro=\(macro)"
+        case let .undefineStaticMacro(macro):
             return "--undefine-macro=\(macro)"
         case let .includePath(path):
             return "--include-path=\(path)"

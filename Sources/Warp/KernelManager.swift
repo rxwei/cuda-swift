@@ -96,7 +96,7 @@ final class KernelManager {
         }
         /// If not cached, compile using NVRTC
         let (module, function) = makeKernel(source, extraOptions: [
-            .defineMacro("TYPE", as: T.kernelDataType.rawValue),
+            .defineStaticMacro("TYPE", as: T.kernelDataType.rawValue),
             .defineMacro("FUNC", as: transformation.source(forType: T.self))
         ])
         modules[key] = (module, function)
@@ -122,7 +122,7 @@ final class KernelManager {
         /// If not cached, compile using NVRTC
         log("Loading CUDA kernel \'\(source) \(operation)\' for \(T.self)...\n")
         let (module, function) = makeKernel(source, extraOptions: [
-            .defineMacro("TYPE", as: T.kernelDataType.rawValue),
+            .defineStaticMacro("TYPE", as: T.kernelDataType.rawValue),
             .defineMacro("OP(_x_, _y_)", as: operation.source)
         ])
         modules[key] = (module, function)
@@ -144,7 +144,7 @@ final class KernelManager {
         /// If not cached, compile using NVRTC
         log("Loading CUDA kernel \'\(source)\' for \(T.self)...\n")
         let (module, function) = makeKernel(source, extraOptions: [
-            .defineMacro("TYPE", as: T.kernelDataType.rawValue)
+            .defineStaticMacro("TYPE", as: T.kernelDataType.rawValue)
         ])
         modules[key] = (module, function)
         return function

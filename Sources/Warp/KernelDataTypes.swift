@@ -22,7 +22,7 @@ public extension KernelArgument {
 
 }
 
-public enum KernelDataType : String {
+public enum KernelDataType : StaticString {
     case float            = "float"              // 32
     case double           = "double"             // 64
     case char             = "char"               // 8
