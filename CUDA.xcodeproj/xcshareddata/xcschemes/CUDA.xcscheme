@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_70"
-               BuildableName = "CuBLAS.framework"
-               BlueprintName = "CuBLAS"
+               BlueprintIdentifier = "OBJ_124"
+               BuildableName = "Warp.framework"
+               BlueprintName = "Warp"
                ReferencedContainer = "container:CUDA.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,35 +28,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_83"
-               BuildableName = "CUDADriver.framework"
-               BlueprintName = "CUDADriver"
-               ReferencedContainer = "container:CUDA.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_85"
-               BuildableName = "CUDARuntime.framework"
-               BlueprintName = "CUDARuntime"
-               ReferencedContainer = "container:CUDA.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_114"
+               BlueprintIdentifier = "OBJ_84"
                BuildableName = "NVRTC.framework"
                BlueprintName = "NVRTC"
                ReferencedContainer = "container:CUDA.xcodeproj">
@@ -70,9 +42,37 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_125"
-               BuildableName = "Warp.framework"
-               BlueprintName = "Warp"
+               BlueprintIdentifier = "OBJ_107"
+               BuildableName = "CuBLAS.framework"
+               BlueprintName = "CuBLAS"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_109"
+               BuildableName = "CUDARuntime.framework"
+               BlueprintName = "CUDARuntime"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_86"
+               BuildableName = "CUDADriver.framework"
+               BlueprintName = "CUDADriver"
                ReferencedContainer = "container:CUDA.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -88,37 +88,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_145"
-               BuildableName = "CuBLASTests.xctest"
-               BlueprintName = "CuBLASTests"
-               ReferencedContainer = "container:CUDA.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_158"
-               BuildableName = "CUDADriverTests.xctest"
-               BlueprintName = "CUDADriverTests"
-               ReferencedContainer = "container:CUDA.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_167"
-               BuildableName = "CUDARuntimeTests.xctest"
-               BlueprintName = "CUDARuntimeTests"
-               ReferencedContainer = "container:CUDA.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_178"
+               BlueprintIdentifier = "OBJ_74"
                BuildableName = "NVRTCTests.xctest"
                BlueprintName = "NVRTCTests"
                ReferencedContainer = "container:CUDA.xcodeproj">
@@ -128,9 +98,39 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_189"
+               BlueprintIdentifier = "OBJ_87"
+               BuildableName = "CUDADriverTests.xctest"
+               BlueprintName = "CUDADriverTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_96"
+               BuildableName = "CuBLASTests.xctest"
+               BlueprintName = "CuBLASTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_111"
                BuildableName = "WarpTests.xctest"
                BlueprintName = "WarpTests"
+               ReferencedContainer = "container:CUDA.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_176"
+               BuildableName = "CUDARuntimeTests.xctest"
+               BlueprintName = "CUDARuntimeTests"
                ReferencedContainer = "container:CUDA.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -151,9 +151,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "OBJ_70"
-            BuildableName = "CuBLAS.framework"
-            BlueprintName = "CuBLAS"
+            BlueprintIdentifier = "OBJ_124"
+            BuildableName = "Warp.framework"
+            BlueprintName = "Warp"
             ReferencedContainer = "container:CUDA.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

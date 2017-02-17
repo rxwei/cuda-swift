@@ -1,0 +1,12 @@
+{
+  "autoPin": true,
+  "pins": [
+    {
+      "package": "CCUDA",
+      "reason": null,
+      "repositoryURL": "https://github.com/rxwei/CCUDA",
+      "version": "1.5.0"
+    }
+  ],
+  "version": 1
+}
