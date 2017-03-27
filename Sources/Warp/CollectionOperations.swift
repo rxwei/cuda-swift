@@ -71,7 +71,7 @@ public enum BinaryOperation : SourceHashable {
     }
 }
 
-public extension DeviceCollection where Element : BLASDataProtocol & FloatingPoint {
+public extension DeviceCollection where Element : BLASDataProtocol & FloatingPoint, Index == Int, IndexDistance == Int {
 
     public func dotProduct(with other: Self) -> Element {
         precondition(count == other.count, "Array count mismatch");
@@ -88,7 +88,7 @@ public extension DeviceCollection where Element : BLASDataProtocol & FloatingPoi
 
 }
 
-public extension MutableDeviceCollection where Element : KernelDataProtocol {
+public extension MutableDeviceCollection where Element : KernelDataProtocol, Index == Int, IndexDistance == Int {
 
     public mutating func incrementElements(by x: Element) {
         let scalarRight = kernelManager.kernel(.scalarRight,
@@ -321,7 +321,7 @@ public extension MutableDeviceCollection where Element : KernelDataProtocol {
 
 }
 
-public extension MutableDeviceCollection where Element : KernelDataProtocol & FloatingPoint {
+public extension MutableDeviceCollection where Element : KernelDataProtocol & FloatingPoint, Index == Int, IndexDistance == Int {
 
     /// Assign the other array with transformation to self
     ///

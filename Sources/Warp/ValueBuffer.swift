@@ -19,8 +19,7 @@ protocol DeviceBufferProtocol : class {
 }
 
 protocol DeviceArrayViewingBufferProtocol : DeviceBufferProtocol {
-    init<ArrayBuffer: DeviceArrayBufferProtocol>(viewing other: ArrayBuffer, offsetBy offset: Int)
-        where ArrayBuffer.Element == Element
+    init<ArrayBuffer: DeviceArrayBufferProtocol>(viewing other: ArrayBuffer, offsetBy offset: Int) where ArrayBuffer.Element == Element, ArrayBuffer.Index == Int
 }
 
 final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
@@ -59,7 +58,7 @@ final class DeviceValueBuffer<Element> : DeviceArrayViewingBufferProtocol {
     }
 
     init<Buffer: DeviceArrayBufferProtocol>
-        (viewing arrayBuffer: Buffer, offsetBy offset: Int) where Buffer.Element == Element
+        (viewing arrayBuffer: Buffer, offsetBy offset: Buffer.Index) where Buffer.Element == Element, Buffer.Index == Int
     {
         device = arrayBuffer.device
         baseAddress = arrayBuffer.baseAddress.advanced(by: arrayBuffer.startIndex + offset)

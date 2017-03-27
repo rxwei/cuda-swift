@@ -25,7 +25,7 @@ protocol DeviceArrayBufferProtocol : DeviceBufferProtocol, MutableCollection, Ra
     subscript(i: Int) -> DeviceValueBuffer<Element> { get set }
 }
 
-extension DeviceArrayBufferProtocol {
+extension DeviceArrayBufferProtocol where Index == Int {
     init() {
         self.init(capacity: 0)
     }
