@@ -261,14 +261,14 @@
 		OBJ_59 /* Frameworks */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Frameworks; sourceTree = SOURCE_ROOT; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_60 /* Scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Scripts; sourceTree = SOURCE_ROOT; };
-		OBJ_64 /* NVRTCTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = NVRTCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_65 /* CUDADriverTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = CUDADriverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_66 /* CuBLASTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = CuBLASTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_67 /* WarpTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = WarpTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_64 /* NVRTCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = NVRTCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_65 /* CUDADriverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = CUDADriverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_66 /* CuBLASTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = CuBLASTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_67 /* WarpTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = WarpTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_68 /* Warp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Warp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_69 /* NVRTC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = NVRTC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_70 /* CuBLAS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CuBLAS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_71 /* CUDARuntimeTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = CUDARuntimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_71 /* CUDARuntimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = CUDARuntimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_72 /* CUDARuntime.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CUDARuntime.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_73 /* CUDADriver.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CUDADriver.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_9 /* CHandleCarrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CHandleCarrier.swift; sourceTree = "<group>"; };
@@ -454,7 +454,7 @@
 			path = Tests/WarpTests;
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -467,7 +467,6 @@
 				OBJ_61 /* Dependencies */,
 				OBJ_63 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_51 /* CuBLASTests */ = {
@@ -759,7 +758,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_63 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1011,7 +1010,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/WarpTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1038,7 +1037,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/WarpTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1251,7 +1250,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDARuntimeTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1278,7 +1277,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDARuntimeTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1473,7 +1472,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/NVRTCTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1500,7 +1499,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/NVRTCTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1527,7 +1526,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDADriverTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1554,7 +1553,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/CUDADriverTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1581,7 +1580,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/CuBLASTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
@@ -1608,7 +1607,7 @@
 					"$(SRCROOT)/.build/checkouts/CCUDA-8988933155084238823",
 				);
 				INFOPLIST_FILE = CUDA.xcodeproj/CuBLASTests_Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks @loader_path/Frameworks /usr/local/cuda/lib";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-L/usr/local/cuda/lib/",
